@@ -1,5 +1,6 @@
 using GGJ2024.Content;
 using GGJ2024.Systems;
+using MoonTools.ECS;
 using MoonWorks.Audio;
 
 namespace GGJ2024.Messages;
@@ -15,3 +16,4 @@ public readonly record struct PlayStaticSoundMessage(
 {
 	public AudioBuffer Sound => StaticAudio.Lookup(StaticSoundID);
 }
+

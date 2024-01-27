@@ -5,6 +5,7 @@ using MoonWorks.Graphics;
 using GGJ2024.Utility;
 using System.Collections.Generic;
 using System.Linq;
+using GGJ2024.Components;
 
 namespace GGJ2024.Systems;
 
@@ -79,7 +80,7 @@ public class Motion : MoonTools.ECS.System
         return new Rectangle(p.X + r.X, p.Y + r.Y, r.Width, r.Height);
     }
 
-    bool CheckCollision(Entity e, Rectangle rect)
+    (Entity other, bool hit) CheckCollision(Entity e, Rectangle rect)
     {
         RetrieveFromHash(rect);
 
@@ -93,16 +94,16 @@ public class Motion : MoonTools.ECS.System
 
                 if (rect.Intersects(otherRect))
                 {
-                    return true;
+                    return (other, true);
                 }
 
             }
         }
 
-        return false;
+        return (default, false);
     }
 
-    (bool hit, Position pos) SweepTest(Entity e)
+    Position SweepTest(Entity e)
     {
         var v = Get<Velocity>(e);
         var p = Get<Position>(e);
@@ -123,14 +124,22 @@ public class Motion : MoonTools.ECS.System
         bool xHit = false;
         bool yHit = false;
 
+        var (staticOther, staticHit) = CheckCollision(e, GetWorldRect(p, r));
+        if (staticHit && !Related<Colliding>(e, staticOther) && !Related<Colliding>(staticOther, e))
+            Relate(e, staticOther, new Colliding());
+
         foreach (var x in xEnum)
         {
             var newPos = new Position(x, p.Y);
             var rect = GetWorldRect(newPos, r);
 
-            xHit = CheckCollision(e, rect);
+            (var other, var hit) = CheckCollision(e, rect);
+            if (!Related<Colliding>(e, other) && !Related<Colliding>(other, e))
+                Relate(e, other, new Colliding());
 
-            if (xHit) break;
+            xHit = hit;
+
+            if (xHit && Has<Solid>(other)) break;
 
             outX = x;
         }
@@ -140,14 +149,18 @@ public class Motion : MoonTools.ECS.System
             var newPos = new Position(p.X, y);
             var rect = GetWorldRect(newPos, r);
 
-            yHit = CheckCollision(e, rect);
+            (var other, var hit) = CheckCollision(e, rect);
+            yHit = hit;
 
-            if (yHit) break;
+            if (!Related<Colliding>(e, other) && !Related<Colliding>(other, e))
+                Relate(e, other, new Colliding());
+
+            if (yHit && Has<Solid>(other)) break;
 
             outY = y;
         }
 
-        return (xHit || yHit, new Position(outX, outY));
+        return new Position(outX, outY);
     }
 
     public override void Update(TimeSpan delta)
@@ -155,17 +168,28 @@ public class Motion : MoonTools.ECS.System
         ClearSpatialHash();
 
         foreach (var entity in RectFilter.Entities)
+        {
+            if (HasOutRelation<Colliding>(entity))
+            {
+                foreach (var o in OutRelations<Colliding>(entity))
+                    Unrelate<Colliding>(entity, o);
+            }
+
+            if (HasInRelation<Holding>(entity))
+                continue;
+
             AddToHash(entity);
+        }
 
         foreach (var entity in VelocityFilter.Entities)
         {
             var pos = Get<Position>(entity);
             var vel = (Vector2)Get<Velocity>(entity);
 
-            if (Has<Rectangle>(entity) && vel.LengthSquared() > 0)
+            if (Has<Rectangle>(entity))
             {
                 var result = SweepTest(entity);
-                Set(entity, result.pos);
+                Set(entity, result);
             }
             else
                 Set(entity, pos + vel);

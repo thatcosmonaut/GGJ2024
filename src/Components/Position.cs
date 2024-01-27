@@ -39,9 +39,9 @@ public readonly record struct Position
         return new Position(a.RealPosition + b.RealPosition);
     }
 
-    public static Position operator -(Position a, Position b)
+    public static Vector2 operator -(Position a, Position b)
     {
-        return new Position(a.RealPosition - b.RealPosition);
+        return a.RealPosition - b.RealPosition;
     }
 
     public static Position operator +(Position a, Vector2 b)
@@ -49,8 +49,4 @@ public readonly record struct Position
         return new Position(a.RealPosition + b);
     }
 
-    public static Position operator -(Position a, Vector2 b)
-    {
-        return new Position(a.RealPosition - b);
-    }
 }

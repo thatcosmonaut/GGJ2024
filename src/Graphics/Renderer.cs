@@ -86,8 +86,9 @@ public class Renderer : MoonTools.ECS.Renderer
 				var position = Get<Position>(entity);
 				var rectangle = Get<Rectangle>(entity);
 				var orientation = Has<Orientation>(entity) ? Get<Orientation>(entity).Angle : 0.0f;
+				var color = Has<Color>(entity) ? Get<Color>(entity) : Color.White;
 
-				SpriteBatch.Add(new Vector3(position.X, position.Y, -1.0f), orientation, new Vector2(rectangle.Width, rectangle.Height), Color.White, new Vector2(0, 0), new Vector2(1, 1));
+				SpriteBatch.Add(new Vector3(position.X, position.Y, -1.0f), orientation, new Vector2(rectangle.Width, rectangle.Height), color, new Vector2(0, 0), new Vector2(1, 1));
 			}
 
 			if (RectangleFilter.Count > 0)

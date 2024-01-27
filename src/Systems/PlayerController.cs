@@ -25,6 +25,8 @@ public class PlayerController : MoonTools.ECS.System
         {
             var player = Get<Player>(entity).Index;
             var velocity = Vector2.Zero;
+            if (Has<TryHold>(entity))
+                Remove<TryHold>(entity);
 
             foreach (var action in ReadMessages<Action>())
             {
@@ -37,6 +39,11 @@ public class PlayerController : MoonTools.ECS.System
                     else if (action.ActionType == Actions.MoveY)
                     {
                         velocity.Y += action.Value;
+                    }
+
+                    if (action.ActionType == Actions.Interact && action.ActionState == ActionState.Pressed)
+                    {
+                        Set(entity, new TryHold());
                     }
                 }
             }
