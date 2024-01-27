@@ -2,6 +2,9 @@ using MoonWorks.Math.Float;
 
 public readonly record struct Velocity
 {
+    public static Velocity Zero = new Velocity(0f, 0f);
+    public static Velocity One = new Velocity(1f, 1f);
+
     private readonly Vector2 Value;
 
     public readonly float X
@@ -20,6 +23,17 @@ public readonly record struct Velocity
         }
     }
 
+    public Velocity(Vector2 v)
+    {
+        Value = v;
+    }
+
+    public Velocity(float x, float y)
+    {
+        Value = new Vector2(x, y);
+    }
+
     public static implicit operator Vector2(Velocity v) => v.Value;
+
 
 }
