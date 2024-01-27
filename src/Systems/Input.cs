@@ -5,6 +5,7 @@ using GGJ2024.Messages;
 using GGJ2024.Utility;
 using System.Text;
 using GGJ2024.Components;
+using GGJ2024.Content;
 
 namespace GGJ2024.Systems;
 
@@ -116,6 +117,10 @@ public class Input : MoonTools.ECS.System
 
     public override void Update(System.TimeSpan delta)
     {
+		if (Inputs.Keyboard.IsPressed(KeyCode.A))
+		{
+			Send(new PlayStaticSoundMessage(StaticAudio.AirHorn));
+		}
 
         foreach (var player in PlayerFilter.Entities)
         {

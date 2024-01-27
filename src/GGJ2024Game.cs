@@ -3,6 +3,7 @@ using MoonWorks;
 using MoonTools.ECS;
 using GGJ2024.Systems;
 using MoonWorks.Math.Float;
+using GGJ2024.Content;
 
 namespace GGJ2024
 {
@@ -12,6 +13,7 @@ namespace GGJ2024
 		World World = new World();
 		Input Input;
 		Motion Motion;
+		Audio Audio;
 
 		public GGJ2024Game(
 			WindowCreateInfo windowCreateInfo,
@@ -19,8 +21,12 @@ namespace GGJ2024
 			bool debugMode
 		) : base(windowCreateInfo, frameLimiterSettings, 60, debugMode)
 		{
+			StaticAudioPacks.LoadAll(AudioDevice);
+			StaticAudio.LoadAll();
+
 			Input = new Input(World, Inputs);
 			Motion = new Motion(World);
+			Audio = new Audio(World, AudioDevice);
 			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
 
 			var rect = World.CreateEntity();
@@ -37,6 +43,9 @@ namespace GGJ2024
 		{
 			Input.Update(dt);
 			Motion.Update(dt);
+			Audio.Update(dt);
+
+			World.FinishUpdate();
 		}
 
 		protected override void Draw(double alpha)
