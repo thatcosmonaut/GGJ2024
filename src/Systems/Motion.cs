@@ -139,7 +139,7 @@ public class Motion : MoonTools.ECS.System
 
             xHit = hit;
 
-            if (xHit && Has<Solid>(other)) break;
+            if (xHit && Has<Solid>(other) && Has<Solid>(e)) break;
 
             outX = x;
         }
@@ -155,7 +155,7 @@ public class Motion : MoonTools.ECS.System
             if (!Related<Colliding>(e, other) && !Related<Colliding>(other, e))
                 Relate(e, other, new Colliding());
 
-            if (yHit && Has<Solid>(other)) break;
+            if (yHit && Has<Solid>(other) && Has<Solid>(e)) break;
 
             outY = y;
         }

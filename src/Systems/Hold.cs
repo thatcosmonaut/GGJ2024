@@ -11,6 +11,7 @@ public class Hold : MoonTools.ECS.System
 {
     MoonTools.ECS.Filter TryHoldFilter;
     MoonTools.ECS.Filter CanHoldFilter;
+    float HoldSpeed = 32.0f;
 
     public Hold(World world) : base(world)
     {
@@ -67,7 +68,7 @@ public class Hold : MoonTools.ECS.System
         }
     }
 
-    void SetHoldVelocity(Entity e)
+    void SetHoldVelocity(Entity e, float dt)
     {
         var holding = OutRelationSingleton<Holding>(e);
         var holdingPos = Get<Position>(holding);
@@ -75,7 +76,7 @@ public class Hold : MoonTools.ECS.System
 
         var vel = holderPos - holdingPos;
 
-        Set(holding, new Velocity(vel));
+        Set(holding, new Velocity(vel * HoldSpeed * dt));
     }
 
     public override void Update(TimeSpan delta)
@@ -86,7 +87,7 @@ public class Hold : MoonTools.ECS.System
                 HoldOrDrop(e);
 
             if (HasOutRelation<Holding>(e))
-                SetHoldVelocity(e);
+                SetHoldVelocity(e, (float)delta.TotalSeconds);
 
         }
 
