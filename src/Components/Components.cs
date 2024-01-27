@@ -1,7 +1,3 @@
-using GGJ2024.Data;
-using MoonWorks.Graphics;
-using MoonWorks.Math.Float;
-
 namespace GGJ2024.Components;
 
 public readonly record struct Player(int Index);

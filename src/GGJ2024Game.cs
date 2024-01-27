@@ -29,6 +29,7 @@ namespace GGJ2024
 		{
 			StaticAudioPacks.LoadAll(AudioDevice);
 			StaticAudio.LoadAll();
+			Fonts.LoadAll(GraphicsDevice);
 
 			Input = new Input(World, Inputs);
 			Motion = new Motion(World);
@@ -50,6 +51,13 @@ namespace GGJ2024
 			World.Set(player, Color.Green);
 
 
+			var rect2 = World.CreateEntity();
+			World.Set(rect2, new Position(Dimensions.GAME_W * 0.5f, (Dimensions.GAME_H * 0.5f) - 64));
+			World.Set(rect2, new Rectangle(0, 0, 128, 128));
+
+			var text = World.CreateEntity();
+			World.Set(text, new Position(10, 10));
+			World.Set(text, new Text(Fonts.KosugiID, 50, "I LOVE GROCERIES!", MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 		}
 
 		protected override void Update(System.TimeSpan dt)
