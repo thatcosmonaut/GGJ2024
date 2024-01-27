@@ -201,19 +201,19 @@ public class Renderer : MoonTools.ECS.Renderer
 	}
 
 	private TextBatch AcquireTextBatch()
+	{
+		if (BatchPool.Count > 0)
 		{
-			if (BatchPool.Count > 0)
-			{
-				return BatchPool.Dequeue();
-			}
-			else
-			{
-				return new TextBatch(GraphicsDevice);
-			}
+			return BatchPool.Dequeue();
 		}
+		else
+		{
+			return new TextBatch(GraphicsDevice);
+		}
+	}
 
-		private void FreeTextBatch(TextBatch batch)
-		{
-			BatchPool.Enqueue(batch);
-		}
+	private void FreeTextBatch(TextBatch batch)
+	{
+		BatchPool.Enqueue(batch);
+	}
 }

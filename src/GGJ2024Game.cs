@@ -58,6 +58,14 @@ namespace GGJ2024
 			var timer = World.CreateEntity();
 			World.Set(timer, new GameTimer(260));
 			World.Set(timer, new Position(Dimensions.GAME_W / 2, Dimensions.GAME_H * 3 / 4));
+
+			var rect2 = World.CreateEntity();
+			World.Set(rect2, new Position(Dimensions.GAME_W * 0.5f, (Dimensions.GAME_H * 0.5f) - 64));
+			World.Set(rect2, new Rectangle(0, 0, 128, 128));
+
+			var text = World.CreateEntity();
+			World.Set(text, new Position(10, 10));
+			World.Set(text, new Text(Fonts.KosugiID, 50, "I LOVE GROCERIES!", MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 		}
 
 		protected override void Update(System.TimeSpan dt)
