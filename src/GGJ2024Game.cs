@@ -17,8 +17,8 @@ namespace GGJ2024
 			bool debugMode
 		) : base(windowCreateInfo, frameLimiterSettings, 60, debugMode)
 		{
-			Renderer = new Renderer(GraphicsDevice);
 			Input = new Input(World, Inputs);
+			Renderer = new Renderer(GraphicsDevice, MainWindow.SwapchainFormat);
 		}
 
 		protected override void Update(System.TimeSpan dt)
@@ -28,21 +28,7 @@ namespace GGJ2024
 
 		protected override void Draw(double alpha)
 		{
-			// Replace this with your own drawing code.
-
-			var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
-			var swapchainTexture = commandBuffer.AcquireSwapchainTexture(MainWindow);
-
-			if (swapchainTexture != null)
-			{
-				commandBuffer.BeginRenderPass(
-					new ColorAttachmentInfo(swapchainTexture, Color.CornflowerBlue)
-				);
-
-				commandBuffer.EndRenderPass();
-			}
-
-			GraphicsDevice.Submit(commandBuffer);
+			Renderer.Render(MainWindow);
 		}
 
 		protected override void Destroy()
