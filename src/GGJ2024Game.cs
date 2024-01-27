@@ -24,8 +24,13 @@ namespace GGJ2024
 			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
 
 			var rect = World.CreateEntity();
-			World.Set(rect, new Position(0f, 0f));
+			World.Set(rect, new Position(0f, Dimensions.GAME_H * 0.5f));
 			World.Set(rect, new Rectangle(0, 0, 16, 16));
+			World.Set(rect, new Velocity(Vector2.UnitX));
+
+			var rect2 = World.CreateEntity();
+			World.Set(rect2, new Position(Dimensions.GAME_W * 0.5f, (Dimensions.GAME_H * 0.5f) - 64));
+			World.Set(rect2, new Rectangle(0, 0, 128, 128));
 		}
 
 		protected override void Update(System.TimeSpan dt)
