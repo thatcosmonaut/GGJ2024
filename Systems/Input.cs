@@ -208,7 +208,7 @@ public class Input : MoonTools.ECS.System
 
                 if (System.MathF.Abs(value) > 0.0f)
                 {
-                    Send(new Action(value, action, ActionStates[action]));
+                    Send(new Action(value, action, ActionStates[action], Get<Player>(player).Index));
                 }
             }
         }

@@ -23,7 +23,7 @@ namespace GGJ2024
 
 		protected override void Update(System.TimeSpan dt)
 		{
-			// Insert your game update logic here.
+			Input.Update(dt);
 		}
 
 		protected override void Draw(double alpha)
