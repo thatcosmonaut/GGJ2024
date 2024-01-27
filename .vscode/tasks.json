@@ -20,6 +20,21 @@
     "panel": "shared"
   },
   "tasks": [
+	{
+		"label": "Build & Run With Hot Reload: .NET 8 Debug",
+		"command": "dotnet",
+		"args": [
+			"watch",
+			"--project",
+			"${workspaceFolder}/GGJ2024.csproj"
+		],
+		"type": "process",
+		"group": {
+			"kind": "build",
+			"isDefault": true
+		},
+		"problemMatcher": []
+	},
     {
       "label": "Build & Run: .NET 8 Debug",
       "type": "shell",

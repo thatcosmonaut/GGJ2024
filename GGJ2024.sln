@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentProcessor", "Content
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentBuilderUI", "ContentBuilder\ContentBuilderUI\ContentBuilderUI.csproj", "{2479F398-6EC6-4B95-8C49-A4AE52C2636B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoonTools.ECS", "lib\MoonTools.ECS\MoonTools.ECS.csproj", "{6F46FB0D-EBE7-4A92-9775-0C549CDC3237}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -68,9 +70,14 @@ Global
 		{2479F398-6EC6-4B95-8C49-A4AE52C2636B}.Debug|x64.Build.0 = Debug|Any CPU
 		{2479F398-6EC6-4B95-8C49-A4AE52C2636B}.Release|x64.ActiveCfg = Release|Any CPU
 		{2479F398-6EC6-4B95-8C49-A4AE52C2636B}.Release|x64.Build.0 = Release|Any CPU
+		{6F46FB0D-EBE7-4A92-9775-0C549CDC3237}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6F46FB0D-EBE7-4A92-9775-0C549CDC3237}.Debug|x64.Build.0 = Debug|Any CPU
+		{6F46FB0D-EBE7-4A92-9775-0C549CDC3237}.Release|x64.ActiveCfg = Release|Any CPU
+		{6F46FB0D-EBE7-4A92-9775-0C549CDC3237}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C5151014-CCB4-4E08-BDC5-F44A5B6BB8CF} = {763A4471-1416-4F2C-916D-58E57A275B81}
 		{2479F398-6EC6-4B95-8C49-A4AE52C2636B} = {763A4471-1416-4F2C-916D-58E57A275B81}
+		{6F46FB0D-EBE7-4A92-9775-0C549CDC3237} = {05DE4CC0-C7B2-4C1B-8A1B-0CCF6CAC6165}
 	EndGlobalSection
 EndGlobal
