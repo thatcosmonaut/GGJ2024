@@ -41,7 +41,6 @@ public class Hold : MoonTools.ECS.System
             {
                 if (Has<CanBeHeld>(o))
                 {
-                    Set(o, Color.Yellow);
                     holding = true;
                     Relate(e, o, new Holding());
                 }
@@ -62,7 +61,6 @@ public class Hold : MoonTools.ECS.System
         else
         {
             var holding = OutRelationSingleton<Holding>(e);
-            Remove<Color>(holding);
             Remove<Velocity>(holding);
             UnrelateAll<Holding>(e);
         }

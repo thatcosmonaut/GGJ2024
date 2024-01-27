@@ -104,6 +104,12 @@ public static class Rando
         return arr[index];
     }
 
+    public static T GetRandomItem<T>(this Array arr)
+    {
+        var index = Int(0, arr.Length);
+        return (T)arr.GetValue(index);
+    }
+
     public static T GetRandomItemWeighted<T>(this SortedDictionary<int, T[]> dict)
     {
         var total = 0;

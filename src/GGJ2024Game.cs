@@ -6,6 +6,7 @@ using MoonWorks.Math.Float;
 using GGJ2024.Content;
 using GGJ2024.Components;
 using GGJ2024.Utility;
+using GGJ2024.Data;
 
 namespace GGJ2024
 {
@@ -28,7 +29,6 @@ namespace GGJ2024
 			StaticAudioPacks.LoadAll(AudioDevice);
 			StaticAudio.LoadAll();
 
-
 			Input = new Input(World, Inputs);
 			Motion = new Motion(World);
 			Audio = new Audio(World, AudioDevice);
@@ -36,6 +36,7 @@ namespace GGJ2024
 			Hold = new Hold(World);
 			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
 
+			CategoriesAndIngredients.Initialize(World);
 
 			var player = World.CreateEntity();
 			World.Set(player, new Position(0f, Dimensions.GAME_H * 0.5f));
@@ -45,15 +46,14 @@ namespace GGJ2024
 			World.Set(player, new Solid());
 			World.Set(player, Color.Green);
 
+			Product product = new Product(World);
+
 			for (var i = 0; i < 30; i++)
 			{
-				var product = World.CreateEntity();
-				World.Set(product, new Position(
+				product.SpawnProduct(new Position(
 					Rando.IntInclusive(0, Dimensions.GAME_W),
 					Rando.IntInclusive(0, Dimensions.GAME_H)
 				));
-				World.Set(product, new Rectangle(0, 0, 16, 16));
-				World.Set(product, new CanBeHeld());
 			}
 
 		}
