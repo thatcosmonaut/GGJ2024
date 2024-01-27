@@ -26,6 +26,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="lib\MoonWorks\MoonWorks.csproj" />
+		<ProjectReference Include="MoonTools.ECS\MoonTools.ECS.csproj" />
 	</ItemGroup>
 
 	<Import Project=".\CopyMoonlibs.targets" />

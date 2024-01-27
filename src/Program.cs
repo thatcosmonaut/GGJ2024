@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using MoonWorks;
+using MoonTools.ECS;
 
 namespace GGJ2024
 {
@@ -26,9 +27,9 @@ namespace GGJ2024
 
 			var debugMode = false;
 
-			#if DEBUG
+#if DEBUG
 			debugMode = true;
-			#endif
+#endif
 
 			GGJ2024Game game = new GGJ2024Game(
 				windowCreateInfo,

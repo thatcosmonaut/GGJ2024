@@ -1,3 +1,6 @@
 [submodule "lib/MoonWorks"]
 	path = lib/MoonWorks
 	url = https://gitea.moonside.games/MoonsideGames/MoonWorks.git
+[submodule "MoonTools.ECS"]
+	path = MoonTools.ECS
+	url = https://gitea.moonside.games/MoonsideGames/MoonTools.ECS
