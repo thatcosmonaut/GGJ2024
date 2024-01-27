@@ -3,6 +3,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MoonWorks;
 using MoonTools.ECS;
+using GGJ2024.Systems;
+using GGJ2024.Components;
 
 namespace GGJ2024
 {
