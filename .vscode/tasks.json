@@ -1,0 +1,116 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "cwd": "${workspaceRoot}"
+  },
+  "windows": {
+    "options": {
+      "shell": {
+        "executable": "cmd.exe",
+        "args": [
+          "/d",
+          "/c"
+        ]
+      }
+    }
+  },
+  "presentation": {
+    "reveal": "always",
+    "focus": true,
+    "panel": "shared"
+  },
+  "tasks": [
+    {
+      "label": "Build & Run: .NET 8 Debug",
+      "type": "shell",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Build: .NET 8 Debug",
+        "Run: .NET 8 Debug"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build: .NET 8 Debug",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "./GGJ2024.csproj",
+        "-p:SolutionDir=${workspaceFolder}/"
+      ],
+      "type": "shell",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run: .NET 8 Debug",
+      "command": "GGJ2024",
+      "windows": {
+		"command": "GGJ2024.exe"
+	  },
+      "options": {
+        "cwd": "${workspaceFolder}/bin/Debug/net8.0"
+      },
+      "type": "process",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build: .NET 8 Release",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "./GGJ2024.csproj",
+        "--configuration",
+        "Release",
+        "-p:SolutionDir=${workspaceFolder}/"
+      ],
+      "type": "shell",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run: .NET 8 Release",
+      "command": "GGJ2024",
+      "windows": {
+        "command": "GGJ2024.exe"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/bin/Release/net8.0"
+      },
+      "type": "process",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build & Run: .NET 8 Release",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Build: .NET 8 Release",
+        "Run: .NET 8 Release"
+      ],
+      "type": "shell",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GGJ2024", "GGJ2024.csproj", "{97E72043-6EBC-44D6-9997-58FB67ADEA34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoonWorks", "lib\MoonWorks\MoonWorks.csproj", "{6411BD60-AFCC-4EAE-A0DF-B4BFA8152210}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dav1dfile-CS", "lib\MoonWorks\lib\dav1dfile\csharp\dav1dfile-CS.csproj", "{EC6BDFF6-5005-4B3F-887B-1190F923E704}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FAudio-CS.Core", "lib\MoonWorks\lib\FAudio\csharp\FAudio-CS.Core.csproj", "{B4C3E993-0E28-43F7-82C1-53E0652BC733}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefreshCS", "lib\MoonWorks\lib\RefreshCS\RefreshCS.csproj", "{923167E1-4F84-472C-B538-D179A303DA72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDL2-CS.Core", "lib\MoonWorks\lib\SDL2-CS\SDL2-CS.Core.csproj", "{C8695E96-F1ED-4F06-BD1C-A7C168E2DB2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WellspringCS", "lib\MoonWorks\lib\WellspringCS\WellspringCS.csproj", "{EE5CD8A3-D454-4AB4-BB4A-47051379C15A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{97E72043-6EBC-44D6-9997-58FB67ADEA34}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{97E72043-6EBC-44D6-9997-58FB67ADEA34}.Debug|x64.Build.0 = Debug|Any CPU
+		{97E72043-6EBC-44D6-9997-58FB67ADEA34}.Release|x64.ActiveCfg = Release|Any CPU
+		{97E72043-6EBC-44D6-9997-58FB67ADEA34}.Release|x64.Build.0 = Release|Any CPU
+		{6411BD60-AFCC-4EAE-A0DF-B4BFA8152210}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6411BD60-AFCC-4EAE-A0DF-B4BFA8152210}.Debug|x64.Build.0 = Debug|Any CPU
+		{6411BD60-AFCC-4EAE-A0DF-B4BFA8152210}.Release|x64.ActiveCfg = Release|Any CPU
+		{6411BD60-AFCC-4EAE-A0DF-B4BFA8152210}.Release|x64.Build.0 = Release|Any CPU
+		{EC6BDFF6-5005-4B3F-887B-1190F923E704}.Debug|x64.ActiveCfg = Debug|x64
+		{EC6BDFF6-5005-4B3F-887B-1190F923E704}.Debug|x64.Build.0 = Debug|x64
+		{EC6BDFF6-5005-4B3F-887B-1190F923E704}.Release|x64.ActiveCfg = Release|x64
+		{EC6BDFF6-5005-4B3F-887B-1190F923E704}.Release|x64.Build.0 = Release|x64
+		{B4C3E993-0E28-43F7-82C1-53E0652BC733}.Debug|x64.ActiveCfg = Debug|x64
+		{B4C3E993-0E28-43F7-82C1-53E0652BC733}.Debug|x64.Build.0 = Debug|x64
+		{B4C3E993-0E28-43F7-82C1-53E0652BC733}.Release|x64.ActiveCfg = Release|x64
+		{B4C3E993-0E28-43F7-82C1-53E0652BC733}.Release|x64.Build.0 = Release|x64
+		{923167E1-4F84-472C-B538-D179A303DA72}.Debug|x64.ActiveCfg = Debug|x64
+		{923167E1-4F84-472C-B538-D179A303DA72}.Debug|x64.Build.0 = Debug|x64
+		{923167E1-4F84-472C-B538-D179A303DA72}.Release|x64.ActiveCfg = Release|x64
+		{923167E1-4F84-472C-B538-D179A303DA72}.Release|x64.Build.0 = Release|x64
+		{C8695E96-F1ED-4F06-BD1C-A7C168E2DB2A}.Debug|x64.ActiveCfg = Debug|x64
+		{C8695E96-F1ED-4F06-BD1C-A7C168E2DB2A}.Debug|x64.Build.0 = Debug|x64
+		{C8695E96-F1ED-4F06-BD1C-A7C168E2DB2A}.Release|x64.ActiveCfg = Release|x64
+		{C8695E96-F1ED-4F06-BD1C-A7C168E2DB2A}.Release|x64.Build.0 = Release|x64
+		{EE5CD8A3-D454-4AB4-BB4A-47051379C15A}.Debug|x64.ActiveCfg = Debug|x64
+		{EE5CD8A3-D454-4AB4-BB4A-47051379C15A}.Debug|x64.Build.0 = Debug|x64
+		{EE5CD8A3-D454-4AB4-BB4A-47051379C15A}.Release|x64.ActiveCfg = Release|x64
+		{EE5CD8A3-D454-4AB4-BB4A-47051379C15A}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach to .NET 8 Debugger",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build: .NET 8 Debug",
+      "program": "${workspaceFolder}/bin/Debug/net8.0/GGJ2024.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/bin/Debug/net8.0",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}

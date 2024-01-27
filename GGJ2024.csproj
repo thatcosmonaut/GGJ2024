@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType Condition="'$(Configuration)' == 'Debug'">Exe</OutputType>
+		<OutputType Condition="'$(Configuration)' == 'Release'">WinExe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<TargetName>GGJ2024</TargetName>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+		<StartupObject>GGJ2024.Program</StartupObject>
+		<AssemblyName>GGJ2024</AssemblyName>
+		<RootNamespace>GGJ2024</RootNamespace>
+		<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<ApplicationIcon />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Include="Content\**\*.*">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<PropertyGroup>
+		<DefaultItemExcludes>$(DefaultItemExcludes);lib\**\*</DefaultItemExcludes>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="lib\MoonWorks\MoonWorks.csproj" />
+	</ItemGroup>
+
+	<Import Project=".\CopyMoonlibs.targets" />
+</Project>
