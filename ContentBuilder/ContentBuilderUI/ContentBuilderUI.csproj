@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<TargetName>ContentBuilderUI</TargetName>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+		<StartupObject>ContentBuilderUI.Program</StartupObject>
+		<AssemblyName>ContentBuilderUI</AssemblyName>
+		<RootNamespace>ContentBuilderUI</RootNamespace>
+		<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<ApplicationIcon>hammer-icon.ico</ApplicationIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Include="Content\**\*.*">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<PropertyGroup>
+		<DefaultItemExcludes>$(DefaultItemExcludes);lib\**\*</DefaultItemExcludes>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ContentProcessor\ContentProcessor.csproj" />
+		<ProjectReference Include="lib\ImGui.NET\ImGui.NET.csproj" />
+		<ProjectReference Include="..\..\lib\MoonWorks\MoonWorks.csproj" />
+	</ItemGroup>
+
+	<Import Project=".\CopyMoonlibs.targets" />
+</Project>

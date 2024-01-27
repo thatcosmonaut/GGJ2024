@@ -11,14 +11,14 @@ public class SpriteBatch
 
 	public uint InstanceCount => Index;
 
-	Buffer BatchBuffer;
+	Buffer InstanceBuffer;
 	Buffer QuadVertexBuffer;
 	Buffer QuadIndexBuffer;
 
 	public unsafe SpriteBatch(GraphicsDevice graphicsDevice)
 	{
 		GraphicsDevice = graphicsDevice;
-		BatchBuffer = Buffer.Create<SpriteInstanceData>(GraphicsDevice, BufferUsageFlags.Vertex, 1024);
+		InstanceBuffer = Buffer.Create<SpriteInstanceData>(GraphicsDevice, BufferUsageFlags.Vertex, 1024);
 		InstanceDatas = new SpriteInstanceData[1024];
 		Index = 0;
 
@@ -77,7 +77,7 @@ public class SpriteBatch
 	// Call this outside of render pass
 	public void Upload(CommandBuffer commandBuffer)
 	{
-		commandBuffer.SetBufferData(BatchBuffer, InstanceDatas, 0, 0, Index);
+		commandBuffer.SetBufferData(InstanceBuffer, InstanceDatas, 0, 0, Index);
 	}
 
 	// Call this inside of render pass
@@ -87,7 +87,7 @@ public class SpriteBatch
 		commandBuffer.BindFragmentSamplers(new TextureSamplerBinding(texture, sampler));
 		commandBuffer.BindVertexBuffers(
 			new BufferBinding(QuadVertexBuffer, 0),
-			new BufferBinding(BatchBuffer, 0)
+			new BufferBinding(InstanceBuffer, 0)
 		);
 		commandBuffer.BindIndexBuffer(QuadIndexBuffer, IndexElementSize.Sixteen);
 		var vertParamOffset = commandBuffer.PushVertexShaderUniforms(viewProjectionMatrices);

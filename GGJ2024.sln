@@ -17,6 +17,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDL2-CS.Core", "lib\MoonWor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WellspringCS", "lib\MoonWorks\lib\WellspringCS\WellspringCS.csproj", "{EE5CD8A3-D454-4AB4-BB4A-47051379C15A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ContentBuilder", "ContentBuilder", "{763A4471-1416-4F2C-916D-58E57A275B81}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentProcessor", "ContentBuilder\ContentProcessor\ContentProcessor.csproj", "{C5151014-CCB4-4E08-BDC5-F44A5B6BB8CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentBuilderUI", "ContentBuilder\ContentBuilderUI\ContentBuilderUI.csproj", "{2479F398-6EC6-4B95-8C49-A4AE52C2636B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -54,5 +60,17 @@ Global
 		{EE5CD8A3-D454-4AB4-BB4A-47051379C15A}.Debug|x64.Build.0 = Debug|x64
 		{EE5CD8A3-D454-4AB4-BB4A-47051379C15A}.Release|x64.ActiveCfg = Release|x64
 		{EE5CD8A3-D454-4AB4-BB4A-47051379C15A}.Release|x64.Build.0 = Release|x64
+		{C5151014-CCB4-4E08-BDC5-F44A5B6BB8CF}.Debug|x64.ActiveCfg = Debug|x64
+		{C5151014-CCB4-4E08-BDC5-F44A5B6BB8CF}.Debug|x64.Build.0 = Debug|x64
+		{C5151014-CCB4-4E08-BDC5-F44A5B6BB8CF}.Release|x64.ActiveCfg = Release|x64
+		{C5151014-CCB4-4E08-BDC5-F44A5B6BB8CF}.Release|x64.Build.0 = Release|x64
+		{2479F398-6EC6-4B95-8C49-A4AE52C2636B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2479F398-6EC6-4B95-8C49-A4AE52C2636B}.Debug|x64.Build.0 = Debug|Any CPU
+		{2479F398-6EC6-4B95-8C49-A4AE52C2636B}.Release|x64.ActiveCfg = Release|Any CPU
+		{2479F398-6EC6-4B95-8C49-A4AE52C2636B}.Release|x64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C5151014-CCB4-4E08-BDC5-F44A5B6BB8CF} = {763A4471-1416-4F2C-916D-58E57A275B81}
+		{2479F398-6EC6-4B95-8C49-A4AE52C2636B} = {763A4471-1416-4F2C-916D-58E57A275B81}
 	EndGlobalSection
 EndGlobal

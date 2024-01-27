@@ -5,6 +5,11 @@
 
 moonlibs/
 
+Content/
+src/Generated
+
+imgui.ini
+
 # User-specific files
 *.rsuser
 *.suo
