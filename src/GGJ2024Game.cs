@@ -5,13 +5,15 @@ namespace GGJ2024
 {
 	class GGJ2024Game : Game
 	{
+		Renderer Renderer;
+
 		public GGJ2024Game(
 			WindowCreateInfo windowCreateInfo,
 			FrameLimiterSettings frameLimiterSettings,
 			bool debugMode
 		) : base(windowCreateInfo, frameLimiterSettings, 60, debugMode)
 		{
-			// Insert your game initialization logic here.
+			Renderer = new Renderer(GraphicsDevice);
 		}
 
 		protected override void Update(System.TimeSpan dt)
