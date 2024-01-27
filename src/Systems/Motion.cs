@@ -3,6 +3,7 @@ using MoonWorks.Math.Float;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
 using GGJ2024.Utility;
+using System.Collections.Generic;
 
 namespace GGJ2024.Systems;
 
@@ -11,10 +12,62 @@ public class Motion : MoonTools.ECS.System
     MoonTools.ECS.Filter VelocityFilter;
     MoonTools.ECS.Filter RectFilter;
 
+    Dictionary<(int, int), HashSet<Entity>> SpatialHash = new();
+    const int CellSize = 32;
+
     public Motion(World world) : base(world)
     {
         VelocityFilter = FilterBuilder.Include<Position>().Include<Velocity>().Build();
         RectFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Build();
+    }
+
+    void ClearSpatialHash()
+    {
+        //don't remove the hashsets/clear the dict, we'll reuse them so we don't have to pressure the GC
+        foreach (var (k, v) in SpatialHash)
+        {
+            SpatialHash[k].Clear();
+        }
+    }
+
+    (int, int) GetHashKey(int x, int y)
+    {
+        return (x / CellSize, y / CellSize);
+    }
+
+    void AddToHash(Entity e)
+    {
+        var pos = Get<Position>(e);
+        var rect = Get<Rectangle>(e);
+        var worldRect = GetWorldRect(pos, rect);
+
+        for (var x = worldRect.X; x < worldRect.X + worldRect.Width; x += CellSize)
+        {
+            for (var y = worldRect.Y; y < worldRect.Y + worldRect.Height; y += CellSize)
+            {
+                var key = GetHashKey(x, y);
+                if (!SpatialHash.ContainsKey(key))
+                    SpatialHash.Add(key, new HashSet<Entity>());
+
+                SpatialHash[key].Add(e);
+            }
+        }
+    }
+
+    IEnumerable<Entity> RetrieveFromHash(Rectangle rect)
+    {
+        for (var x = rect.X; x < rect.X + rect.Width; x++)
+        {
+            for (var y = rect.Y; y < rect.Y + rect.Height; y++)
+            {
+                var key = GetHashKey(x, y);
+                if (SpatialHash.ContainsKey(key))
+                {
+                    foreach (var e in SpatialHash[key])
+                        yield return e;
+                }
+            }
+        }
     }
 
     Rectangle GetWorldRect(Position p, Rectangle r)
@@ -24,7 +77,7 @@ public class Motion : MoonTools.ECS.System
 
     bool CheckCollision(Entity e, Rectangle rect)
     {
-        foreach (var other in RectFilter.Entities)
+        foreach (var other in RetrieveFromHash(rect))
         {
             if (other != e)
             {
@@ -93,6 +146,11 @@ public class Motion : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        ClearSpatialHash();
+
+        foreach (var entity in RectFilter.Entities)
+            AddToHash(entity);
+
         foreach (var entity in VelocityFilter.Entities)
         {
             var pos = Get<Position>(entity);
