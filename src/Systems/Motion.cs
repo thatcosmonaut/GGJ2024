@@ -4,6 +4,7 @@ using MoonTools.ECS;
 using MoonWorks.Graphics;
 using GGJ2024.Utility;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GGJ2024.Systems;
 
@@ -13,6 +14,7 @@ public class Motion : MoonTools.ECS.System
     MoonTools.ECS.Filter RectFilter;
 
     Dictionary<(int, int), HashSet<Entity>> SpatialHash = new();
+    HashSet<Entity> Results = new();
     const int CellSize = 32;
 
     public Motion(World world) : base(world)
@@ -41,9 +43,9 @@ public class Motion : MoonTools.ECS.System
         var rect = Get<Rectangle>(e);
         var worldRect = GetWorldRect(pos, rect);
 
-        for (var x = worldRect.X; x < worldRect.X + worldRect.Width; x += CellSize)
+        for (var x = worldRect.X; x < worldRect.X + worldRect.Width; x++)
         {
-            for (var y = worldRect.Y; y < worldRect.Y + worldRect.Height; y += CellSize)
+            for (var y = worldRect.Y; y < worldRect.Y + worldRect.Height; y++)
             {
                 var key = GetHashKey(x, y);
                 if (!SpatialHash.ContainsKey(key))
@@ -54,8 +56,10 @@ public class Motion : MoonTools.ECS.System
         }
     }
 
-    IEnumerable<Entity> RetrieveFromHash(Rectangle rect)
+    void RetrieveFromHash(Rectangle rect)
     {
+        Results.Clear();
+
         for (var x = rect.X; x < rect.X + rect.Width; x++)
         {
             for (var y = rect.Y; y < rect.Y + rect.Height; y++)
@@ -64,7 +68,7 @@ public class Motion : MoonTools.ECS.System
                 if (SpatialHash.ContainsKey(key))
                 {
                     foreach (var e in SpatialHash[key])
-                        yield return e;
+                        Results.Add(e);
                 }
             }
         }
@@ -77,7 +81,9 @@ public class Motion : MoonTools.ECS.System
 
     bool CheckCollision(Entity e, Rectangle rect)
     {
-        foreach (var other in RetrieveFromHash(rect))
+        RetrieveFromHash(rect);
+
+        foreach (var other in Results)
         {
             if (other != e)
             {
