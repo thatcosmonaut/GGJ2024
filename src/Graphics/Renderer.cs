@@ -34,16 +34,11 @@ public class Renderer : MoonTools.ECS.Renderer
 			"Shaders"
 		);
 
-		var buffer = GraphicsDevice.AcquireCommandBuffer();
+		var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
 
-		SpriteAtlasTexture =
-			Texture.FromImageFile(
-				graphicsDevice,
-				buffer,
-				Path.Combine(baseContentPath, "1x1.png")
-			);
-
-		GraphicsDevice.Submit(buffer);
+		SpriteAtlasTexture = Texture.CreateTexture2D(GraphicsDevice, 1, 1, TextureFormat.R8G8B8A8, TextureUsageFlags.Sampler);
+		commandBuffer.SetTextureData(SpriteAtlasTexture, new Color[] { Color.White });
+		GraphicsDevice.Submit(commandBuffer);
 
 		var vertShaderModule = new ShaderModule(GraphicsDevice, Path.Combine(shaderContentPath, "InstancedSpriteBatch.vert.refresh"));
 		var fragShaderModule = new ShaderModule(GraphicsDevice, Path.Combine(shaderContentPath, "InstancedSpriteBatch.frag.refresh"));
