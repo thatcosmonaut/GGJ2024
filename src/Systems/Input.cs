@@ -85,12 +85,12 @@ public class Input : MoonTools.ECS.System
         ActionBindings = new Dictionary<Actions, GenericAxis>()
             {
                 {Actions.MoveY, new GenericAxis{
-                    Positive = new List<GenericInputs>(){GenericInputs.W, GenericInputs.LeftY},
-                    Negative = new List<GenericInputs>(){GenericInputs.S}
+                    Positive = new List<GenericInputs>(){GenericInputs.S},
+                    Negative = new List<GenericInputs>(){GenericInputs.W, GenericInputs.LeftY}
                 }},
                 {Actions.MoveX, new GenericAxis{
-                    Positive = new List<GenericInputs>(){GenericInputs.A, GenericInputs.LeftX},
-                    Negative = new List<GenericInputs>(){GenericInputs.D}
+                    Positive = new List<GenericInputs>(){GenericInputs.D},
+                    Negative = new List<GenericInputs>(){GenericInputs.A, GenericInputs.LeftX}
                 }},
                 {Actions.Interact, new GenericAxis{
                     Positive = new List<GenericInputs>(){GenericInputs.Space, GenericInputs.AButton}
@@ -117,10 +117,10 @@ public class Input : MoonTools.ECS.System
 
     public override void Update(System.TimeSpan delta)
     {
-		if (Inputs.Keyboard.IsPressed(KeyCode.A))
-		{
-			Send(new PlayStaticSoundMessage(StaticAudio.AirHorn));
-		}
+        if (Inputs.Keyboard.IsPressed(KeyCode.A))
+        {
+            Send(new PlayStaticSoundMessage(StaticAudio.AirHorn));
+        }
 
         foreach (var player in PlayerFilter.Entities)
         {

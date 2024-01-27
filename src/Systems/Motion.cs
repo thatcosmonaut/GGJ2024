@@ -49,8 +49,11 @@ public class Motion : MoonTools.ECS.System
         var p = Get<Position>(e);
         var r = Get<Rectangle>(e);
 
-        var targetX = p.X + v.X;
-        var targetY = p.Y + v.Y;
+        var dx = v.X > 0 ? MathF.Ceiling(v.X) : MathF.Floor(v.X);
+        var dy = v.Y > 0 ? MathF.Ceiling(v.Y) : MathF.Floor(v.Y);
+
+        var targetX = p.X + dx;
+        var targetY = p.Y + dy;
 
         var outX = p.X;
         var outY = p.Y;
@@ -95,7 +98,7 @@ public class Motion : MoonTools.ECS.System
             var pos = Get<Position>(entity);
             var vel = (Vector2)Get<Velocity>(entity);
 
-            if (Has<Rectangle>(entity))
+            if (Has<Rectangle>(entity) && vel.LengthSquared() > 0)
             {
                 var result = SweepTest(entity);
                 Set(entity, result.pos);

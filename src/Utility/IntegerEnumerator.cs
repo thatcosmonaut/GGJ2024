@@ -1,3 +1,5 @@
+using System;
+
 namespace GGJ2024.Utility;
 
 public ref struct IntegerEnumerator

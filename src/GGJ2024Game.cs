@@ -4,6 +4,7 @@ using MoonTools.ECS;
 using GGJ2024.Systems;
 using MoonWorks.Math.Float;
 using GGJ2024.Content;
+using GGJ2024.Components;
 
 namespace GGJ2024
 {
@@ -14,6 +15,7 @@ namespace GGJ2024
 		Input Input;
 		Motion Motion;
 		Audio Audio;
+		PlayerController PlayerController;
 
 		public GGJ2024Game(
 			WindowCreateInfo windowCreateInfo,
@@ -27,12 +29,14 @@ namespace GGJ2024
 			Input = new Input(World, Inputs);
 			Motion = new Motion(World);
 			Audio = new Audio(World, AudioDevice);
+			PlayerController = new PlayerController(World);
 			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
+
 
 			var rect = World.CreateEntity();
 			World.Set(rect, new Position(0f, Dimensions.GAME_H * 0.5f));
 			World.Set(rect, new Rectangle(0, 0, 16, 16));
-			World.Set(rect, new Velocity(Vector2.UnitX));
+			World.Set(rect, new Player(0));
 
 			var rect2 = World.CreateEntity();
 			World.Set(rect2, new Position(Dimensions.GAME_W * 0.5f, (Dimensions.GAME_H * 0.5f) - 64));
@@ -42,6 +46,7 @@ namespace GGJ2024
 		protected override void Update(System.TimeSpan dt)
 		{
 			Input.Update(dt);
+			PlayerController.Update(dt);
 			Motion.Update(dt);
 			Audio.Update(dt);
 
