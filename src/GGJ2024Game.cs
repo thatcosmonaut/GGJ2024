@@ -2,11 +2,15 @@ using MoonWorks.Graphics;
 using MoonWorks;
 using MoonTools.ECS;
 using GGJ2024.Systems;
+using System.IO;
+using System;
+using MoonWorks.Math.Float;
 
 namespace GGJ2024
 {
 	class GGJ2024Game : Game
 	{
+
 		Renderer Renderer;
 		World World = new World();
 		Input Input;
@@ -18,7 +22,11 @@ namespace GGJ2024
 		) : base(windowCreateInfo, frameLimiterSettings, 60, debugMode)
 		{
 			Input = new Input(World, Inputs);
-			Renderer = new Renderer(GraphicsDevice, MainWindow.SwapchainFormat);
+			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
+
+			var rect = World.CreateEntity();
+			World.Set(rect, new Position(0, 0));
+			World.Set(rect, new Rectangle(0, 0, 32, 32));
 		}
 
 		protected override void Update(System.TimeSpan dt)
