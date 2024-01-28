@@ -62,7 +62,6 @@ public class Input : MoonTools.ECS.System
         }
         i = 0;
 
-
         foreach (var input in axis.Negative)
         {
             results.Append("-");
@@ -78,7 +77,7 @@ public class Input : MoonTools.ECS.System
         return results.ToString();
     }
 
-    Dictionary<Actions, ActionState>[] ActionStateDictionaries = new Dictionary<Actions, ActionState>[]
+    Dictionary<Actions, ActionState>[] ActionStateDictionaries = new[]
     {
         new Dictionary<Actions, ActionState>(),
         new Dictionary<Actions, ActionState>()
@@ -124,21 +123,18 @@ public class Input : MoonTools.ECS.System
 
     public override void Update(System.TimeSpan delta)
     {
-        if (Inputs.Keyboard.IsPressed(KeyCode.A))
-        {
-            Send(new PlayStaticSoundMessage(StaticAudio.AirHorn));
-        }
-
         foreach (var player in PlayerFilter.Entities)
         {
-            var actionStates = ActionStateDictionaries[Get<Player>(player).Index];
+            var index = Get<Player>(player).Index;
+            var actionStates = ActionStateDictionaries[index];
+
             foreach (var (action, axis) in ActionBindings)
             {
                 var value = 0.0f;
 
                 foreach (var input in axis.Positive)
                 {
-                    var v = InputHelper.Poll(Inputs, input, Get<Player>(player).Index);
+                    var v = InputHelper.Poll(Inputs, input, index);
                     if (System.MathF.Abs(v) > 0.0f)
                     {
                         value = v;
@@ -180,7 +176,7 @@ public class Input : MoonTools.ECS.System
 
                 foreach (var input in axis.Negative)
                 {
-                    var v = InputHelper.Poll(Inputs, input, Get<Player>(player).Index) * -1.0f;
+                    var v = InputHelper.Poll(Inputs, input, index) * -1.0f;
                     if (System.MathF.Abs(v) > 0.0f)
                     {
                         value += v;
@@ -221,7 +217,7 @@ public class Input : MoonTools.ECS.System
 
                 if (System.MathF.Abs(value) > 0.0f)
                 {
-                    Send(new Action(value, action, actionStates[action], Get<Player>(player).Index));
+                    Send(new Action(value, action, actionStates[action], index));
                 }
             }
         }

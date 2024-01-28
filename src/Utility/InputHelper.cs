@@ -159,9 +159,16 @@ public static class InputHelper
 
     static bool PollButton(Inputs inputs, GamepadButtonCode btn, int index)
     {
+
+        if (index == 0 && inputs.GamepadExists(0) && !inputs.GamepadExists(1))
+            return false;
+
+        if (index == 1 && inputs.GamepadExists(0) && !inputs.GamepadExists(1))
+            index = 0;
+
         if (inputs.GamepadExists(index))
         {
-            return inputs.GetGamepad(index).Button(btn).IsDown; ;
+            return inputs.GetGamepad(index).Button(btn).IsDown;
         }
         return false;
     }
@@ -173,9 +180,18 @@ public static class InputHelper
 
     static float PollStickAxis(Inputs inputs, AxisCode axis, int index)
     {
-        if (inputs.GamepadExists(index))
+        var gamepadIndex = index;
+
+        if (index == 0 && inputs.GamepadExists(0) && !inputs.GamepadExists(1))
+            return 0.0f;
+
+        if (index == 1 && inputs.GamepadExists(0) && !inputs.GamepadExists(1))
+            gamepadIndex = 0;
+
+
+        if (inputs.GamepadExists(gamepadIndex))
         {
-            var value = inputs.GetGamepad(index).AxisValue(axis);
+            var value = inputs.GetGamepad(gamepadIndex).AxisValue(axis);
             if (MathF.Abs(value) > 0.5f)
             {
                 return value;
