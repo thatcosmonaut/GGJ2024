@@ -103,34 +103,31 @@ public class Motion : MoonTools.ECS.System
         return (default, false);
     }
 
-    Position SweepTest(Entity e)
+    Position SweepTest(Entity e, float dt)
     {
-        var v = Get<Velocity>(e);
-        var p = Get<Position>(e);
+        var velocity = Get<Velocity>(e);
+        var position = Get<Position>(e);
         var r = Get<Rectangle>(e);
 
-        var dx = v.X > 0 ? MathF.Ceiling(v.X) : MathF.Floor(v.X);
-        var dy = v.Y > 0 ? MathF.Ceiling(v.Y) : MathF.Floor(v.Y);
+		var movement = new Vector2(velocity.X, velocity.Y) * dt;
+		var targetPosition = position + movement;
 
-        var targetX = p.X + dx;
-        var targetY = p.Y + dy;
+        var xEnum = new IntegerEnumerator(position.X, targetPosition.X);
+        var yEnum = new IntegerEnumerator(position.Y, targetPosition.Y);
 
-        var outX = p.X;
-        var outY = p.Y;
-
-        var xEnum = new IntegerEnumerator(p.X, (int)targetX);
-        var yEnum = new IntegerEnumerator(p.Y, (int)targetY);
+		int mostRecentValidXPosition = position.X;
+		int mostRecentValidYPosition = position.Y;
 
         bool xHit = false;
         bool yHit = false;
 
-        var (staticOther, staticHit) = CheckCollision(e, GetWorldRect(p, r));
+        var (staticOther, staticHit) = CheckCollision(e, GetWorldRect(position, r));
         if (staticHit && !Related<Colliding>(e, staticOther) && !Related<Colliding>(staticOther, e))
             Relate(e, staticOther, new Colliding());
 
         foreach (var x in xEnum)
         {
-            var newPos = new Position(x, p.Y);
+            var newPos = new Position(x, position.Y);
             var rect = GetWorldRect(newPos, r);
 
             (var other, var hit) = CheckCollision(e, rect);
@@ -139,14 +136,19 @@ public class Motion : MoonTools.ECS.System
 
             xHit = hit;
 
-            if (xHit && Has<Solid>(other) && Has<Solid>(e)) break;
+            if (xHit && Has<Solid>(other) && Has<Solid>(e))
+			{
+				movement.X = mostRecentValidXPosition - position.X;
+				position = position.SetX(position.X); // truncates x coord
+				break;
+			}
 
-            outX = x;
+			mostRecentValidXPosition = x;
         }
 
         foreach (var y in yEnum)
         {
-            var newPos = new Position(p.X, y);
+            var newPos = new Position(mostRecentValidXPosition, y);
             var rect = GetWorldRect(newPos, r);
 
             (var other, var hit) = CheckCollision(e, rect);
@@ -155,12 +157,17 @@ public class Motion : MoonTools.ECS.System
             if (!Related<Colliding>(e, other) && !Related<Colliding>(other, e))
                 Relate(e, other, new Colliding());
 
-            if (yHit && Has<Solid>(other) && Has<Solid>(e)) break;
+            if (yHit && Has<Solid>(other) && Has<Solid>(e))
+			{
+				movement.Y = mostRecentValidYPosition - position.Y;
+				position = position.SetY(position.Y); // truncates y coord
+				break;
+			}
 
-            outY = y;
+			mostRecentValidYPosition = y;
         }
 
-        return new Position(outX, outY);
+        return position + movement;
     }
 
     public override void Update(TimeSpan delta)
@@ -188,7 +195,7 @@ public class Motion : MoonTools.ECS.System
 
             if (Has<Rectangle>(entity))
             {
-                var result = SweepTest(entity);
+                var result = SweepTest(entity, (float) delta.TotalSeconds);
                 Set(entity, result);
             }
             else

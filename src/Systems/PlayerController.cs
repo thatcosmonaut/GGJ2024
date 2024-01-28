@@ -10,7 +10,7 @@ namespace GGJ2024.Systems;
 public class PlayerController : MoonTools.ECS.System
 {
     MoonTools.ECS.Filter PlayerFilter;
-    float Speed = 1f;
+    float Speed = 32f;
 
     public PlayerController(World world) : base(world)
     {
@@ -25,8 +25,9 @@ public class PlayerController : MoonTools.ECS.System
     {
         var player = World.CreateEntity();
         World.Set(player, new Position(Dimensions.GAME_W * 0.5f, Dimensions.GAME_H * 0.5f + index * 32.0f));
-        World.Set(player, new Rectangle(0, 0, 16, 16));
+        World.Set(player, new SpriteAnimation(Content.SpriteAnimations.Char_Walk_Down, 0));
         World.Set(player, new Player(index, 0));
+		World.Set(player, new Rectangle(0, 0, 16, 16));
         World.Set(player, new CanHold());
         World.Set(player, new Solid());
         World.Set(player, index == 0 ? Color.Green : Color.Blue);
@@ -122,7 +123,7 @@ public class PlayerController : MoonTools.ECS.System
 
 			var velocity = direction * Speed;
 
-			int framerate = (int) (velocity.LengthSquared() / 100f);
+			int framerate = (int) (velocity.LengthSquared() / 200f);
 
 			Send(new SetAnimationMessage(
 				entity,

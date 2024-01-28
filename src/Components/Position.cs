@@ -34,6 +34,16 @@ public readonly record struct Position
         RealPosition = v;
     }
 
+	public Position SetX(int x)
+	{
+		return new Position((float) x, RealPosition.Y);
+	}
+
+	public Position SetY(int y)
+	{
+		return new Position(RealPosition.X, (float) y);
+	}
+
     public static Position operator +(Position a, Position b)
     {
         return new Position(a.RealPosition + b.RealPosition);
