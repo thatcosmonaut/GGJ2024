@@ -1,4 +1,5 @@
 using GGJ2024.Components;
+using GGJ2024.Data;
 using GGJ2024.Messages;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
@@ -42,7 +43,7 @@ public class PlayerController : MoonTools.ECS.System
         foreach (var entity in PlayerFilter.Entities)
         {
             var player = Get<Player>(entity).Index;
-            var velocity = Vector2.Zero;
+            var direction = Vector2.Zero;
             if (Has<TryHold>(entity))
                 Remove<TryHold>(entity);
 
@@ -52,11 +53,11 @@ public class PlayerController : MoonTools.ECS.System
                 {
                     if (action.ActionType == Actions.MoveX)
                     {
-                        velocity.X += action.Value;
+                        direction.X += action.Value;
                     }
                     else if (action.ActionType == Actions.MoveY)
                     {
-                        velocity.Y += action.Value;
+                        direction.Y += action.Value;
                     }
 
                     if (action.ActionType == Actions.Interact && action.ActionState == ActionState.Pressed)
@@ -66,7 +67,69 @@ public class PlayerController : MoonTools.ECS.System
                 }
             }
 
-            Set(entity, new Velocity(velocity * Speed));
+			if (direction.LengthSquared() > 0)
+			{
+				direction = Vector2.Normalize(direction);
+			}
+
+			SpriteAnimationInfo animation;
+
+			if (direction.X > 0)
+			{
+				if (direction.Y > 0)
+				{
+					animation = Content.SpriteAnimations.Char_Walk_DownRight;
+				}
+				else if (direction.Y < 0)
+				{
+					animation = Content.SpriteAnimations.Char_Walk_UpRight;
+				}
+				else
+				{
+					animation = Content.SpriteAnimations.Char_Walk_Right;
+				}
+			}
+			else if (direction.X < 0)
+			{
+				if (direction.Y > 0)
+				{
+					animation = Content.SpriteAnimations.Char_Walk_DownLeft;
+				}
+				else if (direction.Y < 0)
+				{
+					animation = Content.SpriteAnimations.Char_Walk_UpLeft;
+				}
+				else
+				{
+					animation = Content.SpriteAnimations.Char_Walk_Left;
+				}
+			}
+			else
+			{
+				if (direction.Y > 0)
+				{
+					animation = Content.SpriteAnimations.Char_Walk_Down;
+				}
+				else if (direction.Y < 0)
+				{
+					animation = Content.SpriteAnimations.Char_Walk_Up;
+				}
+				else
+				{
+					animation = Get<SpriteAnimation>(entity).SpriteAnimationInfo;
+				}
+			}
+
+			var velocity = direction * Speed;
+
+			int framerate = (int) (velocity.LengthSquared() / 100f);
+
+			Send(new SetAnimationMessage(
+				entity,
+				new SpriteAnimation(animation, framerate)
+			));
+
+            Set(entity, new Velocity(velocity));
         }
     }
 }

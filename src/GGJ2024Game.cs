@@ -24,6 +24,7 @@ namespace GGJ2024
 		Timer Timer;
 		Orders Orders;
 		SetSpriteAnimationSystem SetSpriteAnimationSystem;
+		UpdateSpriteAnimationSystem UpdateSpriteAnimationSystem;
 
 		PlayerController PlayerController;
 
@@ -53,6 +54,8 @@ namespace GGJ2024
 			Orders = new Orders(World);
 			ProductSpawner = new ProductSpawner(World);
 			SetSpriteAnimationSystem = new SetSpriteAnimationSystem(World);
+			UpdateSpriteAnimationSystem = new UpdateSpriteAnimationSystem(World);
+
 			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
 
 			CategoriesAndIngredients cats = new CategoriesAndIngredients(World);
@@ -74,6 +77,7 @@ namespace GGJ2024
 
 		protected override void Update(System.TimeSpan dt)
 		{
+			UpdateSpriteAnimationSystem.Update(dt);
 			Timer.Update(dt);
 			Ticker.Update(dt);
 			Input.Update(dt);
