@@ -25,3 +25,4 @@ public readonly record struct DrawAsRectangle();
 
 public readonly record struct TextDropShadow(int OffsetX, int OffsetY);
 public readonly record struct ForceIntegerMovement();
+public readonly record struct MaxSpeed(float Value);
