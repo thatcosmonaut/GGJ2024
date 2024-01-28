@@ -19,6 +19,7 @@ public class Renderer : MoonTools.ECS.Renderer
 	SpriteBatch RectangleSpriteBatch;
 	SpriteBatch ArtSpriteBatch;
 
+	Texture RenderTexture;
 	Texture DepthTexture;
 
 	Texture RectangleAtlasTexture;
@@ -32,7 +33,7 @@ public class Renderer : MoonTools.ECS.Renderer
 	Queue<TextBatch> BatchPool = new Queue<TextBatch>();
 	List<(TextBatch, Matrix4x4)> ActiveBatchTransforms = new List<(TextBatch, Matrix4x4)>();
 
-	public Renderer(World world, GraphicsDevice graphicsDevice, TextureFormat swapchainFormat, uint width, uint height) : base(world)
+	public Renderer(World world, GraphicsDevice graphicsDevice, TextureFormat swapchainFormat) : base(world)
 	{
 		GraphicsDevice = graphicsDevice;
 
@@ -50,7 +51,8 @@ public class Renderer : MoonTools.ECS.Renderer
 			"Shaders"
 		);
 
-		DepthTexture = Texture.CreateTexture2D(GraphicsDevice, width, height, TextureFormat.D16, TextureUsageFlags.DepthStencilTarget);
+		RenderTexture = Texture.CreateTexture2D(GraphicsDevice, Dimensions.GAME_W, Dimensions.GAME_H, swapchainFormat, TextureUsageFlags.ColorTarget);
+		DepthTexture = Texture.CreateTexture2D(GraphicsDevice, Dimensions.GAME_W, Dimensions.GAME_H, TextureFormat.D16, TextureUsageFlags.DepthStencilTarget);
 
 		var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
 
@@ -223,7 +225,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
 			commandBuffer.BeginRenderPass(
 				new DepthStencilAttachmentInfo(DepthTexture, new DepthStencilValue(1, 0)),
-				new ColorAttachmentInfo(swapchainTexture, Color.Black)
+				new ColorAttachmentInfo(RenderTexture, Color.Black)
 			);
 
 			var viewProjectionMatrices = new ViewProjectionMatrices(GetCameraMatrix(), GetProjectionMatrix());
@@ -248,6 +250,8 @@ public class Renderer : MoonTools.ECS.Renderer
 			}
 
 			commandBuffer.EndRenderPass();
+
+			commandBuffer.CopyTextureToTexture(RenderTexture, swapchainTexture, MoonWorks.Graphics.Filter.Nearest);
 		}
 
 		GraphicsDevice.Submit(commandBuffer);

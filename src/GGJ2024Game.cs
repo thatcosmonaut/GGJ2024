@@ -61,7 +61,7 @@ namespace GGJ2024
 			UpdateSpriteAnimationSystem = new UpdateSpriteAnimationSystem(World);
 			ColorAnimation = new ColorAnimation(World);
 
-			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat, MainWindow.Width, MainWindow.Height);
+			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
 
 			CategoriesAndIngredients cats = new CategoriesAndIngredients(World);
 			cats.Initialize(World);
