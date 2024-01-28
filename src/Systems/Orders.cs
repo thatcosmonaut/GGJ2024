@@ -1,5 +1,6 @@
 using System;
 using GGJ2024.Components;
+using GGJ2024.Relations;
 using GGJ2024.Utility;
 using MoonTools.ECS;
 

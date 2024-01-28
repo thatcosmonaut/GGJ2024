@@ -6,6 +6,7 @@ using GGJ2024.Utility;
 using System.Collections.Generic;
 using GGJ2024.Components;
 using MoonWorks;
+using GGJ2024.Relations;
 
 namespace GGJ2024.Systems;
 
