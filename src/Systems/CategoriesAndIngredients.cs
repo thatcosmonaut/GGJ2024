@@ -97,7 +97,7 @@ public class CategoriesAndIngredients : Manipulator
             "food" => Category.Food,
             "furniture" => Category.Furniture,
             "gasses" => Category.Gasses,
-            "intellectual property" => Category.IntellectualProperty,
+            "ip" => Category.IntellectualProperty,
             "pharmacy" => Category.Pharmacy,
             "relics" => Category.Relics,
             _ => Category.None
@@ -107,65 +107,65 @@ public class CategoriesAndIngredients : Manipulator
     public static Color GetColor(Category category)
     {
         return category switch
-		{
-			Category.Animals => Color.GreenYellow,
-			Category.Clothes => Color.Azure,
-			Category.Cosmetics => Color.Red,
-			Category.Electronics => Color.Black,
-			Category.Food => Color.ForestGreen,
-			Category.Furniture => Color.Brown,
-			Category.Gasses => Color.Pink,
-			Category.IntellectualProperty => Color.Gray,
-			Category.Pharmacy => Color.Purple,
-			Category.Relics => Color.Gold,
-			Category.None => Color.White,
-			_ => Color.White
-		};
+        {
+            Category.Animals => Color.GreenYellow,
+            Category.Clothes => Color.Azure,
+            Category.Cosmetics => Color.Red,
+            Category.Electronics => Color.Black,
+            Category.Food => Color.ForestGreen,
+            Category.Furniture => Color.Brown,
+            Category.Gasses => Color.Pink,
+            Category.IntellectualProperty => Color.Gray,
+            Category.Pharmacy => Color.Purple,
+            Category.Relics => Color.Gold,
+            Category.None => Color.White,
+            _ => Color.White
+        };
     }
 
     public static string GetStockTicker(Ingredient ingredient)
     {
         return ingredient switch
-		{
-			Ingredient.Ectoplasm => "ECTO",
-			Ingredient.Silicon => "SIL",
-			Ingredient.Blueberry => "BLU",
-			Ingredient.Gems => "GME",
-			Ingredient.Fungus => "FUNG",
-			Ingredient.Elastic => "ELAS",
-			Ingredient.Carbon => "CARB",
-			Ingredient.Mint => "MINT",
-			Ingredient.Milk => "MILK",
-			Ingredient.Bones => "BONE",
-			Ingredient.Spirits => "SPIR",
-			Ingredient.Booze => "BOOZ",
-			Ingredient.Kelp => "KELP",
-			Ingredient.Microplastics => "MPLA",
-			Ingredient.Glass => "GLASS",
-			Ingredient.Helium => "HELI",
-			Ingredient.Shrimp => "SHRI",
-			Ingredient.Uranium => "URA",
-			Ingredient.Gold => "GOLD",
-			Ingredient.Oatmeal => "OAT",
-			Ingredient.None => "NONE",
-			_ => "NONE"
-		};
+        {
+            Ingredient.Ectoplasm => "ECTO",
+            Ingredient.Silicon => "SIL",
+            Ingredient.Blueberry => "BLU",
+            Ingredient.Gems => "GME",
+            Ingredient.Fungus => "FUNG",
+            Ingredient.Elastic => "ELAS",
+            Ingredient.Carbon => "CARB",
+            Ingredient.Mint => "MINT",
+            Ingredient.Milk => "MILK",
+            Ingredient.Bones => "BONE",
+            Ingredient.Spirits => "SPIR",
+            Ingredient.Booze => "BOOZ",
+            Ingredient.Kelp => "KELP",
+            Ingredient.Microplastics => "MPLA",
+            Ingredient.Glass => "GLASS",
+            Ingredient.Helium => "HELI",
+            Ingredient.Shrimp => "SHRI",
+            Ingredient.Uranium => "URA",
+            Ingredient.Gold => "GOLD",
+            Ingredient.Oatmeal => "OAT",
+            Ingredient.None => "NONE",
+            _ => "NONE"
+        };
     }
 
     public (float price, float delta, Ingredient ingredient) ChangePrice()
     {
         float delta = Rando.Range(-MaxPriceDelta, MaxPriceDelta);
 
-		if (!IngredientFilter.Empty)
-		{
-			var entity = IngredientFilter.RandomEntity;
-			var price = Get<Price>(entity).Value;
-			var ingredient = Get<Ingredient>(entity);
-			Set(entity, new Price(price + delta));
-			return (price, delta, ingredient);
-		}
+        if (!IngredientFilter.Empty)
+        {
+            var entity = IngredientFilter.RandomEntity;
+            var price = Get<Price>(entity).Value;
+            var ingredient = Get<Ingredient>(entity);
+            Set(entity, new Price(price + delta));
+            return (price, delta, ingredient);
+        }
 
-		return (0, 0, Ingredient.None); // this should never happen!
+        return (0, 0, Ingredient.None); // this should never happen!
     }
 
     public void Initialize(World world)
