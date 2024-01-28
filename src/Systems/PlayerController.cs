@@ -25,7 +25,7 @@ public class PlayerController : MoonTools.ECS.System
     {
         var player = World.CreateEntity();
         World.Set(player, new Position(Dimensions.GAME_W * 0.5f, Dimensions.GAME_H * 0.5f + index * 32.0f));
-        World.Set(player, new SpriteAnimation(Content.SpriteAnimations.Char_Walk_Down, 0));
+        World.Set(player, new SpriteAnimation(index == 0 ? Content.SpriteAnimations.Char_Walk_Down : Content.SpriteAnimations.Char2_Walk_Down, 0));
         World.Set(player, new Player(index, 0));
 		World.Set(player, new Rectangle(-8, -8, 16, 16));
         World.Set(player, new CanHold());
@@ -43,14 +43,14 @@ public class PlayerController : MoonTools.ECS.System
 
         foreach (var entity in PlayerFilter.Entities)
         {
-            var player = Get<Player>(entity).Index;
+            var playerIndex = Get<Player>(entity).Index;
             var direction = Vector2.Zero;
             if (Has<TryHold>(entity))
                 Remove<TryHold>(entity);
 
             foreach (var action in ReadMessages<Action>())
             {
-                if (action.Index == player)
+                if (action.Index == playerIndex)
                 {
                     if (action.ActionType == Actions.MoveX)
                     {
@@ -79,41 +79,41 @@ public class PlayerController : MoonTools.ECS.System
 			{
 				if (direction.Y > 0)
 				{
-					animation = Content.SpriteAnimations.Char_Walk_DownRight;
+					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_DownRight : Content.SpriteAnimations.Char2_Walk_DownRight;
 				}
 				else if (direction.Y < 0)
 				{
-					animation = Content.SpriteAnimations.Char_Walk_UpRight;
+					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_UpRight : Content.SpriteAnimations.Char2_Walk_UpRight;
 				}
 				else
 				{
-					animation = Content.SpriteAnimations.Char_Walk_Right;
+					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_Right : Content.SpriteAnimations.Char2_Walk_Right;
 				}
 			}
 			else if (direction.X < 0)
 			{
 				if (direction.Y > 0)
 				{
-					animation = Content.SpriteAnimations.Char_Walk_DownLeft;
+					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_DownLeft : Content.SpriteAnimations.Char2_Walk_DownLeft;
 				}
 				else if (direction.Y < 0)
 				{
-					animation = Content.SpriteAnimations.Char_Walk_UpLeft;
+					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_UpLeft : Content.SpriteAnimations.Char2_Walk_UpLeft;
 				}
 				else
 				{
-					animation = Content.SpriteAnimations.Char_Walk_Left;
+					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_Left : Content.SpriteAnimations.Char2_Walk_Left;
 				}
 			}
 			else
 			{
 				if (direction.Y > 0)
 				{
-					animation = Content.SpriteAnimations.Char_Walk_Down;
+					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_Down : Content.SpriteAnimations.Char2_Walk_Down;
 				}
 				else if (direction.Y < 0)
 				{
-					animation = Content.SpriteAnimations.Char_Walk_Up;
+					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_Up : Content.SpriteAnimations.Char2_Walk_Down;
 				}
 				else
 				{
