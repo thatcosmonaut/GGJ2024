@@ -21,6 +21,7 @@ namespace GGJ2024
 		Audio Audio;
 		Hold Hold;
 		ProductSpawner ProductSpawner;
+		Product ProductManipulator;
 		Ticker Ticker;
 		Systems.GameTimer GameTimer;
 		Timing Timing;
@@ -58,6 +59,7 @@ namespace GGJ2024
 			Hold = new Hold(World);
 			Orders = new Orders(World);
 			ProductSpawner = new ProductSpawner(World);
+			ProductManipulator = new Product(World);
 			SetSpriteAnimationSystem = new SetSpriteAnimationSystem(World);
 			UpdateSpriteAnimationSystem = new UpdateSpriteAnimationSystem(World);
 			ColorAnimation = new ColorAnimation(World);
@@ -119,15 +121,6 @@ namespace GGJ2024
 			var timer = World.CreateEntity();
 			World.Set(timer, new Components.GameTimer(260));
 			World.Set(timer, new Position(Dimensions.GAME_W / 2 + 10, Dimensions.GAME_H - 20));
-
-			var shelf = World.CreateEntity();
-			World.Set(shelf, new Position(30, 100));
-			World.Set(shelf, new SpawnCategory(Category.Food));
-			World.Set(shelf, new CanSpawn(new Rectangle(0, 0, 16, 128)));
-
-			var shelf2 = World.CreateEntity();
-			World.Set(shelf2, new Position(300, 200));
-			World.Set(shelf2, new CanSpawn(new Rectangle(0, 0, 128, 16)));
 
 			PlayerController.SpawnPlayer(0);
 			PlayerController.SpawnPlayer(1);

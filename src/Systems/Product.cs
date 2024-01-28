@@ -111,5 +111,18 @@ public class Product : MoonTools.ECS.Manipulator
         }
     }
 
+    public void SpawnShelf(int x, int y, int width, int height, Category category)
+    {
+        var e = CreateEntity();
+        Set(e, new Position(x, y));
+        Set(e, new SpawnCategory(category));
+        Set(e, new CanSpawn(width, height));
+    }
 
+    public void SpawnShelf(int x, int y, int width, int height)
+    {
+        var e = CreateEntity();
+        Set(e, new Position(x, y));
+        Set(e, new CanSpawn(width, height));
+    }
 }
