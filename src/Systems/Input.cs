@@ -45,8 +45,8 @@ public class Input : MoonTools.ECS.System
 		PlayerOneKeyboard.Right = Inputs.Keyboard.Button(KeyCode.D);
 		PlayerOneKeyboard.Interact = Inputs.Keyboard.Button(KeyCode.Space);
 
-		PlayerOneGamepad.Up = Inputs.GetGamepad(0).LeftYUp;
-		PlayerOneGamepad.Down = Inputs.GetGamepad(0).LeftYDown;
+		PlayerOneGamepad.Up = Inputs.GetGamepad(0).LeftYDown;
+		PlayerOneGamepad.Down = Inputs.GetGamepad(0).LeftYUp;
 		PlayerOneGamepad.Left = Inputs.GetGamepad(0).LeftXLeft;
 		PlayerOneGamepad.Right = Inputs.GetGamepad(0).LeftXRight;
 		PlayerOneGamepad.Interact = Inputs.GetGamepad(0).A;
@@ -57,8 +57,8 @@ public class Input : MoonTools.ECS.System
 		PlayerTwoKeyboard.Right = Inputs.Keyboard.Button(KeyCode.Right);
 		PlayerTwoKeyboard.Interact = Inputs.Keyboard.Button(KeyCode.Return);
 
-		PlayerTwoGamepad.Up = Inputs.GetGamepad(1).LeftYUp;
-		PlayerTwoGamepad.Down = Inputs.GetGamepad(1).LeftYDown;
+		PlayerTwoGamepad.Up = Inputs.GetGamepad(1).LeftYDown;
+		PlayerTwoGamepad.Down = Inputs.GetGamepad(1).LeftYUp;
 		PlayerTwoGamepad.Left = Inputs.GetGamepad(1).LeftXLeft;
 		PlayerTwoGamepad.Right = Inputs.GetGamepad(1).LeftXRight;
 		PlayerTwoGamepad.Interact = Inputs.GetGamepad(1).A;
