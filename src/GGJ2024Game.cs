@@ -8,6 +8,7 @@ using GGJ2024.Components;
 using GGJ2024.Utility;
 using GGJ2024.Data;
 using GGJ2024.Messages;
+using GGJ2024.Relations;
 using LD54.Systems;
 
 namespace GGJ2024
@@ -139,8 +140,21 @@ namespace GGJ2024
 			World.Set(timer, new Components.GameTimer(260));
 			World.Set(timer, new Position(Dimensions.GAME_W / 2 + 10, Dimensions.GAME_H - 20));
 
-			PlayerController.SpawnPlayer(0);
-			PlayerController.SpawnPlayer(1);
+			var scoreOne = World.CreateEntity();
+			World.Set(scoreOne, new Position(100, 280));
+			World.Set(scoreOne, new Score(0));
+			World.Set(scoreOne, new Text(Fonts.KosugiID, 8, "0"));
+
+			var scoreTwo = World.CreateEntity();
+			World.Set(scoreTwo, new Position(540, 280));
+			World.Set(scoreTwo, new Score(0));
+			World.Set(scoreTwo, new Text(Fonts.KosugiID, 8, "0"));
+
+			var playerOne = PlayerController.SpawnPlayer(0);
+			var playerTwo = PlayerController.SpawnPlayer(1);
+
+			World.Relate(playerOne, scoreOne, new HasScore());
+			World.Relate(playerTwo, scoreTwo, new HasScore());
 		}
 
 		protected override void Update(System.TimeSpan dt)

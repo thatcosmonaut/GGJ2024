@@ -75,10 +75,10 @@ public class Orders : MoonTools.ECS.System
         if (filled)
         {
             var p = Get<Player>(player);
-            var score = p.Score + CalculateScore(product);
-            System.Console.WriteLine($"score: {score}");
-
-            Set(player, new Player(p.Index, score));
+			var scoreEntity = OutRelationSingleton<HasScore>(player);
+			var score = Get<Score>(scoreEntity).Value + CalculateScore(product);
+			Set(scoreEntity, new Score(score));
+			Set(scoreEntity, new Text(Fonts.KosugiID, 8, score.ToString()));
 
 			SetNewOrderDetails(order); // refill order
             Destroy(product);

@@ -24,12 +24,12 @@ public class PlayerController : MoonTools.ECS.System
 		.Build();
 	}
 
-	public void SpawnPlayer(int index)
+	public Entity SpawnPlayer(int index)
 	{
 		var player = World.CreateEntity();
 		World.Set(player, new Position(Dimensions.GAME_W * 0.47f + index * 48.0f, Dimensions.GAME_H * 0.25f));
 		World.Set(player, new SpriteAnimation(index == 0 ? Content.SpriteAnimations.Char_Walk_Down : Content.SpriteAnimations.Char2_Walk_Down, 0));
-		World.Set(player, new Player(index, 0));
+		World.Set(player, new Player(index));
 		World.Set(player, new Rectangle(-8, -8, 16, 16));
 		World.Set(player, new CanInteract());
 		World.Set(player, new CanInspect());
@@ -40,6 +40,8 @@ public class PlayerController : MoonTools.ECS.System
 		World.Set(player, new MaxSpeed(128));
 		World.Set(player, new Velocity(Vector2.Zero));
 		World.Set(player, new LastDirection(Vector2.Zero));
+
+		return player;
 	}
 
 	public override void Update(System.TimeSpan delta)
