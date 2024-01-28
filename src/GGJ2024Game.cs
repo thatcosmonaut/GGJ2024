@@ -21,6 +21,7 @@ namespace GGJ2024
 		ProductSpawner ProductSpawner;
 		Ticker Ticker;
 		Timer Timer;
+		Orders Orders;
 
 		PlayerController PlayerController;
 
@@ -41,6 +42,7 @@ namespace GGJ2024
 			Audio = new Audio(World, AudioDevice);
 			PlayerController = new PlayerController(World);
 			Hold = new Hold(World);
+			Orders = new Orders(World);
 			ProductSpawner = new ProductSpawner(World);
 			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
 
@@ -54,6 +56,12 @@ namespace GGJ2024
 			World.Set(player, new CanHold());
 			World.Set(player, new Solid());
 			World.Set(player, Color.Green);
+
+			var cashRegister = World.CreateEntity();
+			World.Set(cashRegister, new Position(Vector2.Zero));
+			World.Set(cashRegister, new Rectangle(0, 0, 32, 32));
+			World.Set(cashRegister, new CanFillOrders());
+			World.Set(cashRegister, Color.ForestGreen);
 
 			var timer = World.CreateEntity();
 			World.Set(timer, new GameTimer(260));
@@ -71,6 +79,7 @@ namespace GGJ2024
 			Hold.Update(dt);
 			Audio.Update(dt);
 			ProductSpawner.Update(dt);
+			Orders.Update(dt);
 
 			World.FinishUpdate();
 		}

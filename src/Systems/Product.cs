@@ -25,7 +25,7 @@ public class Product : MoonTools.ECS.Manipulator
             total += Get<Price>(ingredient).Value;
         }
 
-        return total;
+        return MathF.Max(float.Epsilon, total);
     }
 
     public void SpawnProduct(Position position)
