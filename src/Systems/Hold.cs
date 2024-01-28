@@ -61,16 +61,6 @@ public class Hold : MoonTools.ECS.System
 						o,
 						new SpriteAnimation(spriteInfo, 90, true)
 					));
-
-					var category = Get<Category>(OutRelationSingleton<IsInCategory>(o));
-					System.Console.Write($" {TextStorage.GetString(Get<Name>(o).TextID)} ${Product.GetPrice(o)} category: {category} ");
-
-					System.Console.Write("ingredience: ");
-					foreach (var ingredient in OutRelations<HasIngredient>(o))
-					{
-						System.Console.Write($"{Get<Ingredient>(ingredient)} (${Get<Price>(ingredient).Value}) ");
-					}
-					System.Console.WriteLine("");
 				}
 			}
 
@@ -103,7 +93,7 @@ public class Hold : MoonTools.ECS.System
 		}
 	}
 
-	void SetHoldVelocity(Entity e, float dt)
+	void SetHoldParameters(Entity e, float dt)
 	{
 		var holding = OutRelationSingleton<Holding>(e);
 		var holderPos = Get<Position>(e);
@@ -116,19 +106,51 @@ public class Hold : MoonTools.ECS.System
 
 	public void Inspect(Entity potentialHolder, Entity product)
 	{
+		var playerIndex = Get<Player>(potentialHolder).Index;
+
+		var index = 0;
+		if (Some<IsPopupBox>())
+		{
+			// jank to push old boxes farther back
+			foreach (var (_, uiElement) in Relations<ShowingPopup>())
+			{
+				if (Has<IsPopupBox>(uiElement))
+				{
+					Set(uiElement, new Depth(8));
+				}
+				else
+				{
+					Set(uiElement, new Depth(6));
+				}
+			}
+
+			// newly created popups will draw on top of older ones
+			index = 1;
+		}
+
+		var font = Fonts.FromID(Fonts.KosugiID);
+
 		var holderPosition = Get<Position>(potentialHolder);
 
 		Relate(potentialHolder, product, new Inspecting());
 
 		var xOffset = holderPosition.X < Dimensions.GAME_W * 3 / 4 ? 10 : -100;
-		var yOffset = -30;
+		var yOffset = holderPosition.Y > Dimensions.GAME_H * 3 / 4 ? -100 : -30;
 
-		// TODO: set this rectangle based on font textbounds
 		var backgroundRect = CreateEntity();
 		Set(backgroundRect, holderPosition + new Position(xOffset - 5, yOffset - 5));
-		Set(backgroundRect, new Rectangle(0, 0, 100, 100));
 		Set(backgroundRect, new DrawAsRectangle());
-		Set(backgroundRect, new ColorBlend(new Color(0, 52, 139)));
+		Set(backgroundRect, new Depth(8 - index * 4));
+		Set(backgroundRect, new IsPopupBox());
+
+		if (playerIndex == 0)
+		{
+			Set(backgroundRect, new ColorBlend(Color.DarkGreen));
+		}
+		else
+		{
+			Set(backgroundRect, new ColorBlend(new Color(0, 52, 139)));
+		}
 
 		Relate(potentialHolder, backgroundRect, new ShowingPopup());
 
@@ -136,8 +158,19 @@ public class Hold : MoonTools.ECS.System
 		Set(name, holderPosition + new Position(xOffset, yOffset));
 		Set(name, new Text(Fonts.KosugiID, 10, Get<Name>(product).TextID, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 		Set(name, new TextDropShadow(1, 1));
+		Set(name, new Depth(6 - index * 4));
 
 		Relate(potentialHolder, name, new ShowingPopup());
+
+		font.TextBounds(
+			TextStorage.GetString(Get<Name>(product).TextID),
+			10,
+			MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+			MoonWorks.Graphics.Font.VerticalAlignment.Top,
+			out var textBounds
+		);
+
+		var textBoundsRectangle = TextRectangle(textBounds, new Position(xOffset - 5, yOffset - 5));
 
 		yOffset += 15;
 
@@ -145,6 +178,7 @@ public class Hold : MoonTools.ECS.System
 		Set(price, holderPosition + new Position(xOffset, yOffset));
 		Set(price, new Text(Fonts.KosugiID, 10, "$" + Product.GetPrice(product).ToString("F2"), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 		Set(price, new TextDropShadow(1, 1));
+		Set(price, new Depth(6 - index * 4));
 
 		Relate(potentialHolder, price, new ShowingPopup());
 		Relate(price, product, new DisplayingProductPrice());
@@ -160,27 +194,53 @@ public class Hold : MoonTools.ECS.System
 			Set(ingredientName, holderPosition + new Position(xOffset, yOffset));
 			Set(ingredientName, new Text(Fonts.KosugiID, 8, ingredientString, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 			Set(ingredientName, new TextDropShadow(1, 1));
+			Set(ingredientName, new Depth(6 - index * 4));
 
 			Relate(potentialHolder, ingredientName, new ShowingPopup());
 
-			Fonts.FromID(Fonts.KosugiID).TextBounds(
+			font.TextBounds(
 				ingredientString,
-				10,
+				8,
 				MoonWorks.Graphics.Font.HorizontalAlignment.Left,
 				MoonWorks.Graphics.Font.VerticalAlignment.Top,
-				out var textBounds
+				out textBounds
 			);
 
+			textBoundsRectangle = Rectangle.Union(
+				textBoundsRectangle,
+				TextRectangle(textBounds, new Position(xOffset, yOffset))
+			);
+
+			var priceAdditionalOffset = textBounds.W + 3;
+
 			var ingredientPrice = CreateEntity();
-			Set(ingredientPrice, holderPosition + new Position(xOffset + textBounds.W + 3, yOffset));
+			Set(ingredientPrice, holderPosition + new Position(xOffset + priceAdditionalOffset, yOffset));
 			Set(ingredientPrice, new Text(Fonts.KosugiID, 8, ingredientPriceString, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 			Set(ingredientPrice, new TextDropShadow(1, 1));
+			Set(ingredientPrice, new Depth(6 - index * 4));
 
 			Relate(potentialHolder, ingredientPrice, new ShowingPopup());
 			Relate(ingredientPrice, ingredient, new DisplayingIngredientPrice());
 
+			font.TextBounds(
+				ingredientPriceString,
+				8,
+				MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+				MoonWorks.Graphics.Font.VerticalAlignment.Top,
+				out textBounds
+			);
+
+			textBoundsRectangle = Rectangle.Union(
+				textBoundsRectangle,
+				TextRectangle(textBounds, new Position(xOffset + priceAdditionalOffset, yOffset))
+			);
+
 			yOffset += 15;
 		}
+
+		textBoundsRectangle.Inflate(5, 5);
+
+		Set(backgroundRect, new Rectangle(0, 0, textBoundsRectangle.Width, textBoundsRectangle.Height));
 	}
 
 	public void StopInspect(Entity potentialHolder)
@@ -217,7 +277,7 @@ public class Hold : MoonTools.ECS.System
 			{
 				foreach (var other in OutRelations<Colliding>(holder))
 				{
-					if (Has<CanBeHeld>(other))
+					if (Has<CanInspect>(holder) && Has<CanBeHeld>(other))
 					{
 						Inspect(holder, other);
 						break;
@@ -227,7 +287,7 @@ public class Hold : MoonTools.ECS.System
 
 			if (HasOutRelation<Holding>(holder))
 			{
-				SetHoldVelocity(holder, (float)delta.TotalSeconds);
+				SetHoldParameters(holder, (float)delta.TotalSeconds);
 			}
         }
 
@@ -243,4 +303,9 @@ public class Hold : MoonTools.ECS.System
 			Set(uiText, new Text(Fonts.KosugiID, 8, ingredientPriceString, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 		}
     }
+
+	private static Rectangle TextRectangle(WellspringCS.Wellspring.Rectangle textBounds, Position position)
+	{
+		return new Rectangle((int) textBounds.X + position.X, (int) textBounds.Y + position.Y, (int) textBounds.W, (int) textBounds.H);
+	}
 }

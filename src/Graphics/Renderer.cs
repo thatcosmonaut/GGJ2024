@@ -16,13 +16,11 @@ public class Renderer : MoonTools.ECS.Renderer
 	GraphicsPipeline SpriteBatchPipeline;
 	GraphicsPipeline TextPipeline;
 
-	SpriteBatch RectangleSpriteBatch;
 	SpriteBatch ArtSpriteBatch;
 
 	Texture RenderTexture;
 	Texture DepthTexture;
 
-	Texture RectangleAtlasTexture;
 	Texture SpriteAtlasTexture;
 
 	Sampler PointSampler;
@@ -53,12 +51,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
 		RenderTexture = Texture.CreateTexture2D(GraphicsDevice, Dimensions.GAME_W, Dimensions.GAME_H, swapchainFormat, TextureUsageFlags.ColorTarget);
 		DepthTexture = Texture.CreateTexture2D(GraphicsDevice, Dimensions.GAME_W, Dimensions.GAME_H, TextureFormat.D16, TextureUsageFlags.DepthStencilTarget);
-
-		var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
-
-		RectangleAtlasTexture = Texture.CreateTexture2D(GraphicsDevice, 1, 1, TextureFormat.R8G8B8A8, TextureUsageFlags.Sampler);
-		commandBuffer.SetTextureData(RectangleAtlasTexture, new Color[] { Color.White });
-		GraphicsDevice.Submit(commandBuffer);
 
 		SpriteAtlasTexture = TextureAtlases.TP_Sprites.Texture;
 
@@ -100,7 +92,7 @@ public class Renderer : MoonTools.ECS.Renderer
 						ColorAttachmentBlendState.AlphaBlend
 					)
 				),
-				DepthStencilState = DepthStencilState.Disable,
+				DepthStencilState = DepthStencilState.DepthReadWrite,
 				VertexShaderInfo = GraphicsDevice.TextVertexShaderInfo,
 				FragmentShaderInfo = GraphicsDevice.TextFragmentShaderInfo,
 				VertexInputState = GraphicsDevice.TextVertexInputState,
@@ -112,7 +104,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
 		PointSampler = new Sampler(GraphicsDevice, SamplerCreateInfo.PointClamp);
 
-		RectangleSpriteBatch = new SpriteBatch(GraphicsDevice);
 		ArtSpriteBatch = new SpriteBatch(GraphicsDevice);
 	}
 
@@ -124,7 +115,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
 		if (swapchainTexture != null)
 		{
-			RectangleSpriteBatch.Reset();
 			ArtSpriteBatch.Reset();
 
 			foreach (var (batch, _) in ActiveBatchTransforms)
@@ -139,8 +129,14 @@ public class Renderer : MoonTools.ECS.Renderer
 				var rectangle = Get<Rectangle>(entity);
 				var orientation = Has<Orientation>(entity) ? Get<Orientation>(entity).Angle : 0.0f;
 				var color = Has<ColorBlend>(entity) ? Get<ColorBlend>(entity).Color : Color.White;
+				var depth = -2f;
+				if (Has<Depth>(entity))
+				{
+					depth = -Get<Depth>(entity).Value;
+				}
 
-				RectangleSpriteBatch.Add(new Vector3(position.X + rectangle.X, position.Y + rectangle.Y, -2f), orientation, new Vector2(rectangle.Width, rectangle.Height), color, new Vector2(0, 0), new Vector2(1, 1));
+				var sprite = SpriteAnimations.Pixel.Frames[0];
+				ArtSpriteBatch.Add(new Vector3(position.X + rectangle.X, position.Y + rectangle.Y, depth), orientation, new Vector2(rectangle.Width, rectangle.Height), color, sprite.UV.LeftTop, sprite.UV.Dimensions);
 			}
 
 			foreach (var entity in SpriteAnimationFilter.Entities)
@@ -168,12 +164,17 @@ public class Renderer : MoonTools.ECS.Renderer
 				var str = Data.TextStorage.GetString(text.TextID);
 				var font = Fonts.FromID(text.FontID);
 				var color = Color.White;
+				var depth = -1f;
 
 				if (Has<ColorBlend>(entity))
 				{
 					color = Get<ColorBlend>(entity).Color;
 				}
 
+				if (Has<Depth>(entity))
+				{
+					depth = -Get<Depth>(entity).Value;
+				}
 
 				if (Has<TextDropShadow>(entity))
 				{
@@ -183,7 +184,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
 					var dropShadowBatch = AcquireTextBatch();
 					dropShadowBatch.Start(font);
-					ActiveBatchTransforms.Add((dropShadowBatch, Matrix4x4.CreateTranslation(dropShadowPosition.X, dropShadowPosition.Y, -2)));
+					ActiveBatchTransforms.Add((dropShadowBatch, Matrix4x4.CreateTranslation(dropShadowPosition.X, dropShadowPosition.Y, depth - 1)));
 
 					dropShadowBatch.Add(
 						str,
@@ -196,7 +197,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
 				var textBatch = AcquireTextBatch();
 				textBatch.Start(font);
-				ActiveBatchTransforms.Add((textBatch, Matrix4x4.CreateTranslation(new Vector3(position.X, position.Y, -1))));
+				ActiveBatchTransforms.Add((textBatch, Matrix4x4.CreateTranslation(new Vector3(position.X, position.Y, depth))));
 
 				textBatch.Add(
 					str,
@@ -206,11 +207,6 @@ public class Renderer : MoonTools.ECS.Renderer
 					text.VerticalAlignment
 				);
 
-			}
-
-			if (RectangleSpriteBatch.InstanceCount > 0)
-			{
-				RectangleSpriteBatch.Upload(commandBuffer);
 			}
 
 			if (ArtSpriteBatch.InstanceCount > 0)
@@ -233,11 +229,6 @@ public class Renderer : MoonTools.ECS.Renderer
 			if (ArtSpriteBatch.InstanceCount > 0)
 			{
 				ArtSpriteBatch.Render(commandBuffer, SpriteBatchPipeline, SpriteAtlasTexture, PointSampler, viewProjectionMatrices);
-			}
-
-			if (RectangleSpriteBatch.InstanceCount > 0)
-			{
-				RectangleSpriteBatch.Render(commandBuffer, SpriteBatchPipeline, RectangleAtlasTexture, PointSampler, viewProjectionMatrices);
 			}
 
 			if (ActiveBatchTransforms.Count > 0)

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Collections.Generic;
 using GGJ2024.Data;
 using GGJ2024.Relations;
+using MoonWorks.Math;
 
 namespace GGJ2024.Systems;
 
@@ -76,6 +77,8 @@ public class Product : MoonTools.ECS.Manipulator
         Set(entity, new CanBeHeld());
 		Set(entity, new Depth(8));
         Set(entity, new SlowDownAnimation(15, 1));
+		var depth = MathHelper.Lerp(100, 10, position.Y / (float) Dimensions.GAME_H);
+		Set(entity, new Depth(depth));
 
         var product = Products.GetRandomItem();
 
