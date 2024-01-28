@@ -45,12 +45,12 @@ public static class Rando
 
     public static int Int(int min, int max)
     {
-        return (int)MathF.Floor(Value * (max - min) + min);
+		return Rand.Next(min, max);
     }
 
     public static int IntInclusive(int min, int max)
     {
-        return (int)MathF.Floor(Value * (max - min + 1) + min);
+		return Rand.Next(min, max + 1);
     }
 
     public static Vector2 OnUnitCircle()

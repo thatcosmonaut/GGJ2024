@@ -113,7 +113,7 @@ public class Product : MoonTools.ECS.Manipulator
 
 		if (animation != null)
 		{
-			Set(entity, new SpriteAnimation(animation, 10));
+			Set(entity, new SpriteAnimation(animation, 10, true, Rando.Int(0, animation.Frames.Length)));
 		}
 
         foreach (var category in CategoryFilter.Entities)
