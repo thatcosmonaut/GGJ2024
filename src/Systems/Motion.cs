@@ -5,6 +5,7 @@ using MoonWorks.Graphics;
 using GGJ2024.Utility;
 using System.Collections.Generic;
 using GGJ2024.Components;
+using MoonWorks;
 
 namespace GGJ2024.Systems;
 
@@ -95,7 +96,7 @@ public class Motion : MoonTools.ECS.System
         return new Rectangle(p.X + r.X, p.Y + r.Y, r.Width, r.Height);
     }
 
-    (Entity other, bool hit) CheckCollision(Entity e, Rectangle rect)
+    (Entity other, bool hit) CheckSolidCollision(Entity e, Rectangle rect)
     {
         RetrieveFromHash(SolidSpatialHash, SolidResults, rect);
 
@@ -141,7 +142,7 @@ public class Motion : MoonTools.ECS.System
             var newPos = new Position(x, position.Y);
             var rect = GetWorldRect(newPos, r);
 
-            (var other, var hit) = CheckCollision(e, rect);
+            (var other, var hit) = CheckSolidCollision(e, rect);
 
             xHit = hit;
 
@@ -160,7 +161,7 @@ public class Motion : MoonTools.ECS.System
             var newPos = new Position(mostRecentValidXPosition, y);
             var rect = GetWorldRect(newPos, r);
 
-            (var other, var hit) = CheckCollision(e, rect);
+            (var other, var hit) = CheckSolidCollision(e, rect);
             yHit = hit;
 
             if (yHit && Has<Solid>(other) && Has<Solid>(e))
@@ -242,5 +243,35 @@ public class Motion : MoonTools.ECS.System
                 Set(entity, pos + scaledVelocity);
 			}
         }
+
+		foreach (var entity in SolidFilter.Entities)
+		{
+			var position = Get<Position>(entity);
+			var rectangle = Get<Rectangle>(entity);
+
+			var leftPos = new Position(position.X - 1, position.Y);
+			var rightPos = new Position(position.X + 1, position.Y);
+			var upPos = new Position(position.X, position.Y - 1);
+			var downPos = new Position(position.X, position.Y + 1);
+
+			var leftRectangle = GetWorldRect(leftPos, rectangle);
+			var rightRectangle = GetWorldRect(rightPos, rectangle);
+			var upRectangle = GetWorldRect(upPos, rectangle);
+			var downRectangle = GetWorldRect(downPos, rectangle);
+
+			var (_, leftCollided) = CheckSolidCollision(entity, leftRectangle);
+			var (_, rightCollided) = CheckSolidCollision(entity, rightRectangle);
+			var (_, upCollided) = CheckSolidCollision(entity, upRectangle);
+			var (_, downCollided) = CheckSolidCollision(entity, downRectangle);
+
+			if (leftCollided || rightCollided || upCollided || downCollided)
+			{
+				Set(entity, new TouchingSolid());
+			}
+			else
+			{
+				Remove<TouchingSolid>(entity);
+			}
+		}
     }
 }
