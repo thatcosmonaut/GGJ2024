@@ -32,6 +32,16 @@ public static class Rando
         return Value * (max - min) + min;
     }
 
+    public static void Shuffle<T>(this T[] arr)
+    {
+        for (int i = arr.Length - 1; i >= 1; i--)
+        {
+            var j = Rando.IntInclusive(0, i);
+            var other = arr[j];
+            arr[j] = arr[i];
+            arr[i] = other;
+        }
+    }
 
     public static int Int(int min, int max)
     {

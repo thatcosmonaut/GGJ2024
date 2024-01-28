@@ -1,7 +1,9 @@
 using System;
+using System.IO;
 using System.Text;
 using GGJ2024.Components;
 using GGJ2024.Content;
+using GGJ2024.Utility;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
 using MoonWorks.Graphics.Font;
@@ -21,6 +23,8 @@ public class Ticker : MoonTools.ECS.System
 
 	const int PRICE_SPEED = -10;
 	const int NEWS_SPEED = -40;
+	string[] News;
+	int NewsIndex = 0;
 
 	public Ticker(World world, CategoriesAndIngredients categoriesAndIngredients) : base(world)
 	{
@@ -28,6 +32,16 @@ public class Ticker : MoonTools.ECS.System
 			.Include<Position>()
 			.Include<TickerText>()
 			.Build();
+
+		var newsFilePath = Path.Combine(
+			System.AppContext.BaseDirectory,
+			"Content",
+			"Data",
+			"news"
+		);
+
+		News = File.ReadAllLines(newsFilePath);
+		News.Shuffle();
 
 		Random = new MoonTools.ECS.Random();
 
@@ -160,7 +174,7 @@ public class Ticker : MoonTools.ECS.System
 
 	private void SpawnNews(float farthestRight)
 	{
-		var str = RandomString(70);
+		var str = News[NewsIndex];
 
 		Fonts.FromID(Fonts.PixeltypeID).TextBounds(
 			str,
@@ -182,6 +196,13 @@ public class Ticker : MoonTools.ECS.System
 		foreach (var entity in TickerTextFilter.Entities)
 		{
 			Set(entity, new Velocity(NEWS_SPEED, 0));
+		}
+
+		NewsIndex++;
+		if (NewsIndex >= News.Length)
+		{
+			NewsIndex = 0;
+			News.Shuffle();
 		}
 	}
 
