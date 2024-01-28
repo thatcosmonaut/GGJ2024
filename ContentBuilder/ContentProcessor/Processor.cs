@@ -559,7 +559,8 @@ namespace ContentProcessor
 
 			foreach (var directory in texturePageDir.EnumerateDirectories())
 			{
-				var animationMetadataPath = Path.Combine(directory.FullName, directory.Name + ".json");
+				//var animationMetadataPath = Path.Combine(directory.FullName, directory.Name + ".json");
+				var animationMetadataPath = directory.GetFiles("*.json")[0].FullName;
 				var animationMetadata = JsonSerializer.Deserialize<CramTextureAtlasAnimationData>(File.ReadAllText(animationMetadataPath), jsonSerializerOptions);
 
 				var frameList = new List<string>();
