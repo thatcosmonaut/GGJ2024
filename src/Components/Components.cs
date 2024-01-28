@@ -15,3 +15,4 @@ public readonly record struct Price(float Value);
 public readonly record struct TickerText(float Width);
 public readonly record struct ColorBlend(Color Color);
 public readonly record struct CanFillOrders();
+public readonly record struct CanGiveOrders();

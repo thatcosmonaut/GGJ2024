@@ -8,6 +8,7 @@ using GGJ2024.Components;
 using GGJ2024.Utility;
 using GGJ2024.Data;
 using GGJ2024.Messages;
+using LD54.Systems;
 
 namespace GGJ2024
 {
@@ -21,7 +22,8 @@ namespace GGJ2024
 		Hold Hold;
 		ProductSpawner ProductSpawner;
 		Ticker Ticker;
-		Timer Timer;
+		Systems.GameTimer GameTimer;
+		Timing Timing;
 		Orders Orders;
 		SetSpriteAnimationSystem SetSpriteAnimationSystem;
 		UpdateSpriteAnimationSystem UpdateSpriteAnimationSystem;
@@ -45,7 +47,8 @@ namespace GGJ2024
 			StaticAudio.LoadAll();
 			Fonts.LoadAll(GraphicsDevice);
 
-			Timer = new Timer(World);
+			GameTimer = new(World);
+			Timing = new(World);
 			Input = new Input(World, Inputs);
 			Motion = new Motion(World);
 			Audio = new Audio(World, AudioDevice);
@@ -69,8 +72,15 @@ namespace GGJ2024
 			World.Set(cashRegister, new CanFillOrders());
 			World.Set(cashRegister, Color.ForestGreen);
 
+
+			var ordersKiosk = World.CreateEntity();
+			World.Set(ordersKiosk, new Position(Dimensions.GAME_W - 32, Dimensions.GAME_H - 32));
+			World.Set(ordersKiosk, new Rectangle(0, 0, 32, 32));
+			World.Set(ordersKiosk, new CanGiveOrders());
+			World.Set(ordersKiosk, Color.Orange);
+
 			var timer = World.CreateEntity();
-			World.Set(timer, new GameTimer(260));
+			World.Set(timer, new Components.GameTimer(260));
 			World.Set(timer, new Position(Dimensions.GAME_W / 2, Dimensions.GAME_H * 3 / 4));
 
 			PlayerController.SpawnPlayer(0);
@@ -79,8 +89,9 @@ namespace GGJ2024
 
 		protected override void Update(System.TimeSpan dt)
 		{
+			Timing.Update(dt);
 			UpdateSpriteAnimationSystem.Update(dt);
-			Timer.Update(dt);
+			GameTimer.Update(dt);
 			Ticker.Update(dt);
 			Input.Update(dt);
 			PlayerController.Update(dt);

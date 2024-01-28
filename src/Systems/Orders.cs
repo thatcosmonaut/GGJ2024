@@ -10,6 +10,7 @@ public class Orders : MoonTools.ECS.System
     Filter CategoryFilter;
     Filter IngredientFilter;
     Product Product;
+    float OrderWaitTime = 3.0f;
 
     public Orders(World world) : base(world)
     {
@@ -104,9 +105,8 @@ public class Orders : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
-        var player = GetSingletonEntity<Player>(); //TODO: do this for real
-        if (!HasOutRelation<HasOrder>(player))
-            GetNewOrder(player);
+        var player = GetSingletonEntity<Player>();
+
 
         var cashRegister = GetSingletonEntity<CanFillOrders>();
 
@@ -135,6 +135,30 @@ public class Orders : MoonTools.ECS.System
                     Destroy(OutRelationSingleton<Holding>(i));
                     Destroy(i);
                 }
+            }
+        }
+
+        var ordersKiosk = GetSingletonEntity<CanGiveOrders>();
+
+        foreach (var o in OutRelations<Colliding>(ordersKiosk))
+        {
+            if (Has<Player>(o) && !HasOutRelation<CantGetOrders>(o))
+            {
+                var timer = CreateEntity();
+                Set(timer, new Timer(OrderWaitTime));
+                Relate(o, timer, new CantGetOrders());
+                GetNewOrder(o);
+            }
+        }
+
+        foreach (var i in InRelations<Colliding>(ordersKiosk))
+        {
+            if (Has<Player>(i) && !HasOutRelation<CantGetOrders>(i))
+            {
+                var timer = CreateEntity();
+                Set(timer, new Timer(OrderWaitTime));
+                Relate(i, timer, new CantGetOrders());
+                GetNewOrder(i);
             }
         }
 
