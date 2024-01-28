@@ -45,7 +45,7 @@ public class ProductSpawner : MoonTools.ECS.System
         SpawnVerticalDoubleShelf(x, bottomShelfY, 6);
 
         Product.SpawnShelf(320 - spawnStepDistance - 16, 200, 4, 2);
-        //Product.SpawnShelf(320 - spawnStepDistance - 16, 100, 4, 1);
+        Product.SpawnShelf(640 - spawnStepDistance + 3, 170, 1, 4, Categories[9]);
     }
 
     public void SpawnVerticalDoubleShelf(int x, int y, int categoryInt)
@@ -61,7 +61,7 @@ public class ProductSpawner : MoonTools.ECS.System
         // This is for auto refresh level editing
         if (false)
         {
-            var respawnTime = .1f;
+            var respawnTime = .5f;
             time += (float)delta.TotalSeconds;
             if (time > respawnTime)
             {
