@@ -101,6 +101,7 @@ public class Hold : MoonTools.ECS.System
 		var xOffset = holderPosition.X < Dimensions.GAME_W * 3 / 4 ? 10 : -100;
 		var yOffset = -30;
 
+		// TODO: set this rectangle based on font textbounds
 		var backgroundRect = CreateEntity();
 		Set(backgroundRect, holderPosition + new Position(xOffset - 5, yOffset - 5));
 		Set(backgroundRect, new Rectangle(0, 0, 100, 100));
