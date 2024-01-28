@@ -12,7 +12,7 @@ public class Hold : MoonTools.ECS.System
 {
     MoonTools.ECS.Filter TryHoldFilter;
     MoonTools.ECS.Filter CanHoldFilter;
-    float HoldSpeed = 32.0f;
+    float HoldSpeed = 300.0f;
     Product Product;
 
     public Hold(World world) : base(world)
