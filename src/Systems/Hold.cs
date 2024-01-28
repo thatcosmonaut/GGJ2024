@@ -4,6 +4,7 @@ using MoonWorks.Math.Float;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
 using GGJ2024.Components;
+using GGJ2024.Data;
 
 namespace GGJ2024.Systems;
 
@@ -46,7 +47,7 @@ public class Hold : MoonTools.ECS.System
                     holding = true;
                     Relate(e, o, new Holding());
                     var category = Get<Category>(OutRelationSingleton<IsInCategory>(o));
-                    System.Console.Write($"price: ${Product.GetPrice(o)} category: {category} ");
+                    System.Console.Write($" {TextStorage.GetString(Get<Name>(o).TextID)} ${Product.GetPrice(o)} category: {category} ");
 
                     System.Console.Write("ingredience: ");
                     foreach (var ingredient in OutRelations<HasIngredient>(o))
