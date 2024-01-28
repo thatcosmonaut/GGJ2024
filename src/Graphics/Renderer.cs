@@ -172,7 +172,7 @@ public class Renderer : MoonTools.ECS.Renderer
 				var str = Data.TextStorage.GetString(text.TextID);
 				var font = Fonts.FromID(text.FontID);
 				var color = Color.White;
-				var depth = -1;
+				var depth = -1f;
 
 				if (Has<ColorBlend>(entity))
 				{

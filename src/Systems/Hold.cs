@@ -93,7 +93,7 @@ public class Hold : MoonTools.ECS.System
 		}
 	}
 
-	void SetHoldVelocity(Entity e, float dt)
+	void SetHoldParameters(Entity e, float dt)
 	{
 		var holding = OutRelationSingleton<Holding>(e);
 		var holderPos = Get<Position>(e);
@@ -188,7 +188,7 @@ public class Hold : MoonTools.ECS.System
 			Set(ingredientPrice, holderPosition + new Position(xOffset + textBounds.W + 3, yOffset));
 			Set(ingredientPrice, new Text(Fonts.KosugiID, 8, ingredientPriceString, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 			Set(ingredientPrice, new TextDropShadow(1, 1));
-			Set(ingredientPrice, new Depth(11 - playerIndex * 2));
+			Set(ingredientPrice, new Depth(9 - playerIndex * 2));
 
 			Relate(potentialHolder, ingredientPrice, new ShowingPopup());
 			Relate(ingredientPrice, ingredient, new DisplayingIngredientPrice());
@@ -245,7 +245,7 @@ public class Hold : MoonTools.ECS.System
 
 			if (HasOutRelation<Holding>(holder))
 			{
-				SetHoldVelocity(holder, (float)delta.TotalSeconds);
+				SetHoldParameters(holder, (float)delta.TotalSeconds);
 			}
         }
 
