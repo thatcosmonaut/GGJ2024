@@ -100,7 +100,7 @@ public class Renderer : MoonTools.ECS.Renderer
 						ColorAttachmentBlendState.AlphaBlend
 					)
 				),
-				DepthStencilState = DepthStencilState.Disable,
+				DepthStencilState = DepthStencilState.DepthReadWrite,
 				VertexShaderInfo = GraphicsDevice.TextVertexShaderInfo,
 				FragmentShaderInfo = GraphicsDevice.TextFragmentShaderInfo,
 				VertexInputState = GraphicsDevice.TextVertexInputState,
@@ -139,8 +139,12 @@ public class Renderer : MoonTools.ECS.Renderer
 				var rectangle = Get<Rectangle>(entity);
 				var orientation = Has<Orientation>(entity) ? Get<Orientation>(entity).Angle : 0.0f;
 				var color = Has<ColorBlend>(entity) ? Get<ColorBlend>(entity).Color : Color.White;
-
-				RectangleSpriteBatch.Add(new Vector3(position.X + rectangle.X, position.Y + rectangle.Y, -2f), orientation, new Vector2(rectangle.Width, rectangle.Height), color, new Vector2(0, 0), new Vector2(1, 1));
+				var depth = -2f;
+				if (Has<Depth>(entity))
+				{
+					depth = -Get<Depth>(entity).Value;
+				}
+				RectangleSpriteBatch.Add(new Vector3(position.X + rectangle.X, position.Y + rectangle.Y, depth), orientation, new Vector2(rectangle.Width, rectangle.Height), color, new Vector2(0, 0), new Vector2(1, 1));
 			}
 
 			foreach (var entity in SpriteAnimationFilter.Entities)
@@ -168,12 +172,17 @@ public class Renderer : MoonTools.ECS.Renderer
 				var str = Data.TextStorage.GetString(text.TextID);
 				var font = Fonts.FromID(text.FontID);
 				var color = Color.White;
+				var depth = -1;
 
 				if (Has<ColorBlend>(entity))
 				{
 					color = Get<ColorBlend>(entity).Color;
 				}
 
+				if (Has<Depth>(entity))
+				{
+					depth = -Get<Depth>(entity).Value;
+				}
 
 				if (Has<TextDropShadow>(entity))
 				{
@@ -183,7 +192,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
 					var dropShadowBatch = AcquireTextBatch();
 					dropShadowBatch.Start(font);
-					ActiveBatchTransforms.Add((dropShadowBatch, Matrix4x4.CreateTranslation(dropShadowPosition.X, dropShadowPosition.Y, -2)));
+					ActiveBatchTransforms.Add((dropShadowBatch, Matrix4x4.CreateTranslation(dropShadowPosition.X, dropShadowPosition.Y, depth - 1)));
 
 					dropShadowBatch.Add(
 						str,
@@ -196,7 +205,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
 				var textBatch = AcquireTextBatch();
 				textBatch.Start(font);
-				ActiveBatchTransforms.Add((textBatch, Matrix4x4.CreateTranslation(new Vector3(position.X, position.Y, -1))));
+				ActiveBatchTransforms.Add((textBatch, Matrix4x4.CreateTranslation(new Vector3(position.X, position.Y, depth))));
 
 				textBatch.Add(
 					str,
