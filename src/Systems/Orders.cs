@@ -91,7 +91,7 @@ public class Orders : MoonTools.ECS.System
                 var requiredIngredient = OutRelationSingleton<RequiresIngredient>(order);
                 if (HasOutRelation<HasIngredient>(product))
                 {
-                    var ingredient = OutRelationSingleton<IsInCategory>(product);
+                    var ingredient = OutRelationSingleton<HasIngredient>(product);
 
                     if (requiredIngredient == ingredient)
                         return (order, true);

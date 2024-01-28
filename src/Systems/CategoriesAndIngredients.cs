@@ -109,9 +109,9 @@ public class CategoriesAndIngredients : Manipulator
         return category switch
         {
             Category.Animals => Color.GreenYellow,
-            Category.Clothes => Color.Azure,
+            Category.Clothes => Color.Blue,
             Category.Cosmetics => Color.Red,
-            Category.Electronics => Color.Black,
+            Category.Electronics => Color.Beige,
             Category.Food => Color.ForestGreen,
             Category.Furniture => Color.Brown,
             Category.Gasses => Color.Pink,
