@@ -19,5 +19,5 @@ public readonly record struct CanGiveOrders();
 
 public readonly record struct ColorSpeed(float RedSpeed, float GreenSpeed, float BlueSpeed);
 
-// NOTE: depth is Fucked Up, bigger number = closer to the camera, can't be 0
 public readonly record struct Depth(int Value);
+public readonly record struct Invisible();

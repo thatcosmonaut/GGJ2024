@@ -9,5 +9,12 @@ layout(binding = 0, set = 1) uniform sampler2D Sampler;
 
 void main()
 {
+	vec4 sampledColor = texture(Sampler, inTexCoord);
+
+	if (sampledColor.a < 0.02)
+	{
+		discard;
+	}
+
 	FragColor = texture(Sampler, inTexCoord) * inColor;
 }

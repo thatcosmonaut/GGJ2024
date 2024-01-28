@@ -19,6 +19,8 @@ public class Renderer : MoonTools.ECS.Renderer
 	SpriteBatch RectangleSpriteBatch;
 	SpriteBatch ArtSpriteBatch;
 
+	Texture DepthTexture;
+
 	Texture RectangleAtlasTexture;
 	Texture SpriteAtlasTexture;
 
@@ -30,11 +32,11 @@ public class Renderer : MoonTools.ECS.Renderer
 	Queue<TextBatch> BatchPool = new Queue<TextBatch>();
 	List<(TextBatch, Matrix4x4)> ActiveBatchTransforms = new List<(TextBatch, Matrix4x4)>();
 
-	public Renderer(World world, GraphicsDevice graphicsDevice, TextureFormat swapchainFormat) : base(world)
+	public Renderer(World world, GraphicsDevice graphicsDevice, TextureFormat swapchainFormat, uint width, uint height) : base(world)
 	{
 		GraphicsDevice = graphicsDevice;
 
-		RectangleFilter = FilterBuilder.Include<Rectangle>().Include<Position>().Build();
+		RectangleFilter = FilterBuilder.Include<Rectangle>().Include<Position>().Exclude<Invisible>().Build();
 		TextFilter = FilterBuilder.Include<Text>().Include<Position>().Build();
 		SpriteAnimationFilter = FilterBuilder.Include<SpriteAnimation>().Include<Position>().Build();
 
@@ -47,6 +49,8 @@ public class Renderer : MoonTools.ECS.Renderer
 			baseContentPath,
 			"Shaders"
 		);
+
+		DepthTexture = Texture.CreateTexture2D(GraphicsDevice, width, height, TextureFormat.D16, TextureUsageFlags.DepthStencilTarget);
 
 		var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
 
@@ -64,12 +68,13 @@ public class Renderer : MoonTools.ECS.Renderer
 				new GraphicsPipelineCreateInfo
 				{
 					AttachmentInfo = new GraphicsPipelineAttachmentInfo(
+						TextureFormat.D16,
 						new ColorAttachmentDescription(
 							swapchainFormat,
 							ColorAttachmentBlendState.NonPremultiplied
 						)
 					),
-					DepthStencilState = DepthStencilState.Disable,
+					DepthStencilState = DepthStencilState.DepthReadWrite,
 					MultisampleState = MultisampleState.None,
 					PrimitiveType = PrimitiveType.TriangleList,
 					RasterizerState = RasterizerState.CCW_CullNone,
@@ -87,6 +92,7 @@ public class Renderer : MoonTools.ECS.Renderer
 			new GraphicsPipelineCreateInfo
 			{
 				AttachmentInfo = new GraphicsPipelineAttachmentInfo(
+					TextureFormat.D16,
 					new ColorAttachmentDescription(
 						swapchainFormat,
 						ColorAttachmentBlendState.AlphaBlend
@@ -125,8 +131,6 @@ public class Renderer : MoonTools.ECS.Renderer
 			}
 			ActiveBatchTransforms.Clear();
 
-			// NOTE: depth is Fucked Up, bigger number = closer to the camera, can't be 0
-
 			foreach (var entity in RectangleFilter.Entities)
 			{
 				var position = Get<Position>(entity);
@@ -134,7 +138,7 @@ public class Renderer : MoonTools.ECS.Renderer
 				var orientation = Has<Orientation>(entity) ? Get<Orientation>(entity).Angle : 0.0f;
 				var color = Has<Color>(entity) ? Get<Color>(entity) : Color.White;
 
-				RectangleSpriteBatch.Add(new Vector3(position.X + rectangle.X, position.Y + rectangle.Y, -2f), orientation, new Vector2(rectangle.Width, rectangle.Height), color, new Vector2(0, 0), new Vector2(1, 1));
+				RectangleSpriteBatch.Add(new Vector3(position.X + rectangle.X, position.Y + rectangle.Y, -50f), orientation, new Vector2(rectangle.Width, rectangle.Height), color, new Vector2(0, 0), new Vector2(1, 1));
 			}
 
 			foreach (var entity in SpriteAnimationFilter.Entities)
@@ -197,6 +201,7 @@ public class Renderer : MoonTools.ECS.Renderer
 			}
 
 			commandBuffer.BeginRenderPass(
+				new DepthStencilAttachmentInfo(DepthTexture, new DepthStencilValue(1, 0)),
 				new ColorAttachmentInfo(swapchainTexture, Color.Black)
 			);
 
