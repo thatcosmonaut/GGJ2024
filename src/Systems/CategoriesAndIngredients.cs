@@ -161,7 +161,7 @@ public class CategoriesAndIngredients : Manipulator
             var entity = IngredientFilter.RandomEntity;
             var price = Get<Price>(entity).Value;
             var ingredient = Get<Ingredient>(entity);
-            Set(entity, new Price(price + delta));
+            Set(entity, new Price(MathF.Round(MathF.Max(float.Epsilon, price + delta), 2)));
             return (price, delta, ingredient);
         }
 
