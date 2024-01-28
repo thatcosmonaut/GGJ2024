@@ -21,6 +21,7 @@ namespace GGJ2024
 		Audio Audio;
 		Hold Hold;
 		ProductSpawner ProductSpawner;
+		Product ProductManipulator;
 		Ticker Ticker;
 		Systems.GameTimer GameTimer;
 		Timing Timing;
@@ -39,6 +40,7 @@ namespace GGJ2024
 		{
 			TextureAtlases.LoadAll();
 			SpriteAnimations.LoadAll();
+			ProductLoader.Load();
 
 			var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
 			TextureAtlases.TP_Sprites.Load(GraphicsDevice, commandBuffer);
@@ -57,6 +59,7 @@ namespace GGJ2024
 			Hold = new Hold(World);
 			Orders = new Orders(World);
 			ProductSpawner = new ProductSpawner(World);
+			ProductManipulator = new Product(World);
 			SetSpriteAnimationSystem = new SetSpriteAnimationSystem(World);
 			UpdateSpriteAnimationSystem = new UpdateSpriteAnimationSystem(World);
 			ColorAnimation = new ColorAnimation(World);
@@ -108,7 +111,6 @@ namespace GGJ2024
 			World.Set(cashRegister, new Rectangle(0, 0, 32, 32));
 			World.Set(cashRegister, new CanFillOrders());
 			World.Set(cashRegister, Color.ForestGreen);
-
 
 			var ordersKiosk = World.CreateEntity();
 			World.Set(ordersKiosk, new Position(Dimensions.GAME_W - 32, Dimensions.GAME_H - 32));
