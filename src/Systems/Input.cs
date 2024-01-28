@@ -78,19 +78,23 @@ public class Input : MoonTools.ECS.System
         return results.ToString();
     }
 
-    Dictionary<Actions, ActionState> ActionStates = new Dictionary<Actions, ActionState>();
+    Dictionary<Actions, ActionState>[] ActionStateDictionaries = new Dictionary<Actions, ActionState>[]
+    {
+        new Dictionary<Actions, ActionState>(),
+        new Dictionary<Actions, ActionState>()
+    };
 
     public static void ResetActions()
     {
         ActionBindings = new Dictionary<Actions, GenericAxis>()
             {
                 {Actions.MoveY, new GenericAxis{
-                    Positive = new List<GenericInputs>(){GenericInputs.S},
-                    Negative = new List<GenericInputs>(){GenericInputs.W, GenericInputs.LeftY}
+                    Positive = new List<GenericInputs>(){GenericInputs.S,  GenericInputs.LeftY},
+                    Negative = new List<GenericInputs>(){GenericInputs.W}
                 }},
                 {Actions.MoveX, new GenericAxis{
-                    Positive = new List<GenericInputs>(){GenericInputs.D},
-                    Negative = new List<GenericInputs>(){GenericInputs.A, GenericInputs.LeftX}
+                    Positive = new List<GenericInputs>(){GenericInputs.D, GenericInputs.LeftX},
+                    Negative = new List<GenericInputs>(){GenericInputs.A}
                 }},
                 {Actions.Interact, new GenericAxis{
                     Positive = new List<GenericInputs>(){GenericInputs.Space, GenericInputs.AButton}
@@ -107,9 +111,12 @@ public class Input : MoonTools.ECS.System
         Inputs = inputContext;
         ResetActions();
 
-        foreach (var n in (Actions[])System.Enum.GetValues(typeof(Actions)))
+        foreach (var dict in ActionStateDictionaries)
         {
-            ActionStates[n] = ActionState.Off;
+            foreach (var n in (Actions[])System.Enum.GetValues(typeof(Actions)))
+            {
+                dict[n] = ActionState.Off;
+            }
         }
 
         PlayerFilter = FilterBuilder.Include<Player>().Build();
@@ -124,6 +131,7 @@ public class Input : MoonTools.ECS.System
 
         foreach (var player in PlayerFilter.Entities)
         {
+            var actionStates = ActionStateDictionaries[Get<Player>(player).Index];
             foreach (var (action, axis) in ActionBindings)
             {
                 var value = 0.0f;
@@ -135,36 +143,36 @@ public class Input : MoonTools.ECS.System
                     {
                         value = v;
 
-                        switch (ActionStates[action])
+                        switch (actionStates[action])
                         {
                             case ActionState.Off:
-                                ActionStates[action] = ActionState.Pressed;
+                                actionStates[action] = ActionState.Pressed;
                                 break;
                             case ActionState.Pressed:
-                                ActionStates[action] = ActionState.Held;
+                                actionStates[action] = ActionState.Held;
                                 break;
                             case ActionState.Held:
                                 break;
                             case ActionState.Released:
-                                ActionStates[action] = ActionState.Pressed;
+                                actionStates[action] = ActionState.Pressed;
                                 break;
                         }
                         break;
                     }
                     else
                     {
-                        switch (ActionStates[action])
+                        switch (actionStates[action])
                         {
                             case ActionState.Off:
                                 break;
                             case ActionState.Pressed:
-                                ActionStates[action] = ActionState.Released;
+                                actionStates[action] = ActionState.Released;
                                 break;
                             case ActionState.Held:
-                                ActionStates[action] = ActionState.Released;
+                                actionStates[action] = ActionState.Released;
                                 break;
                             case ActionState.Released:
-                                ActionStates[action] = ActionState.Off;
+                                actionStates[action] = ActionState.Off;
                                 break;
                         }
                     }
@@ -176,36 +184,36 @@ public class Input : MoonTools.ECS.System
                     if (System.MathF.Abs(v) > 0.0f)
                     {
                         value += v;
-                        switch (ActionStates[action])
+                        switch (actionStates[action])
                         {
                             case ActionState.Off:
-                                ActionStates[action] = ActionState.Pressed;
+                                actionStates[action] = ActionState.Pressed;
                                 break;
                             case ActionState.Pressed:
-                                ActionStates[action] = ActionState.Held;
+                                actionStates[action] = ActionState.Held;
                                 break;
                             case ActionState.Held:
                                 break;
                             case ActionState.Released:
-                                ActionStates[action] = ActionState.Pressed;
+                                actionStates[action] = ActionState.Pressed;
                                 break;
                         }
                         break;
                     }
                     else
                     {
-                        switch (ActionStates[action])
+                        switch (actionStates[action])
                         {
                             case ActionState.Off:
                                 break;
                             case ActionState.Pressed:
-                                ActionStates[action] = ActionState.Released;
+                                actionStates[action] = ActionState.Released;
                                 break;
                             case ActionState.Held:
-                                ActionStates[action] = ActionState.Released;
+                                actionStates[action] = ActionState.Released;
                                 break;
                             case ActionState.Released:
-                                ActionStates[action] = ActionState.Off;
+                                actionStates[action] = ActionState.Off;
                                 break;
                         }
                     }
@@ -213,7 +221,7 @@ public class Input : MoonTools.ECS.System
 
                 if (System.MathF.Abs(value) > 0.0f)
                 {
-                    Send(new Action(value, action, ActionStates[action], Get<Player>(player).Index));
+                    Send(new Action(value, action, actionStates[action], Get<Player>(player).Index));
                 }
             }
         }

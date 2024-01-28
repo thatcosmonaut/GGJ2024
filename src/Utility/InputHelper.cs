@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using MoonWorks.Input;
 using MoonWorks.Math;
@@ -159,7 +160,9 @@ public static class InputHelper
     static bool PollButton(Inputs inputs, GamepadButtonCode btn, int index)
     {
         if (inputs.GamepadExists(index))
-            return inputs.GetGamepad(index).Button(btn).IsDown;
+        {
+            return inputs.GetGamepad(index).Button(btn).IsDown; ;
+        }
         return false;
     }
 
@@ -172,7 +175,11 @@ public static class InputHelper
     {
         if (inputs.GamepadExists(index))
         {
-            return inputs.GetGamepad(index).AxisValue(axis);
+            var value = inputs.GetGamepad(index).AxisValue(axis);
+            if (MathF.Abs(value) > 0.5f)
+            {
+                return value;
+            }
         }
 
         return 0.0f;
@@ -180,8 +187,11 @@ public static class InputHelper
 
     static bool PollKey(Inputs inputs, KeyCode key, int index)
     {
-        if (index == 0)
-            return inputs.Keyboard.IsDown(key);
+        if (!inputs.GamepadExists(1))
+        {
+            if (index == 0)
+                return inputs.Keyboard.IsDown(key);
+        }
         return false;
     }
 

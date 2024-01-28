@@ -60,14 +60,6 @@ namespace GGJ2024
 
 			Ticker = new Ticker(World, cats);
 
-			var player = World.CreateEntity();
-			World.Set(player, new Position(0f, Dimensions.GAME_H * 0.5f));
-			World.Set(player, new Rectangle(0, 0, 16, 16));
-			World.Set(player, new Player(0, 0));
-			World.Set(player, new CanHold());
-			World.Set(player, new Solid());
-			World.Set(player, Color.Green);
-
 			var cashRegister = World.CreateEntity();
 			World.Set(cashRegister, new Position(Vector2.Zero));
 			World.Set(cashRegister, new Rectangle(0, 0, 32, 32));
