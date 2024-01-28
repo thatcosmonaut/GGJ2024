@@ -100,7 +100,7 @@ namespace GGJ2024
 
 			var uiBottomBackground = World.CreateEntity();
 			World.Set(uiBottomBackground, new Position(0, Dimensions.GAME_H - 40));
-			World.Set(uiBottomBackground, new Depth(1));
+			World.Set(uiBottomBackground, new Depth(9));
 			World.Set(uiBottomBackground, new SpriteAnimation(Content.SpriteAnimations.HUD_Bottom, 0));
 
 			var cashRegister = World.CreateEntity();

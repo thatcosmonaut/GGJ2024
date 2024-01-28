@@ -116,11 +116,11 @@ public class Hold : MoonTools.ECS.System
 			{
 				if (Has<IsPopupBox>(uiElement))
 				{
-					Set(uiElement, new Depth(11));
+					Set(uiElement, new Depth(8));
 				}
 				else
 				{
-					Set(uiElement, new Depth(9));
+					Set(uiElement, new Depth(6));
 				}
 			}
 
@@ -140,7 +140,7 @@ public class Hold : MoonTools.ECS.System
 		var backgroundRect = CreateEntity();
 		Set(backgroundRect, holderPosition + new Position(xOffset - 5, yOffset - 5));
 		Set(backgroundRect, new DrawAsRectangle());
-		Set(backgroundRect, new Depth(11 - index * 4));
+		Set(backgroundRect, new Depth(8 - index * 4));
 		Set(backgroundRect, new IsPopupBox());
 
 		if (playerIndex == 0)
@@ -158,7 +158,7 @@ public class Hold : MoonTools.ECS.System
 		Set(name, holderPosition + new Position(xOffset, yOffset));
 		Set(name, new Text(Fonts.KosugiID, 10, Get<Name>(product).TextID, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 		Set(name, new TextDropShadow(1, 1));
-		Set(name, new Depth(9 - index * 4));
+		Set(name, new Depth(6 - index * 4));
 
 		Relate(potentialHolder, name, new ShowingPopup());
 
@@ -178,7 +178,7 @@ public class Hold : MoonTools.ECS.System
 		Set(price, holderPosition + new Position(xOffset, yOffset));
 		Set(price, new Text(Fonts.KosugiID, 10, "$" + Product.GetPrice(product).ToString("F2"), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 		Set(price, new TextDropShadow(1, 1));
-		Set(price, new Depth(9 - index * 4));
+		Set(price, new Depth(6 - index * 4));
 
 		Relate(potentialHolder, price, new ShowingPopup());
 		Relate(price, product, new DisplayingProductPrice());
@@ -194,7 +194,7 @@ public class Hold : MoonTools.ECS.System
 			Set(ingredientName, holderPosition + new Position(xOffset, yOffset));
 			Set(ingredientName, new Text(Fonts.KosugiID, 8, ingredientString, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 			Set(ingredientName, new TextDropShadow(1, 1));
-			Set(ingredientName, new Depth(9 - index * 4));
+			Set(ingredientName, new Depth(6 - index * 4));
 
 			Relate(potentialHolder, ingredientName, new ShowingPopup());
 
@@ -215,7 +215,7 @@ public class Hold : MoonTools.ECS.System
 			Set(ingredientPrice, holderPosition + new Position(xOffset + textBounds.W + 3, yOffset));
 			Set(ingredientPrice, new Text(Fonts.KosugiID, 8, ingredientPriceString, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 			Set(ingredientPrice, new TextDropShadow(1, 1));
-			Set(ingredientPrice, new Depth(9 - index * 4));
+			Set(ingredientPrice, new Depth(6 - index * 4));
 
 			Relate(potentialHolder, ingredientPrice, new ShowingPopup());
 			Relate(ingredientPrice, ingredient, new DisplayingIngredientPrice());
