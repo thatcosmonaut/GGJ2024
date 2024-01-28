@@ -12,6 +12,7 @@ public class Hold : MoonTools.ECS.System
     MoonTools.ECS.Filter TryHoldFilter;
     MoonTools.ECS.Filter CanHoldFilter;
     float HoldSpeed = 32.0f;
+    Product Product;
 
     public Hold(World world) : base(world)
     {
@@ -29,6 +30,7 @@ public class Hold : MoonTools.ECS.System
             .Include<Position>()
             .Include<CanHold>()
             .Build();
+        Product = new Product(world);
     }
 
     void HoldOrDrop(Entity e)
@@ -44,7 +46,7 @@ public class Hold : MoonTools.ECS.System
                     holding = true;
                     Relate(e, o, new Holding());
                     var category = Get<Category>(OutRelationSingleton<IsInCategory>(o));
-                    System.Console.Write($"category: {category} ");
+                    System.Console.Write($"price: ${Product.GetPrice(o)} category: {category} ");
 
                     System.Console.Write("ingredience: ");
                     foreach (var ingredient in OutRelations<HasIngredient>(o))
