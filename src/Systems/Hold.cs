@@ -135,7 +135,7 @@ public class Hold : MoonTools.ECS.System
 		Relate(potentialHolder, product, new Inspecting());
 
 		var xOffset = holderPosition.X < Dimensions.GAME_W * 3 / 4 ? 10 : -100;
-		var yOffset = -30;
+		var yOffset = holderPosition.Y > Dimensions.GAME_H * 3 / 4 ? -100 : -30;
 
 		var backgroundRect = CreateEntity();
 		Set(backgroundRect, holderPosition + new Position(xOffset - 5, yOffset - 5));
@@ -211,8 +211,10 @@ public class Hold : MoonTools.ECS.System
 				TextRectangle(textBounds, new Position(xOffset, yOffset))
 			);
 
+			var priceAdditionalOffset = textBounds.W + 3;
+
 			var ingredientPrice = CreateEntity();
-			Set(ingredientPrice, holderPosition + new Position(xOffset + textBounds.W + 3, yOffset));
+			Set(ingredientPrice, holderPosition + new Position(xOffset + priceAdditionalOffset, yOffset));
 			Set(ingredientPrice, new Text(Fonts.KosugiID, 8, ingredientPriceString, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 			Set(ingredientPrice, new TextDropShadow(1, 1));
 			Set(ingredientPrice, new Depth(6 - index * 4));
@@ -230,7 +232,7 @@ public class Hold : MoonTools.ECS.System
 
 			textBoundsRectangle = Rectangle.Union(
 				textBoundsRectangle,
-				TextRectangle(textBounds, new Position(xOffset, yOffset))
+				TextRectangle(textBounds, new Position(xOffset + priceAdditionalOffset, yOffset))
 			);
 
 			yOffset += 15;
