@@ -122,7 +122,7 @@ public class PlayerController : MoonTools.ECS.System
 
 			var velocity = direction * Speed;
 
-			int framerate = (int)(velocity.LengthSquared() / 200f);
+			int framerate = (int)(velocity.LengthSquared() / 1000f);
 
 			Send(new SetAnimationMessage(
 				entity,
