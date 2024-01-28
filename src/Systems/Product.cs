@@ -71,12 +71,50 @@ public class Product : MoonTools.ECS.Manipulator
     {
         var entity = CreateEntity();
         Set(entity, position);
-        Set(entity, new Rectangle(0, 0, 16, 16));
+        Set(entity, new Rectangle(-8, -8, 16, 16));
         Set(entity, new CanBeHeld());
 
         var product = Products.GetRandomItem();
 
         Set(entity, new Name(TextStorage.GetID(product.Name)));
+
+		SpriteAnimationInfo animation = null;
+		switch (product.Category)
+		{
+			case Category.Animals:
+				animation = Content.SpriteAnimations.Item_Animal;
+				break;
+			case Category.Clothes:
+				animation = Content.SpriteAnimations.Item_Clothing;
+				break;
+			case Category.Cosmetics:
+				animation = Content.SpriteAnimations.Item_Cosmetics;
+				break;
+			case Category.Electronics:
+				break;
+			case Category.Food:
+				break;
+			case Category.Furniture:
+				break;
+			case Category.Gasses:
+				break;
+			case Category.IntellectualProperty:
+				break;
+			case Category.Pharmacy:
+				break;
+			case Category.Relics:
+				animation = Content.SpriteAnimations.Item_Relic;
+				break;
+			case Category.None:
+				break;
+			default:
+				break;
+		}
+
+		if (animation != null)
+		{
+			Set(entity, new SpriteAnimation(animation, 10));
+		}
 
         foreach (var category in CategoryFilter.Entities)
         {
@@ -84,6 +122,7 @@ public class Product : MoonTools.ECS.Manipulator
             {
                 Relate(entity, category, new IsInCategory());
                 Set(entity, CategoriesAndIngredients.GetColor(Get<Category>(category)));
+
                 break;
             }
         }
@@ -95,5 +134,5 @@ public class Product : MoonTools.ECS.Manipulator
                 Relate(entity, ingredient, new HasIngredient());
             }
         }
-    }
+	}
 }

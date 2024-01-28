@@ -131,6 +131,7 @@ public class Renderer : MoonTools.ECS.Renderer
 			}
 			ActiveBatchTransforms.Clear();
 
+			/*
 			foreach (var entity in RectangleFilter.Entities)
 			{
 				var position = Get<Position>(entity);
@@ -140,6 +141,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
 				RectangleSpriteBatch.Add(new Vector3(position.X + rectangle.X, position.Y + rectangle.Y, -50f), orientation, new Vector2(rectangle.Width, rectangle.Height), color, new Vector2(0, 0), new Vector2(1, 1));
 			}
+			*/
 
 			foreach (var entity in SpriteAnimationFilter.Entities)
 			{
