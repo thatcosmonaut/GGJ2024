@@ -150,7 +150,7 @@ public class Renderer : MoonTools.ECS.Renderer
 				var sprite = animation.CurrentSprite;
 				var origin = animation.Origin;
 				var offset = -origin - new Vector2(sprite.FrameRect.X, sprite.FrameRect.Y);
-				var depth = -1;
+				var depth = -1f;
 
 				if (Has<Depth>(entity))
 				{

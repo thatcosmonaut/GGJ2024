@@ -7,91 +7,112 @@ using GGJ2024.Components;
 using GGJ2024.Data;
 using GGJ2024.Content;
 using GGJ2024.Relations;
+using MoonWorks.Math;
+using GGJ2024.Messages;
 
 namespace GGJ2024.Systems;
 
 public class Hold : MoonTools.ECS.System
 {
-    MoonTools.ECS.Filter TryHoldFilter;
-    MoonTools.ECS.Filter CanHoldFilter;
-    float HoldSpeed = 300.0f;
-    Product Product;
+	MoonTools.ECS.Filter TryHoldFilter;
+	MoonTools.ECS.Filter CanHoldFilter;
+	MoonTools.ECS.Filter CanBeHeldFilter;
+	float HoldSpeed = 300.0f;
+	Product Product;
 
-    public Hold(World world) : base(world)
-    {
-        TryHoldFilter =
-            FilterBuilder
-            .Include<Rectangle>()
-            .Include<Position>()
-            .Include<CanHold>()
-            .Include<TryHold>()
-            .Build();
+	public Hold(World world) : base(world)
+	{
+		TryHoldFilter =
+			FilterBuilder
+			.Include<Rectangle>()
+			.Include<Position>()
+			.Include<CanHold>()
+			.Include<TryHold>()
+			.Build();
 
-        CanHoldFilter =
-            FilterBuilder
-            .Include<Rectangle>()
-            .Include<Position>()
-            .Include<CanHold>()
-            .Build();
-        Product = new Product(world);
-    }
+		CanHoldFilter =
+			FilterBuilder
+			.Include<Rectangle>()
+			.Include<Position>()
+			.Include<CanHold>()
+			.Build();
 
-    void HoldOrDrop(Entity e)
-    {
-        if (!HasOutRelation<Holding>(e))
-        {
-            bool holding = false;
+		CanBeHeldFilter =
+			FilterBuilder.Include<CanBeHeld>().Build();
 
-            foreach (var o in OutRelations<Colliding>(e))
-            {
-                if (Has<CanBeHeld>(o))
-                {
-                    holding = true;
-                    Relate(e, o, new Holding());
-                    var category = Get<Category>(OutRelationSingleton<IsInCategory>(o));
-                    System.Console.Write($" {TextStorage.GetString(Get<Name>(o).TextID)} ${Product.GetPrice(o)} category: {category} ");
+		Product = new Product(world);
+	}
 
-                    System.Console.Write("ingredience: ");
-                    foreach (var ingredient in OutRelations<HasIngredient>(o))
-                    {
-                        System.Console.Write($"{Get<Ingredient>(ingredient)} (${Get<Price>(ingredient).Value}) ");
-                    }
-                    System.Console.WriteLine("");
-                }
-            }
+	void HoldOrDrop(Entity e)
+	{
+		if (!HasOutRelation<Holding>(e))
+		{
+			bool holding = false;
 
-            if (!holding)
-            {
-                foreach (var i in InRelations<Colliding>(e))
-                {
-                    if (Has<CanBeHeld>(i))
-                    {
-                        Set(i, Color.Yellow);
-                        Relate(e, i, new Holding());
+			foreach (var o in OutRelations<Colliding>(e))
+			{
+				if (Has<CanBeHeld>(o))
+				{
+					holding = true;
+					Relate(e, o, new Holding());
+
+					var spriteInfo = Get<SpriteAnimation>(o).SpriteAnimationInfo;
+					Send(new SetAnimationMessage(
+						o,
+						new SpriteAnimation(spriteInfo, 90, true)
+					));
+
+					var category = Get<Category>(OutRelationSingleton<IsInCategory>(o));
+					System.Console.Write($" {TextStorage.GetString(Get<Name>(o).TextID)} ${Product.GetPrice(o)} category: {category} ");
+
+					System.Console.Write("ingredience: ");
+					foreach (var ingredient in OutRelations<HasIngredient>(o))
+					{
+						System.Console.Write($"{Get<Ingredient>(ingredient)} (${Get<Price>(ingredient).Value}) ");
+					}
+					System.Console.WriteLine("");
+				}
+			}
+
+			if (!holding)
+			{
+				foreach (var i in InRelations<Colliding>(e))
+				{
+					if (Has<CanBeHeld>(i))
+					{
+						Set(i, Color.Yellow);
+						Relate(e, i, new Holding());
 
 						StopInspect(e);
-                    }
-                }
-            }
-        }
-        else
-        {
-            var holding = OutRelationSingleton<Holding>(e);
-            Remove<Velocity>(holding);
-            UnrelateAll<Holding>(e);
-        }
-    }
+					}
+				}
+			}
+		}
+		else
+		{
+			// Dropping
+			var holding = OutRelationSingleton<Holding>(e);
+			Remove<Velocity>(holding);
+			UnrelateAll<Holding>(e);
+			var spriteInfo = Get<SpriteAnimation>(holding).SpriteAnimationInfo;
+			Send(new SetAnimationMessage(
+				holding,
+				new SpriteAnimation(spriteInfo, 90, true)
+			));
+			Set(holding, Get<Position>(holding) + new Position(0, 10));
+		}
+	}
 
-    void SetHoldVelocity(Entity e, float dt)
-    {
-        var holding = OutRelationSingleton<Holding>(e);
-        var holdingPos = Get<Position>(holding);
-        var holderPos = Get<Position>(e);
+	void SetHoldVelocity(Entity e, float dt)
+	{
+		var holding = OutRelationSingleton<Holding>(e);
+		var holderPos = Get<Position>(e);
+		var holderDirection = Get<LastDirection>(e).Direction;
 
-        var vel = holderPos - holdingPos;
-
-        Set(holding, new Velocity(vel * HoldSpeed * dt));
-    }
+		Set(holding, holderPos + holderDirection * 16 + new Position(0, -10));
+		var depth = MathHelper.Lerp(100, 10, Get<Position>(holding).Y / (float) Dimensions.GAME_H);
+		Set(holding, new Depth(depth));
+	}
 
 	public void Inspect(Entity potentialHolder, Entity product)
 	{
@@ -175,10 +196,10 @@ public class Hold : MoonTools.ECS.System
 		}
 	}
 
-    public override void Update(TimeSpan delta)
-    {
-        foreach (var holder in CanHoldFilter.Entities)
-        {
+	public override void Update(TimeSpan delta)
+	{
+		foreach (var holder in CanHoldFilter.Entities)
+		{
 			if (HasOutRelation<Inspecting>(holder))
 			{
 				var inspectedProduct = OutRelationSingleton<Inspecting>(holder);
@@ -188,9 +209,9 @@ public class Hold : MoonTools.ECS.System
 				}
 			}
 
-            if (Has<TryHold>(holder))
+			if (Has<TryHold>(holder))
 			{
-                HoldOrDrop(holder);
+				HoldOrDrop(holder);
 			}
 			else if (!HasOutRelation<Inspecting>(holder))
 			{
@@ -204,9 +225,9 @@ public class Hold : MoonTools.ECS.System
 				}
 			}
 
-            if (HasOutRelation<Holding>(holder))
+			if (HasOutRelation<Holding>(holder))
 			{
-                SetHoldVelocity(holder, (float)delta.TotalSeconds);
+				SetHoldVelocity(holder, (float)delta.TotalSeconds);
 			}
         }
 

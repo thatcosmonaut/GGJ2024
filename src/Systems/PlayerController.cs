@@ -2,8 +2,10 @@ using System;
 using GGJ2024.Components;
 using GGJ2024.Data;
 using GGJ2024.Messages;
+using GGJ2024.Relations;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
+using MoonWorks.Math;
 using MoonWorks.Math.Float;
 
 namespace GGJ2024.Systems;
@@ -212,6 +214,8 @@ public class PlayerController : MoonTools.ECS.System
 			}
 
 			Set(entity, new Velocity(velocity));
+			var depth = MathHelper.Lerp(100, 10, Get<Position>(entity).Y / (float) Dimensions.GAME_H);
+			Set(entity, new Depth(depth));
 		}
 	}
 }
