@@ -220,6 +220,19 @@ public class Hold : MoonTools.ECS.System
 			Relate(potentialHolder, ingredientPrice, new ShowingPopup());
 			Relate(ingredientPrice, ingredient, new DisplayingIngredientPrice());
 
+			font.TextBounds(
+				ingredientPriceString,
+				8,
+				MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+				MoonWorks.Graphics.Font.VerticalAlignment.Top,
+				out textBounds
+			);
+
+			textBoundsRectangle = Rectangle.Union(
+				textBoundsRectangle,
+				TextRectangle(textBounds, new Position(xOffset, yOffset))
+			);
+
 			yOffset += 15;
 		}
 
@@ -262,7 +275,7 @@ public class Hold : MoonTools.ECS.System
 			{
 				foreach (var other in OutRelations<Colliding>(holder))
 				{
-					if (Has<CanBeHeld>(other))
+					if (Has<CanInspect>(holder) && Has<CanBeHeld>(other))
 					{
 						Inspect(holder, other);
 						break;
