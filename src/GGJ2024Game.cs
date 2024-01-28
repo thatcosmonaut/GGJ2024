@@ -124,8 +124,8 @@ namespace GGJ2024
 			World.Set(uiBottomBackground, new SpriteAnimation(Content.SpriteAnimations.HUD_Bottom, 0));
 
 			var cashRegister = World.CreateEntity();
-			World.Set(cashRegister, new Position(16, Dimensions.GAME_H - 16));
-			World.Set(cashRegister, new Rectangle(-16, -16, 32, 32));
+			World.Set(cashRegister, new Position(8, 77));
+			World.Set(cashRegister, new Rectangle(0, 0, 80, 90));
 			World.Set(cashRegister, new CanInteract());
 			World.Set(cashRegister, new CanFillOrders());
 			World.Set(cashRegister, Color.ForestGreen);
