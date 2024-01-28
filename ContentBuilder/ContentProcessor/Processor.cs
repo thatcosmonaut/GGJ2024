@@ -571,7 +571,15 @@ namespace ContentProcessor
 					frameList.Add(spritePath);
 				}
 
-				animations.Add(directory.Name, animationMetadata);
+				var newAnimationMetaData = new CramTextureAtlasAnimationData
+				{
+					Frames = frameList.ToArray(),
+					FrameRate = animationMetadata.FrameRate,
+					XOrigin = animationMetadata.XOrigin,
+					YOrigin = animationMetadata.YOrigin
+				};
+
+				animations.Add(directory.Name, newAnimationMetaData);
 			}
 
 			textureAtlasData.Animations = animations;
