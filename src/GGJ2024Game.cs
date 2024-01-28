@@ -7,6 +7,7 @@ using GGJ2024.Content;
 using GGJ2024.Components;
 using GGJ2024.Utility;
 using GGJ2024.Data;
+using GGJ2024.Messages;
 
 namespace GGJ2024
 {
@@ -22,6 +23,7 @@ namespace GGJ2024
 		Ticker Ticker;
 		Timer Timer;
 		Orders Orders;
+		SetSpriteAnimationSystem SetSpriteAnimationSystem;
 
 		PlayerController PlayerController;
 
@@ -50,6 +52,7 @@ namespace GGJ2024
 			Hold = new Hold(World);
 			Orders = new Orders(World);
 			ProductSpawner = new ProductSpawner(World);
+			SetSpriteAnimationSystem = new SetSpriteAnimationSystem(World);
 			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
 
 			CategoriesAndIngredients cats = new CategoriesAndIngredients(World);
@@ -59,7 +62,7 @@ namespace GGJ2024
 
 			var player = World.CreateEntity();
 			World.Set(player, new Position(0f, Dimensions.GAME_H * 0.5f));
-			World.Set(player, new Rectangle(0, 0, 16, 16));
+			World.Set(player, new SpriteAnimation(Content.SpriteAnimations.Char_Walk_Down));
 			World.Set(player, new Player(0));
 			World.Set(player, new CanHold());
 			World.Set(player, new Solid());
@@ -88,6 +91,7 @@ namespace GGJ2024
 			Audio.Update(dt);
 			ProductSpawner.Update(dt);
 			Orders.Update(dt);
+			SetSpriteAnimationSystem.Update(dt);
 
 			World.FinishUpdate();
 		}

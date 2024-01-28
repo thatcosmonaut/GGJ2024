@@ -16,12 +16,16 @@ public class Renderer : MoonTools.ECS.Renderer
 	GraphicsPipeline SpriteBatchPipeline;
 	GraphicsPipeline TextPipeline;
 
-	SpriteBatch SpriteBatch;
+	SpriteBatch RectangleSpriteBatch;
+	SpriteBatch ArtSpriteBatch;
 
-	Texture SpriteAtlasTexture; // TODO: create this!
+	Texture RectangleAtlasTexture;
+	Texture SpriteAtlasTexture;
+
 	Sampler PointSampler;
 	MoonTools.ECS.Filter RectangleFilter;
 	MoonTools.ECS.Filter TextFilter;
+	MoonTools.ECS.Filter SpriteAnimationFilter;
 
 	Queue<TextBatch> BatchPool = new Queue<TextBatch>();
 	List<(TextBatch, Matrix4x4)> ActiveBatchTransforms = new List<(TextBatch, Matrix4x4)>();
@@ -32,6 +36,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
 		RectangleFilter = FilterBuilder.Include<Rectangle>().Include<Position>().Build();
 		TextFilter = FilterBuilder.Include<Text>().Include<Position>().Build();
+		SpriteAnimationFilter = FilterBuilder.Include<SpriteAnimation>().Include<Position>().Build();
 
 		var baseContentPath = Path.Combine(
 			System.AppContext.BaseDirectory,
@@ -45,9 +50,11 @@ public class Renderer : MoonTools.ECS.Renderer
 
 		var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
 
-		SpriteAtlasTexture = Texture.CreateTexture2D(GraphicsDevice, 1, 1, TextureFormat.R8G8B8A8, TextureUsageFlags.Sampler);
-		commandBuffer.SetTextureData(SpriteAtlasTexture, new Color[] { Color.White });
+		RectangleAtlasTexture = Texture.CreateTexture2D(GraphicsDevice, 1, 1, TextureFormat.R8G8B8A8, TextureUsageFlags.Sampler);
+		commandBuffer.SetTextureData(RectangleAtlasTexture, new Color[] { Color.White });
 		GraphicsDevice.Submit(commandBuffer);
+
+		SpriteAtlasTexture = TextureAtlases.TP_Sprites.Texture;
 
 		var vertShaderModule = new ShaderModule(GraphicsDevice, Path.Combine(shaderContentPath, "InstancedSpriteBatch.vert.refresh"));
 		var fragShaderModule = new ShaderModule(GraphicsDevice, Path.Combine(shaderContentPath, "InstancedSpriteBatch.frag.refresh"));
@@ -59,7 +66,7 @@ public class Renderer : MoonTools.ECS.Renderer
 					AttachmentInfo = new GraphicsPipelineAttachmentInfo(
 						new ColorAttachmentDescription(
 							swapchainFormat,
-							ColorAttachmentBlendState.Opaque
+							ColorAttachmentBlendState.NonPremultiplied
 						)
 					),
 					DepthStencilState = DepthStencilState.Disable,
@@ -97,7 +104,8 @@ public class Renderer : MoonTools.ECS.Renderer
 
 		PointSampler = new Sampler(GraphicsDevice, SamplerCreateInfo.PointClamp);
 
-		SpriteBatch = new SpriteBatch(GraphicsDevice);
+		RectangleSpriteBatch = new SpriteBatch(GraphicsDevice);
+		ArtSpriteBatch = new SpriteBatch(GraphicsDevice);
 	}
 
 	public void Render(Window window)
@@ -108,7 +116,8 @@ public class Renderer : MoonTools.ECS.Renderer
 
 		if (swapchainTexture != null)
 		{
-			SpriteBatch.Reset();
+			RectangleSpriteBatch.Reset();
+			ArtSpriteBatch.Reset();
 
 			foreach (var (batch, _) in ActiveBatchTransforms)
 			{
@@ -123,7 +132,15 @@ public class Renderer : MoonTools.ECS.Renderer
 				var orientation = Has<Orientation>(entity) ? Get<Orientation>(entity).Angle : 0.0f;
 				var color = Has<Color>(entity) ? Get<Color>(entity) : Color.White;
 
-				SpriteBatch.Add(new Vector3(position.X, position.Y, -1.0f), orientation, new Vector2(rectangle.Width, rectangle.Height), color, new Vector2(0, 0), new Vector2(1, 1));
+				RectangleSpriteBatch.Add(new Vector3(position.X, position.Y, -2f), orientation, new Vector2(rectangle.Width, rectangle.Height), color, new Vector2(0, 0), new Vector2(1, 1));
+			}
+
+			foreach (var entity in SpriteAnimationFilter.Entities)
+			{
+				var position = Get<Position>(entity);
+				var sprite = Get<SpriteAnimation>(entity).CurrentSprite;
+
+				ArtSpriteBatch.Add(new Vector3(position.X, position.Y, -1f), 0, new Vector2(sprite.SliceRect.W, sprite.SliceRect.H), Color.White, sprite.UV.LeftTop, sprite.UV.Dimensions);
 			}
 
 			foreach (var entity in TextFilter.Entities)
@@ -153,8 +170,15 @@ public class Renderer : MoonTools.ECS.Renderer
 				);
 			}
 
-			if (RectangleFilter.Count > 0)
-				SpriteBatch.Upload(commandBuffer);
+			if (RectangleSpriteBatch.InstanceCount > 0)
+			{
+				RectangleSpriteBatch.Upload(commandBuffer);
+			}
+
+			if (ArtSpriteBatch.InstanceCount > 0)
+			{
+				ArtSpriteBatch.Upload(commandBuffer);
+			}
 
 			foreach (var (batch, _) in ActiveBatchTransforms)
 			{
@@ -165,11 +189,20 @@ public class Renderer : MoonTools.ECS.Renderer
 				new ColorAttachmentInfo(swapchainTexture, Color.Black)
 			);
 
-			if (SpriteBatch.InstanceCount > 0)
-			{
-				var viewProjectionMatrices = new ViewProjectionMatrices(GetCameraMatrix(), GetProjectionMatrix());
-				SpriteBatch.Render(commandBuffer, SpriteBatchPipeline, SpriteAtlasTexture, PointSampler, viewProjectionMatrices);
+			var viewProjectionMatrices = new ViewProjectionMatrices(GetCameraMatrix(), GetProjectionMatrix());
 
+			if (RectangleSpriteBatch.InstanceCount > 0)
+			{
+				RectangleSpriteBatch.Render(commandBuffer, SpriteBatchPipeline, RectangleAtlasTexture, PointSampler, viewProjectionMatrices);
+			}
+
+			if (ArtSpriteBatch.InstanceCount > 0)
+			{
+				ArtSpriteBatch.Render(commandBuffer, SpriteBatchPipeline, SpriteAtlasTexture, PointSampler, viewProjectionMatrices);
+			}
+
+			if (ActiveBatchTransforms.Count > 0)
+			{
 				commandBuffer.BindGraphicsPipeline(TextPipeline);
 				foreach (var (batch, transform) in ActiveBatchTransforms)
 				{

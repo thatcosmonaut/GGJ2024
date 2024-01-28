@@ -68,8 +68,8 @@ public class SpriteBatch
 		InstanceDatas[Index].Scale = size;
 		InstanceDatas[Index].Color = color;
 		InstanceDatas[Index].UV0 = leftTopUV;
-		InstanceDatas[Index].UV1 = new Vector2(left, bottom);
-		InstanceDatas[Index].UV2 = new Vector2(right, top);
+		InstanceDatas[Index].UV1 = new Vector2(right, top);
+		InstanceDatas[Index].UV2 = new Vector2(left, bottom);
 		InstanceDatas[Index].UV3 = new Vector2(right, bottom);
 		Index += 1;
 	}
