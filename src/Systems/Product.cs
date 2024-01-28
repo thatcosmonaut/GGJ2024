@@ -1,11 +1,10 @@
-
-
 using System;
-using GGJ2024.Data;
 using MoonTools.ECS;
 using GGJ2024.Utility;
 using GGJ2024.Components;
 using MoonWorks.Math.Float;
+
+namespace GGJ2024.Systems;
 
 public class Product : MoonTools.ECS.Manipulator
 {
@@ -18,6 +17,17 @@ public class Product : MoonTools.ECS.Manipulator
         IngredientFilter = FilterBuilder.Include<Ingredient>().Build();
     }
 
+    public float GetPrice(Entity e)
+    {
+        float total = 0.0f;
+        foreach (var ingredient in OutRelations<HasIngredient>(e))
+        {
+            total += Get<Price>(ingredient).Value;
+        }
+
+        return total;
+    }
+
     public void SpawnProduct(Position position)
     {
         var entity = CreateEntity();
@@ -25,28 +35,19 @@ public class Product : MoonTools.ECS.Manipulator
         Set(entity, new Rectangle(0, 0, 16, 16));
         Set(entity, new CanBeHeld());
 
-        var category = Enum.GetValues(typeof(Category)).GetRandomItem<Category>(); //TODO: replace with actual data
-        var ingredient = Enum.GetValues(typeof(Ingredient)).GetRandomItem<Ingredient>();
-
-        Set(entity, CategoriesAndIngredients.GetColor(category));
-
-        foreach (var ce in CategoryFilter.Entities)
+        foreach (var category in CategoryFilter.EntitiesInRandomOrder)
         {
-            var cat = Get<Category>(ce);
-            if (cat == category)
-            {
-                Relate(entity, ce, new IsInCategory());
-                break;
-            }
+            Relate(entity, category, new IsInCategory());
+            Set(entity, CategoriesAndIngredients.GetColor(Get<Category>(category)));
+            break;
         }
 
-        foreach (var ie in IngredientFilter.Entities)
+        foreach (var ingredient in IngredientFilter.EntitiesInRandomOrder)
         {
-            var i = Get<Ingredient>(ie);
-            if (i == ingredient)
-            {
-                Relate(entity, ie, new HasIngredient());
-            }
+            Relate(entity, ingredient, new HasIngredient());
+            if (Rando.Value > 0.33)
+                break;
+
         }
     }
 }

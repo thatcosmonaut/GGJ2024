@@ -18,6 +18,7 @@ namespace GGJ2024
 		Motion Motion;
 		Audio Audio;
 		Hold Hold;
+		ProductSpawner ProductSpawner;
 		PlayerController PlayerController;
 
 		public GGJ2024Game(
@@ -34,9 +35,11 @@ namespace GGJ2024
 			Audio = new Audio(World, AudioDevice);
 			PlayerController = new PlayerController(World);
 			Hold = new Hold(World);
+			ProductSpawner = new ProductSpawner(World);
 			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
 
-			CategoriesAndIngredients.Initialize(World);
+			CategoriesAndIngredients cats = new CategoriesAndIngredients(World);
+			cats.Initialize(World);
 
 			var player = World.CreateEntity();
 			World.Set(player, new Position(0f, Dimensions.GAME_H * 0.5f));
@@ -46,15 +49,6 @@ namespace GGJ2024
 			World.Set(player, new Solid());
 			World.Set(player, Color.Green);
 
-			Product product = new Product(World);
-
-			for (var i = 0; i < 30; i++)
-			{
-				product.SpawnProduct(new Position(
-					Rando.IntInclusive(0, Dimensions.GAME_W),
-					Rando.IntInclusive(0, Dimensions.GAME_H)
-				));
-			}
 
 		}
 
@@ -65,6 +59,7 @@ namespace GGJ2024
 			Motion.Update(dt);
 			Hold.Update(dt);
 			Audio.Update(dt);
+			ProductSpawner.Update(dt);
 
 			World.FinishUpdate();
 		}

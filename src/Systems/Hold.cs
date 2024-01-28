@@ -43,6 +43,15 @@ public class Hold : MoonTools.ECS.System
                 {
                     holding = true;
                     Relate(e, o, new Holding());
+                    var category = Get<Category>(OutRelationSingleton<IsInCategory>(o));
+                    System.Console.Write($"category: {category} ");
+
+                    System.Console.Write("ingredience: ");
+                    foreach (var ingredient in OutRelations<HasIngredient>(o))
+                    {
+                        System.Console.Write($"{Get<Ingredient>(ingredient)} (${Get<Price>(ingredient).Value}) ");
+                    }
+                    System.Console.WriteLine("");
                 }
             }
 

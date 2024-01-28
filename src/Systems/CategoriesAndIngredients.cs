@@ -3,8 +3,9 @@ using MoonWorks;
 using GGJ2024.Components;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
+using GGJ2024.Utility;
 
-namespace GGJ2024.Data;
+namespace GGJ2024.Systems;
 
 public enum Category
 {
@@ -46,8 +47,14 @@ public enum Ingredient
     None
 }
 
-public static class CategoriesAndIngredients
+public class CategoriesAndIngredients : Manipulator
 {
+    const float MaxPriceDelta = 10.0f;
+
+    public CategoriesAndIngredients(World world) : base(world)
+    {
+    }
+
     public static Ingredient GetIngredient(string s)
     {
         return s.ToLowerInvariant() switch
@@ -112,21 +119,34 @@ public static class CategoriesAndIngredients
         };
     }
 
-    public static void Initialize(World world)
+    public float GetPriceChange()
+    {
+        float delta = Rando.Range(-MaxPriceDelta, MaxPriceDelta);
+        return delta;
+    }
+
+    public void Initialize(World world)
     {
         var categories = Enum.GetValues(typeof(Category));
         var ingredients = Enum.GetValues(typeof(Ingredient));
 
         foreach (Category category in categories)
         {
-            var e = world.CreateEntity();
-            world.Set(e, category);
+            if (category != Category.None)
+            {
+                var e = world.CreateEntity();
+                world.Set(e, category);
+            }
         }
 
         foreach (Ingredient ingredient in ingredients)
         {
-            var e = world.CreateEntity();
-            world.Set(e, ingredient);
+            if (ingredient != Ingredient.None)
+            {
+                var e = world.CreateEntity();
+                world.Set(e, ingredient);
+                world.Set(e, new Price(Rando.Range(0f, 100.0f)));
+            }
         }
     }
 

@@ -10,3 +10,5 @@ public readonly record struct CanBeHeld();
 public readonly record struct TryHold();
 public readonly record struct CanHold();
 public readonly record struct Solid();
+
+public readonly record struct Price(float Value);
