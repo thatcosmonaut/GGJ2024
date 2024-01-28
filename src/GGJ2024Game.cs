@@ -90,7 +90,7 @@ namespace GGJ2024
 
 			var background = World.CreateEntity();
 			World.Set(background, new Position(0, 0));
-			World.Set(background, new Depth(100));
+			World.Set(background, new Depth(999));
 			World.Set(background, new SpriteAnimation(Content.SpriteAnimations.BG, 0));
 
 			var uiTickerBackground = World.CreateEntity();

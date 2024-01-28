@@ -1,4 +1,5 @@
 using System;
+using System.Security.Cryptography.X509Certificates;
 using GGJ2024.Components;
 using GGJ2024.Messages;
 using MoonTools.ECS;
@@ -8,9 +9,11 @@ namespace GGJ2024.Systems;
 public class SetSpriteAnimationSystem : MoonTools.ECS.System
 {
 
+	MoonTools.ECS.Filter SlowDownAnimationFilter;
+
 	public SetSpriteAnimationSystem(World world) : base(world)
 	{
-
+		SlowDownAnimationFilter = FilterBuilder.Include<SlowDownAnimation>().Build();
 	}
 
 	public override void Update(TimeSpan delta)
@@ -42,6 +45,18 @@ public class SetSpriteAnimationSystem : MoonTools.ECS.System
 			{
 				Set(message.Entity, message.Animation);
 			}
+		}
+
+		// Slows down item animation
+		foreach (var entity in SlowDownAnimationFilter.Entities)
+		{
+			var c = Get<SlowDownAnimation>(entity);
+			var goal = c.BaseSpeed;
+			var step = c.step;
+			var currentAnimation = Get<SpriteAnimation>(entity);
+			var frameRate = currentAnimation.FrameRate;
+			frameRate = Math.Max(frameRate - step, goal);
+			Set(entity, currentAnimation.ChangeFramerate(frameRate));
 		}
 	}
 }

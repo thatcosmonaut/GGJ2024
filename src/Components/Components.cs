@@ -20,8 +20,15 @@ public readonly record struct CanGiveOrders();
 
 public readonly record struct ColorSpeed(float RedSpeed, float GreenSpeed, float BlueSpeed);
 
-public readonly record struct Depth(int Value);
+public readonly record struct Depth(float Value);
 public readonly record struct DrawAsRectangle();
 
 public readonly record struct TextDropShadow(int OffsetX, int OffsetY);
 public readonly record struct ForceIntegerMovement();
+public readonly record struct MaxSpeed(float Value);
+
+public readonly record struct FunnyRunTimer(float Time); //Scooby doo style quick run when starting to move
+public readonly record struct CanFunnyRun();
+
+public readonly record struct LastDirection(MoonWorks.Math.Float.Vector2 Direction);
+public readonly record struct SlowDownAnimation(int BaseSpeed, int step);

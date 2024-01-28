@@ -5,7 +5,7 @@ public readonly record struct Velocity
     public static Velocity Zero = new Velocity(0f, 0f);
     public static Velocity One = new Velocity(1f, 1f);
 
-    private readonly Vector2 Value;
+    public readonly Vector2 Value;
 
     public readonly float X
     {

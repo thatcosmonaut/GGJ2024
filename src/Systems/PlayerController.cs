@@ -1,8 +1,11 @@
+using System;
 using GGJ2024.Components;
 using GGJ2024.Data;
 using GGJ2024.Messages;
+using GGJ2024.Relations;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
+using MoonWorks.Math;
 using MoonWorks.Math.Float;
 
 namespace GGJ2024.Systems;
@@ -10,7 +13,7 @@ namespace GGJ2024.Systems;
 public class PlayerController : MoonTools.ECS.System
 {
 	MoonTools.ECS.Filter PlayerFilter;
-	float Speed = 128f;
+	float MaxSpeedBase = 128f;
 
 	public PlayerController(World world) : base(world)
 	{
@@ -28,14 +31,19 @@ public class PlayerController : MoonTools.ECS.System
 		World.Set(player, new SpriteAnimation(index == 0 ? Content.SpriteAnimations.Char_Walk_Down : Content.SpriteAnimations.Char2_Walk_Down, 0));
 		World.Set(player, new Player(index, 0));
 		World.Set(player, new Rectangle(-8, -8, 16, 16));
-        World.Set(player, new CanHold());
-        World.Set(player, new Solid());
-        World.Set(player, index == 0 ? Color.Green : Color.Blue);
+		World.Set(player, new CanHold());
+		World.Set(player, new Solid());
+		World.Set(player, index == 0 ? Color.Green : Color.Blue);
 		World.Set(player, new Depth(5));
-    }
+		World.Set(player, new MaxSpeed(128));
+		World.Set(player, new Velocity(Vector2.Zero));
+		World.Set(player, new LastDirection(Vector2.Zero));
+	}
 
 	public override void Update(System.TimeSpan delta)
 	{
+		var deltaTime = (float)delta.TotalSeconds;
+
 		foreach (var entity in PlayerFilter.Entities)
 		{
 			var playerIndex = Get<Player>(entity).Index;
@@ -43,6 +51,7 @@ public class PlayerController : MoonTools.ECS.System
 			if (Has<TryHold>(entity))
 				Remove<TryHold>(entity);
 
+			#region Input
 			var inputState = Get<InputState>(entity);
 
 			if (inputState.Left.IsDown)
@@ -62,17 +71,71 @@ public class PlayerController : MoonTools.ECS.System
 			{
 				direction.Y = 1;
 			}
+			#endregion
 
 			if (inputState.Interact.IsPressed)
 			{
 				Set(entity, new TryHold());
 			}
 
-			if (direction.LengthSquared() > 0)
+			// Movement
+			var velocity = Get<Velocity>(entity).Value;
+
+			var accelSpeed = 64f;
+
+			velocity += direction * accelSpeed * deltaTime * 60;
+
+			if (Has<FunnyRunTimer>(entity))
 			{
-				direction = Vector2.Normalize(direction);
+				var time = Get<FunnyRunTimer>(entity).Time - deltaTime;
+				if (time < 0)
+				{
+					Remove<FunnyRunTimer>(entity);
+				}
+				else
+				{
+					Set(entity, new FunnyRunTimer(time));
+				}
 			}
 
+			var maxSpeed = Get<MaxSpeed>(entity).Value;
+			if (direction.LengthSquared() > 0)
+			{
+				var dot = Vector2.Dot(Vector2.Normalize(direction), Vector2.Normalize(Get<LastDirection>(entity).Direction));
+				if (dot < 0)
+				{
+					Set(entity, new CanFunnyRun());
+				}
+
+				if (Has<CanFunnyRun>(entity))
+				{
+					maxSpeed = (maxSpeed + MaxSpeedBase) / 2f;
+					Remove<CanFunnyRun>(entity);
+					Set(entity, new FunnyRunTimer(.25f));
+				}
+
+				direction = Vector2.Normalize(direction);
+
+				var maxAdd = deltaTime * 60;
+				if (HasOutRelation<Holding>(entity))
+				{
+					maxAdd /= 2;
+				}
+
+				maxSpeed = Math.Min(maxSpeed + maxAdd, 300);
+				Set(entity, new MaxSpeed(maxSpeed));
+				Set(entity, new LastDirection(direction));
+			}
+			else
+			{
+				Set(entity, new CanFunnyRun());
+				var speed = Get<Velocity>(entity).Value.Length();
+				speed = Math.Max(speed - (20 * deltaTime * 60), 0);
+				velocity = Vector2.Normalize(velocity) * speed;
+				Set(entity, new MaxSpeed(MaxSpeedBase));
+			}
+
+			#region Animation
 			SpriteAnimationInfo animation;
 
 			if (direction.X > 0)
@@ -120,17 +183,39 @@ public class PlayerController : MoonTools.ECS.System
 					animation = Get<SpriteAnimation>(entity).SpriteAnimationInfo;
 				}
 			}
+			#endregion
 
-			var velocity = direction * Speed;
+			// limit max speed
+			if (velocity.Length() > maxSpeed)
+			{
+				velocity = Vector2.Normalize(velocity) * maxSpeed;
+			}
 
-			int framerate = (int)(velocity.LengthSquared() / 1000f);
+			int framerate = (int)(velocity.Length() / 20f);
+			if (Has<FunnyRunTimer>(entity))
+			{
+				framerate = 25;
+			}
 
-			Send(new SetAnimationMessage(
-				entity,
-				new SpriteAnimation(animation, framerate)
-			));
+			if (direction.LengthSquared() > 0)
+			{
+				Send(new SetAnimationMessage(
+					entity,
+					new SpriteAnimation(animation, framerate, true)
+				));
+			}
+			else
+			{
+				Send(new SetAnimationMessage(
+					entity,
+					new SpriteAnimation(animation, 0, true, 0),
+					true
+				));
+			}
 
 			Set(entity, new Velocity(velocity));
+			var depth = MathHelper.Lerp(100, 10, Get<Position>(entity).Y / (float) Dimensions.GAME_H);
+			Set(entity, new Depth(depth));
 		}
 	}
 }
