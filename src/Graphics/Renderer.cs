@@ -170,9 +170,9 @@ public class Renderer : MoonTools.ECS.Renderer
 				var viewProjectionMatrices = new ViewProjectionMatrices(GetCameraMatrix(), GetProjectionMatrix());
 				SpriteBatch.Render(commandBuffer, SpriteBatchPipeline, SpriteAtlasTexture, PointSampler, viewProjectionMatrices);
 
+				commandBuffer.BindGraphicsPipeline(TextPipeline);
 				foreach (var (batch, transform) in ActiveBatchTransforms)
 				{
-					commandBuffer.BindGraphicsPipeline(TextPipeline);
 					batch.Render(commandBuffer, transform * viewProjectionMatrices.View * viewProjectionMatrices.Projection);
 				}
 			}

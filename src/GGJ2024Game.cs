@@ -36,7 +36,6 @@ namespace GGJ2024
 			Fonts.LoadAll(GraphicsDevice);
 
 			Timer = new Timer(World);
-			Ticker = new Ticker(World);
 			Input = new Input(World, Inputs);
 			Motion = new Motion(World);
 			Audio = new Audio(World, AudioDevice);
@@ -48,6 +47,8 @@ namespace GGJ2024
 
 			CategoriesAndIngredients cats = new CategoriesAndIngredients(World);
 			cats.Initialize(World);
+
+			Ticker = new Ticker(World, cats);
 
 			var player = World.CreateEntity();
 			World.Set(player, new Position(0f, Dimensions.GAME_H * 0.5f));
