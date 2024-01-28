@@ -122,6 +122,34 @@ public class CategoriesAndIngredients : Manipulator
         };
     }
 
+    public static string GetStockTicker(Ingredient ingredient)
+    {
+        return ingredient switch
+        {
+            Ingredient.Ectoplasm => "ECTO",
+            Ingredient.Silicon => "SIL",
+            Ingredient.Blueberry => "BLU",
+            Ingredient.Gems => "GME",
+            Ingredient.Fungus => "FUNG",
+            Ingredient.Elastic => "ELAS",
+            Ingredient.Carbon => "CARB",
+            Ingredient.Mint => "MINT",
+            Ingredient.Milk => "MILK",
+            Ingredient.Bones => "BONE",
+            Ingredient.Spirits => "SPIR",
+            Ingredient.Booze => "BOOZ",
+            Ingredient.Kelp => "KELP",
+            Ingredient.Microplastics => "MPLA",
+            Ingredient.Glass => "GLASS",
+            Ingredient.Helium => "HELI",
+            Ingredient.Shrimp => "SHRI",
+            Ingredient.Uranium => "URA",
+            Ingredient.Gold => "GOLD",
+            Ingredient.Oatmeal => "OAT",
+            Ingredient.None => "NONE",
+        };
+    }
+
     public (float delta, Ingredient ingredient) ChangePrice()
     {
         float delta = Rando.Range(-MaxPriceDelta, MaxPriceDelta);
