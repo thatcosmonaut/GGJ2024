@@ -36,7 +36,7 @@ public class Renderer : MoonTools.ECS.Renderer
 	{
 		GraphicsDevice = graphicsDevice;
 
-		RectangleFilter = FilterBuilder.Include<Rectangle>().Include<Position>().Exclude<Invisible>().Build();
+		RectangleFilter = FilterBuilder.Include<Rectangle>().Include<Position>().Include<DrawAsRectangle>().Build();
 		TextFilter = FilterBuilder.Include<Text>().Include<Position>().Build();
 		SpriteAnimationFilter = FilterBuilder.Include<SpriteAnimation>().Include<Position>().Build();
 
@@ -131,17 +131,15 @@ public class Renderer : MoonTools.ECS.Renderer
 			}
 			ActiveBatchTransforms.Clear();
 
-			/*
 			foreach (var entity in RectangleFilter.Entities)
 			{
 				var position = Get<Position>(entity);
 				var rectangle = Get<Rectangle>(entity);
 				var orientation = Has<Orientation>(entity) ? Get<Orientation>(entity).Angle : 0.0f;
-				var color = Has<Color>(entity) ? Get<Color>(entity) : Color.White;
+				var color = Has<ColorBlend>(entity) ? Get<ColorBlend>(entity).Color : Color.White;
 
-				RectangleSpriteBatch.Add(new Vector3(position.X + rectangle.X, position.Y + rectangle.Y, -50f), orientation, new Vector2(rectangle.Width, rectangle.Height), color, new Vector2(0, 0), new Vector2(1, 1));
+				RectangleSpriteBatch.Add(new Vector3(position.X + rectangle.X, position.Y + rectangle.Y, -2f), orientation, new Vector2(rectangle.Width, rectangle.Height), color, new Vector2(0, 0), new Vector2(1, 1));
 			}
-			*/
 
 			foreach (var entity in SpriteAnimationFilter.Entities)
 			{
@@ -174,6 +172,26 @@ public class Renderer : MoonTools.ECS.Renderer
 					color = Get<ColorBlend>(entity).Color;
 				}
 
+
+				if (Has<TextDropShadow>(entity))
+				{
+					var dropShadow = Get<TextDropShadow>(entity);
+
+					var dropShadowPosition = position + new Position(dropShadow.OffsetX, dropShadow.OffsetY);
+
+					var dropShadowBatch = AcquireTextBatch();
+					dropShadowBatch.Start(font);
+					ActiveBatchTransforms.Add((dropShadowBatch, Matrix4x4.CreateTranslation(dropShadowPosition.X, dropShadowPosition.Y, -2)));
+
+					dropShadowBatch.Add(
+						str,
+						text.Size,
+						Color.Black,
+						text.HorizontalAlignment,
+						text.VerticalAlignment
+					);
+				}
+
 				var textBatch = AcquireTextBatch();
 				textBatch.Start(font);
 				ActiveBatchTransforms.Add((textBatch, Matrix4x4.CreateTranslation(new Vector3(position.X, position.Y, -1))));
@@ -185,6 +203,7 @@ public class Renderer : MoonTools.ECS.Renderer
 					text.HorizontalAlignment,
 					text.VerticalAlignment
 				);
+
 			}
 
 			if (RectangleSpriteBatch.InstanceCount > 0)
@@ -209,14 +228,14 @@ public class Renderer : MoonTools.ECS.Renderer
 
 			var viewProjectionMatrices = new ViewProjectionMatrices(GetCameraMatrix(), GetProjectionMatrix());
 
-			if (RectangleSpriteBatch.InstanceCount > 0)
-			{
-				RectangleSpriteBatch.Render(commandBuffer, SpriteBatchPipeline, RectangleAtlasTexture, PointSampler, viewProjectionMatrices);
-			}
-
 			if (ArtSpriteBatch.InstanceCount > 0)
 			{
 				ArtSpriteBatch.Render(commandBuffer, SpriteBatchPipeline, SpriteAtlasTexture, PointSampler, viewProjectionMatrices);
+			}
+
+			if (RectangleSpriteBatch.InstanceCount > 0)
+			{
+				RectangleSpriteBatch.Render(commandBuffer, SpriteBatchPipeline, RectangleAtlasTexture, PointSampler, viewProjectionMatrices);
 			}
 
 			if (ActiveBatchTransforms.Count > 0)

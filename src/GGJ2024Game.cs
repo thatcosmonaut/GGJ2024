@@ -72,25 +72,21 @@ namespace GGJ2024
 			World.Set(topBorder, new Position(0, 65));
 			World.Set(topBorder, new Rectangle(0, 0, Dimensions.GAME_W, 10));
 			World.Set(topBorder, new Solid());
-			World.Set(topBorder, new Invisible());
 
 			var leftBorder = World.CreateEntity();
 			World.Set(leftBorder, new Position(-10, 0));
 			World.Set(leftBorder, new Rectangle(0, 0, 10, Dimensions.GAME_H));
 			World.Set(leftBorder, new Solid());
-			World.Set(leftBorder, new Invisible());
 
 			var rightBorder = World.CreateEntity();
 			World.Set(rightBorder, new Position(Dimensions.GAME_W, 0));
 			World.Set(rightBorder, new Rectangle(0, 0, 10, Dimensions.GAME_H));
 			World.Set(rightBorder, new Solid());
-			World.Set(rightBorder, new Invisible());
 
 			var bottomBorder = World.CreateEntity();
 			World.Set(bottomBorder, new Position(0, Dimensions.GAME_H));
 			World.Set(bottomBorder, new Rectangle(0, 0, Dimensions.GAME_W, 10));
 			World.Set(bottomBorder, new Solid());
-			World.Set(bottomBorder, new Invisible());
 
 			var background = World.CreateEntity();
 			World.Set(background, new Position(0, 0));

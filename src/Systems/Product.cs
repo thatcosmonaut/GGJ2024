@@ -73,6 +73,7 @@ public class Product : MoonTools.ECS.Manipulator
         Set(entity, position);
         Set(entity, new Rectangle(-8, -8, 16, 16));
         Set(entity, new CanBeHeld());
+		Set(entity, new Depth(8));
 
         var product = Products.GetRandomItem();
 

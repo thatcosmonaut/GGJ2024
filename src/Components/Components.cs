@@ -20,4 +20,6 @@ public readonly record struct CanGiveOrders();
 public readonly record struct ColorSpeed(float RedSpeed, float GreenSpeed, float BlueSpeed);
 
 public readonly record struct Depth(int Value);
-public readonly record struct Invisible();
+public readonly record struct DrawAsRectangle();
+
+public readonly record struct TextDropShadow(int OffsetX, int OffsetY);

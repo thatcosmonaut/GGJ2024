@@ -24,4 +24,18 @@ public struct Text
 		HorizontalAlignment = horizontalAlignment;
 		VerticalAlignment = verticalAlignment;
 	}
+
+	public Text(
+		FontID packID,
+		int size,
+		int textID,
+		HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left,
+		VerticalAlignment verticalAlignment = VerticalAlignment.Baseline
+	) {
+		FontID = packID;
+		Size = size;
+		TextID = textID;
+		HorizontalAlignment = horizontalAlignment;
+		VerticalAlignment = verticalAlignment;
+	}
 }

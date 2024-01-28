@@ -6,3 +6,5 @@ public readonly record struct RequiresCategory();
 public readonly record struct RequiresIngredient();
 public readonly record struct HasOrder();
 public readonly record struct CantGetOrders();
+public readonly record struct Inspecting();
+public readonly record struct Displaying();
