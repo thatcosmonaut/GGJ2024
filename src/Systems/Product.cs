@@ -92,16 +92,22 @@ public class Product : MoonTools.ECS.Manipulator
 				animation = Content.SpriteAnimations.Item_Cosmetics;
 				break;
 			case Category.Electronics:
+				animation = Content.SpriteAnimations.Item_Electronics;
 				break;
 			case Category.Food:
+				animation = Content.SpriteAnimations.Item_Food;
 				break;
 			case Category.Furniture:
+				animation = Content.SpriteAnimations.Item_Furniture;
 				break;
 			case Category.Gasses:
+				animation = Content.SpriteAnimations.Item_Gasses;
 				break;
 			case Category.IntellectualProperty:
+				animation = Content.SpriteAnimations.Item_IP;
 				break;
 			case Category.Pharmacy:
+				animation = Content.SpriteAnimations.Item_Pharmacy;
 				break;
 			case Category.Relics:
 				animation = Content.SpriteAnimations.Item_Relic;
