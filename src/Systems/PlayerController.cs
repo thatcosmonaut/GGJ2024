@@ -35,11 +35,12 @@ public class PlayerController : MoonTools.ECS.System
 		World.Set(player, new Depth(5));
 		World.Set(player, new MaxSpeed(128));
 		World.Set(player, new Velocity(Vector2.Zero));
+		World.Set(player, new LastDirection(Vector2.Zero));
 	}
 
 	public override void Update(System.TimeSpan delta)
 	{
-		var deltaTime = delta.Milliseconds / 10f;
+		var deltaTime = (float)delta.TotalSeconds;
 
 		foreach (var entity in PlayerFilter.Entities)
 		{
@@ -77,18 +78,57 @@ public class PlayerController : MoonTools.ECS.System
 
 			// Movement
 			var velocity = Get<Velocity>(entity).Value;
-			velocity += direction * 64f * deltaTime;
+
+			var accelSpeed = 64f;
+
+			velocity += direction * accelSpeed * deltaTime * 60;
+
+			if (Has<FunnyRunTimer>(entity))
+			{
+				var time = Get<FunnyRunTimer>(entity).Time - deltaTime;
+				if (time < 0)
+				{
+					Remove<FunnyRunTimer>(entity);
+				}
+				else
+				{
+					Set(entity, new FunnyRunTimer(time));
+				}
+			}
+
 			var maxSpeed = Get<MaxSpeed>(entity).Value;
 			if (direction.LengthSquared() > 0)
 			{
+				var dot = Vector2.Dot(Vector2.Normalize(direction), Vector2.Normalize(Get<LastDirection>(entity).Direction));
+				if (dot < 0)
+				{
+					Set(entity, new CanFunnyRun());
+				}
+
+				if (Has<CanFunnyRun>(entity))
+				{
+					maxSpeed = (maxSpeed + MaxSpeedBase) / 2f;
+					Remove<CanFunnyRun>(entity);
+					Set(entity, new FunnyRunTimer(.25f));
+				}
+
 				direction = Vector2.Normalize(direction);
-				maxSpeed = Math.Min(maxSpeed + (deltaTime), 300);
+
+				var maxAdd = deltaTime * 60;
+				if (HasOutRelation<Holding>(entity))
+				{
+					maxAdd /= 2;
+				}
+
+				maxSpeed = Math.Min(maxSpeed + maxAdd, 300);
 				Set(entity, new MaxSpeed(maxSpeed));
+				Set(entity, new LastDirection(direction));
 			}
 			else
 			{
+				Set(entity, new CanFunnyRun());
 				var speed = Get<Velocity>(entity).Value.Length();
-				speed = Math.Max(speed - (10 * deltaTime), 0);
+				speed = Math.Max(speed - (20 * deltaTime * 60), 0);
 				velocity = Vector2.Normalize(velocity) * speed;
 				Set(entity, new MaxSpeed(MaxSpeedBase));
 			}
@@ -150,6 +190,10 @@ public class PlayerController : MoonTools.ECS.System
 			}
 
 			int framerate = (int)(velocity.Length() / 20f);
+			if (Has<FunnyRunTimer>(entity))
+			{
+				framerate = 25;
+			}
 
 			if (direction.LengthSquared() > 0)
 			{
