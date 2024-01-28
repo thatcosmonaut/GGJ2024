@@ -16,13 +16,10 @@ public enum DirectoryType
     SpriteTPage,
     AudioStatic,
     AudioStreaming,
-    AudioStems,
     Fonts,
     Shaders,
     Textures,
-    Videos,
-    Levels,
-    HitBoxes
+	Data
 }
 
 public class TrackedDirectory
@@ -205,6 +202,9 @@ public static class Operations
 
         // Shaders
         TrackDirectory(Path.Combine(contentDir, "Shaders"), DirectoryType.Shaders);
+
+		// Data
+		TrackDirectory(Path.Combine(contentDir, "Data"), DirectoryType.Data);
     }
 
     private static void TrackDirectory(string path, DirectoryType directoryType)
@@ -218,8 +218,7 @@ public static class Operations
         }
         else if (
             directoryType == DirectoryType.AudioStatic ||
-            directoryType == DirectoryType.AudioStreaming ||
-            directoryType == DirectoryType.AudioStems
+            directoryType == DirectoryType.AudioStreaming
         ) {
             Audio.Add(trackedDirectory);
         }
@@ -302,11 +301,6 @@ public static class Operations
                 Processor.ProcessStreamingAudio(source, output, classOutput);
                 break;
 
-            case DirectoryType.AudioStems:
-                WriteOutput("Processing Music Stems");
-                Processor.ProcessMusicStems(source, output, classOutput);
-                break;
-
             case DirectoryType.Fonts:
                 WriteOutput("Packing Font: " + subFolderName);
                 Processor.ProcessFontFolder(source, output, subFolderName);
@@ -317,22 +311,13 @@ public static class Operations
                 Processor.ProcessShaders(source, output);
                 break;
 
-            case DirectoryType.Videos:
-                WriteOutput("Processing Videos: " + subFolderName);
-                Processor.ProcessVideos(source, output, classOutput);
-                break;
-
-            case DirectoryType.HitBoxes:
-                Processor.ProcessHitboxes(source, output);
-                break;
-
-            case DirectoryType.Levels:
-                Processor.ProcessLevels(source, output, classOutput);
-                break;
-
             case DirectoryType.Textures:
                 Processor.ProcessTextures(source, output);
                 break;
+
+			case DirectoryType.Data:
+				Processor.CopyData(source, output);
+				break;
 
             default:
                 trackedDirectory.BuildStatus = BuildStatus.OutOfDate;

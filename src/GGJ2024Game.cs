@@ -31,6 +31,13 @@ namespace GGJ2024
 			bool debugMode
 		) : base(windowCreateInfo, frameLimiterSettings, 60, debugMode)
 		{
+			TextureAtlases.LoadAll();
+			SpriteAnimations.LoadAll();
+
+			var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
+			TextureAtlases.TP_Sprites.Load(GraphicsDevice, commandBuffer);
+			GraphicsDevice.Submit(commandBuffer);
+
 			StaticAudioPacks.LoadAll(AudioDevice);
 			StaticAudio.LoadAll();
 			Fonts.LoadAll(GraphicsDevice);

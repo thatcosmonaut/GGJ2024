@@ -1245,6 +1245,19 @@ namespace GGJ2024.Content
 			File.WriteAllText(classPath, musicStemsClassClode);
 		}
 
+		public static void CopyData(DirectoryInfo sourceDir, DirectoryInfo outputDir)
+		{
+			var dataDir = new DirectoryInfo(Path.Combine(sourceDir.FullName, "Data"));
+			var dataOutputDir = new DirectoryInfo(Path.Combine(outputDir.FullName, "Data"));
+
+			dataOutputDir.Create();
+
+			foreach (var file in dataDir.GetFiles())
+			{
+				File.Copy(file.FullName, Path.Combine(dataOutputDir.FullName, file.Name));
+			}
+		}
+
 		public static void ExportResource<T>(T resource, FileInfo dest)
 		{
 			var stream = new FileStream(dest.FullName, FileMode.Create, FileAccess.Write);
