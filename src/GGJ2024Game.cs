@@ -27,6 +27,7 @@ namespace GGJ2024
 		Orders Orders;
 		SetSpriteAnimationSystem SetSpriteAnimationSystem;
 		UpdateSpriteAnimationSystem UpdateSpriteAnimationSystem;
+		ColorAnimation ColorAnimation;
 
 		PlayerController PlayerController;
 
@@ -58,6 +59,7 @@ namespace GGJ2024
 			ProductSpawner = new ProductSpawner(World);
 			SetSpriteAnimationSystem = new SetSpriteAnimationSystem(World);
 			UpdateSpriteAnimationSystem = new UpdateSpriteAnimationSystem(World);
+			ColorAnimation = new ColorAnimation(World);
 
 			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
 
@@ -111,6 +113,7 @@ namespace GGJ2024
 			ProductSpawner.Update(dt);
 			Orders.Update(dt);
 			SetSpriteAnimationSystem.Update(dt);
+			ColorAnimation.Update(dt);
 
 			World.FinishUpdate();
 		}

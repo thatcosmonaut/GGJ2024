@@ -1,62 +1,56 @@
+using System;
 using MoonWorks.Math.Float;
 
 public readonly record struct Position
 {
-    private readonly Vector2 RealPosition;
-    public readonly int X
+    private readonly Vector2 RawPosition;
+	public readonly int X { get; }
+	public readonly int Y { get; }
+
+    public Position(float x, float y)
     {
-        get
-        {
-            return (int)RealPosition.X;
-        }
+        RawPosition = new Vector2(x, y);
+		X = (int) MathF.Round(x);
+		Y = (int) MathF.Round(y);
     }
 
-    public readonly int Y
+    public Position(int x, int y)
     {
-        get
-        {
-            return (int)RealPosition.Y;
-        }
-    }
-
-    public Position(float X, float Y)
-    {
-        RealPosition = new Vector2(X, Y);
-    }
-
-    public Position(int X, int Y)
-    {
-        RealPosition = new Vector2(X, Y);
+        RawPosition = new Vector2(x, y);
+		X = x;
+		Y = y;
     }
 
     public Position(Vector2 v)
     {
-        RealPosition = v;
+        RawPosition = v;
+		X = (int) MathF.Round(v.X);
+		Y = (int) MathF.Round(v.Y);
     }
 
 	public Position SetX(int x)
 	{
-		return new Position((float) x, RealPosition.Y);
+		return new Position((float) x, RawPosition.Y);
 	}
 
 	public Position SetY(int y)
 	{
-		return new Position(RealPosition.X, (float) y);
+		return new Position(RawPosition.X, (float) y);
 	}
 
     public static Position operator +(Position a, Position b)
     {
-        return new Position(a.RealPosition + b.RealPosition);
+        return new Position(a.RawPosition + b.RawPosition);
     }
 
     public static Vector2 operator -(Position a, Position b)
     {
-        return a.RealPosition - b.RealPosition;
+        return a.RawPosition - b.RawPosition;
     }
 
     public static Position operator +(Position a, Vector2 b)
     {
-        return new Position(a.RealPosition + b);
+        return new Position(a.RawPosition + b);
     }
 
 }

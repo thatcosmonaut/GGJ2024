@@ -21,8 +21,8 @@ public class Ticker : MoonTools.ECS.System
 
 	CategoriesAndIngredients CategoriesAndIngredients;
 
-	const int PRICE_SPEED = -10;
-	const int NEWS_SPEED = -40;
+	const int PRICE_SPEED = -35;
+	const int NEWS_SPEED = -35;
 	string[] News;
 	int NewsIndex = 0;
 
@@ -50,12 +50,12 @@ public class Ticker : MoonTools.ECS.System
 
 	public override void Update(TimeSpan delta)
 	{
-		var farthestRight = 0f;
+		var farthestRight = 0;
 
 		foreach (var tickerTextEntity in TickerTextFilter.Entities)
 		{
 			var position = Get<Position>(tickerTextEntity);
-			var width = Get<TickerText>(tickerTextEntity).Width;
+			var width = (int) Get<TickerText>(tickerTextEntity).Width;
 
 			if (position.X + width > farthestRight)
 			{
@@ -81,12 +81,14 @@ public class Ticker : MoonTools.ECS.System
 		}
 	}
 
-	private void SpawnTickerText(float farthestRight)
+	private void SpawnTickerText(int farthestRight)
 	{
 		var (price, change, ingredient) = CategoriesAndIngredients.ChangePrice();
 		var symbol = CategoriesAndIngredients.GetStockTicker(ingredient);
 		var priceString = price.ToString("F2");
 		var changeString = change.ToString("F2");
+
+		bool colorAnimate = price < 0;
 
 		Fonts.FromID(Fonts.PixeltypeID).TextBounds(
 			symbol,
@@ -113,7 +115,12 @@ public class Ticker : MoonTools.ECS.System
 			World.Set(tickerSymbolText, new ColorBlend(Color.Red));
 		}
 
-		x += textBounds.W + 5;
+		if (colorAnimate)
+		{
+			World.Set(tickerSymbolText, new ColorSpeed(Random.NextSingle() * 10, Random.NextSingle() * 10, Random.NextSingle() * 10));
+		}
+
+		x += (int) textBounds.W + 5;
 
 		var tickerPriceText = World.CreateEntity();
 		World.Set(tickerPriceText, new Position(x, 5));
@@ -129,6 +136,11 @@ public class Ticker : MoonTools.ECS.System
 			World.Set(tickerPriceText, new ColorBlend(Color.Red));
 		}
 
+		if (colorAnimate)
+		{
+			World.Set(tickerPriceText, new ColorSpeed(Random.NextSingle() * 10, Random.NextSingle() * 10, Random.NextSingle() * 10));
+		}
+
 		Fonts.FromID(Fonts.PixeltypeID).TextBounds(
 			priceString,
 			16,
@@ -139,7 +151,7 @@ public class Ticker : MoonTools.ECS.System
 
 		World.Set(tickerPriceText, new TickerText(textBounds.W));
 
-		x += textBounds.W + 5;
+		x += (int) textBounds.W + 5;
 
 		var tickerChangeText = World.CreateEntity();
 		World.Set(tickerChangeText, new Position(x, 5));
@@ -165,6 +177,11 @@ public class Ticker : MoonTools.ECS.System
 			World.Set(tickerChangeText, new ColorBlend(Color.Red));
 		}
 
+		if (colorAnimate)
+		{
+			World.Set(tickerChangeText, new ColorSpeed(Random.NextSingle() * 10, Random.NextSingle() * 10, Random.NextSingle() * 10));
+		}
+
 		// slow down all entities
 		foreach (var entity in TickerTextFilter.Entities)
 		{
@@ -172,7 +189,7 @@ public class Ticker : MoonTools.ECS.System
 		}
 	}
 
-	private void SpawnNews(float farthestRight)
+	private void SpawnNews(int farthestRight)
 	{
 		var str = News[NewsIndex];
 
