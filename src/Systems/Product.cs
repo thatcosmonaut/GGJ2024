@@ -84,8 +84,6 @@ public class Product : MoonTools.ECS.Manipulator
             case Category.Relics:
                 animation = Content.SpriteAnimations.Item_Relic;
                 break;
-            case Category.None:
-                break;
             default:
                 break;
         }
@@ -112,4 +110,6 @@ public class Product : MoonTools.ECS.Manipulator
             }
         }
     }
+
+
 }

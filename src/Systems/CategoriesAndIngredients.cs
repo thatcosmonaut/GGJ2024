@@ -18,8 +18,7 @@ public enum Category
     Gasses,
     IntellectualProperty,
     Pharmacy,
-    Relics,
-    None
+    Relics
 }
 
 public enum Ingredient
@@ -43,8 +42,7 @@ public enum Ingredient
     Shrimp,
     Uranium,
     Gold,
-    Oatmeal,
-    None
+    Oatmeal
 }
 
 public class CategoriesAndIngredients : Manipulator
@@ -81,8 +79,7 @@ public class CategoriesAndIngredients : Manipulator
             "shrimp" => Ingredient.Shrimp,
             "uranium" => Ingredient.Uranium,
             "gold" => Ingredient.Gold,
-            "oatmeal" => Ingredient.Oatmeal,
-            _ => Ingredient.None
+            "oatmeal" => Ingredient.Oatmeal
         };
     }
 
@@ -99,8 +96,7 @@ public class CategoriesAndIngredients : Manipulator
             "gasses" => Category.Gasses,
             "ip" => Category.IntellectualProperty,
             "pharmacy" => Category.Pharmacy,
-            "relics" => Category.Relics,
-            _ => Category.None
+            "relics" => Category.Relics
         };
     }
 
@@ -118,7 +114,6 @@ public class CategoriesAndIngredients : Manipulator
             Category.IntellectualProperty => Color.Gray,
             Category.Pharmacy => Color.Purple,
             Category.Relics => Color.Gold,
-            Category.None => Color.White,
             _ => Color.White
         };
     }
@@ -147,7 +142,6 @@ public class CategoriesAndIngredients : Manipulator
             Ingredient.Uranium => "URA",
             Ingredient.Gold => "GOLD",
             Ingredient.Oatmeal => "OAT",
-            Ingredient.None => "NONE",
             _ => "NONE"
         };
     }
@@ -161,12 +155,12 @@ public class CategoriesAndIngredients : Manipulator
             var entity = IngredientFilter.RandomEntity;
             var price = Get<Price>(entity).Value;
             var ingredient = Get<Ingredient>(entity);
-			price = MathF.Round(price + delta, 2);
+            price = MathF.Round(price + delta, 2);
             Set(entity, new Price(price));
             return (price, delta, ingredient);
         }
 
-        return (0, 0, Ingredient.None); // this should never happen!
+        return (0, 0, Ingredient.Blueberry); // this should never happen!
     }
 
     public void Initialize(World world)
@@ -176,21 +170,15 @@ public class CategoriesAndIngredients : Manipulator
 
         foreach (Category category in categories)
         {
-            if (category != Category.None)
-            {
-                var e = world.CreateEntity();
-                world.Set(e, category);
-            }
+            var e = world.CreateEntity();
+            world.Set(e, category);
         }
 
         foreach (Ingredient ingredient in ingredients)
         {
-            if (ingredient != Ingredient.None)
-            {
-                var e = world.CreateEntity();
-                world.Set(e, ingredient);
-                world.Set(e, new Price(Rando.Range(0f, 100.0f)));
-            }
+            var e = world.CreateEntity();
+            world.Set(e, ingredient);
+            world.Set(e, new Price(Rando.Range(0f, 100.0f)));
         }
     }
 

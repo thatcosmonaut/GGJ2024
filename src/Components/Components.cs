@@ -1,4 +1,6 @@
+using MoonWorks.Math.Float;
 using MoonWorks.Graphics;
+using GGJ2024.Systems;
 
 namespace GGJ2024.Components;
 
@@ -35,3 +37,5 @@ public readonly record struct LastDirection(MoonWorks.Math.Float.Vector2 Directi
 public readonly record struct SlowDownAnimation(int BaseSpeed, int step);
 
 public readonly record struct IsPopupBox(); // jank because we cant check relation type count
+public readonly record struct SpawnCategory(Category Category);
+public readonly record struct CanSpawn(Rectangle Rectangle);

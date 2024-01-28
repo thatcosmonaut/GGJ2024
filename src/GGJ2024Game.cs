@@ -110,7 +110,6 @@ namespace GGJ2024
 			World.Set(cashRegister, new CanFillOrders());
 			World.Set(cashRegister, Color.ForestGreen);
 
-
 			var ordersKiosk = World.CreateEntity();
 			World.Set(ordersKiosk, new Position(Dimensions.GAME_W - 32, Dimensions.GAME_H - 32));
 			World.Set(ordersKiosk, new Rectangle(0, 0, 32, 32));
@@ -120,6 +119,15 @@ namespace GGJ2024
 			var timer = World.CreateEntity();
 			World.Set(timer, new Components.GameTimer(260));
 			World.Set(timer, new Position(Dimensions.GAME_W / 2 + 10, Dimensions.GAME_H - 20));
+
+			var shelf = World.CreateEntity();
+			World.Set(shelf, new Position(30, 100));
+			World.Set(shelf, new SpawnCategory(Category.Food));
+			World.Set(shelf, new CanSpawn(new Rectangle(0, 0, 16, 128)));
+
+			var shelf2 = World.CreateEntity();
+			World.Set(shelf2, new Position(300, 200));
+			World.Set(shelf2, new CanSpawn(new Rectangle(0, 0, 128, 16)));
 
 			PlayerController.SpawnPlayer(0);
 			PlayerController.SpawnPlayer(1);
