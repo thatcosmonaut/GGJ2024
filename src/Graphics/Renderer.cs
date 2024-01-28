@@ -133,6 +133,12 @@ public class Renderer : MoonTools.ECS.Renderer
 
 				var str = Data.TextStorage.GetString(text.TextID);
 				var font = Fonts.FromID(text.FontID);
+				var color = Color.White;
+
+				if (Has<ColorBlend>(entity))
+				{
+					color = Get<ColorBlend>(entity).Color;
+				}
 
 				var textBatch = AcquireTextBatch();
 				textBatch.Start(font);
@@ -141,7 +147,7 @@ public class Renderer : MoonTools.ECS.Renderer
 				textBatch.Add(
 					str,
 					text.Size,
-					Color.White,
+					color,
 					text.HorizontalAlignment,
 					text.VerticalAlignment
 				);
@@ -156,7 +162,7 @@ public class Renderer : MoonTools.ECS.Renderer
 			}
 
 			commandBuffer.BeginRenderPass(
-				new ColorAttachmentInfo(swapchainTexture, Color.CornflowerBlue)
+				new ColorAttachmentInfo(swapchainTexture, Color.Black)
 			);
 
 			if (SpriteBatch.InstanceCount > 0)

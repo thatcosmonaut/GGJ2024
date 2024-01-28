@@ -48,7 +48,7 @@ public class PlayerController : MoonTools.ECS.System
                 }
             }
 
-            Set(entity, new Velocity(velocity * Speed * (float)delta.TotalSeconds));
+            Set(entity, new Velocity(velocity * Speed));
         }
     }
 }

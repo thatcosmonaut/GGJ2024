@@ -192,7 +192,7 @@ public class Motion : MoonTools.ECS.System
                 Set(entity, result);
             }
             else
-                Set(entity, pos + vel);
+                Set(entity, pos + vel * (float) delta.TotalSeconds);
         }
     }
 }
