@@ -137,7 +137,7 @@ namespace GGJ2024
 			World.Set(ordersKiosk, Color.Orange);
 
 			var timer = World.CreateEntity();
-			World.Set(timer, new Components.GameTimer(260));
+			World.Set(timer, new Components.GameTimer(90));
 			World.Set(timer, new Position(Dimensions.GAME_W / 2 + 10, Dimensions.GAME_H - 20));
 
 			var scoreOne = World.CreateEntity();
