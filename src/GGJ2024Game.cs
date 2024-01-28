@@ -39,6 +39,7 @@ namespace GGJ2024
 		{
 			TextureAtlases.LoadAll();
 			SpriteAnimations.LoadAll();
+			ProductLoader.Load();
 
 			var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
 			TextureAtlases.TP_Sprites.Load(GraphicsDevice, commandBuffer);

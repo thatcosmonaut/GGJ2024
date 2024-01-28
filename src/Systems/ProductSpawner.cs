@@ -23,7 +23,8 @@ public class ProductSpawner : MoonTools.ECS.System
                 Product.SpawnProduct(new Position(
                     Rando.IntInclusive(0, Dimensions.GAME_W),
                     Rando.IntInclusive(0, Dimensions.GAME_H)
-                ));
+                ),
+                Category.Clothes);
             }
         }
     }
