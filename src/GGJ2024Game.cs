@@ -64,12 +64,28 @@ namespace GGJ2024
 			UpdateSpriteAnimationSystem = new UpdateSpriteAnimationSystem(World);
 			ColorAnimation = new ColorAnimation(World);
 
-			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
-
 			CategoriesAndIngredients cats = new CategoriesAndIngredients(World);
 			cats.Initialize(World);
 
 			Ticker = new Ticker(World, cats);
+
+			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
+
+			var orderOne = World.CreateEntity();
+			World.Set(orderOne, new Position(240, 280));
+			World.Set(orderOne, new IsOrder());
+
+			var orderTwo = World.CreateEntity();
+			World.Set(orderTwo, new Position(320, 280));
+			World.Set(orderTwo, new IsOrder());
+
+			var orderThree = World.CreateEntity();
+			World.Set(orderThree, new Position(400, 280));
+			World.Set(orderThree, new IsOrder());
+
+			Orders.SetNewOrderDetails(orderOne);
+			Orders.SetNewOrderDetails(orderTwo);
+			Orders.SetNewOrderDetails(orderThree);
 
 			var topBorder = World.CreateEntity();
 			World.Set(topBorder, new Position(0, 65));
@@ -107,8 +123,9 @@ namespace GGJ2024
 			World.Set(uiBottomBackground, new SpriteAnimation(Content.SpriteAnimations.HUD_Bottom, 0));
 
 			var cashRegister = World.CreateEntity();
-			World.Set(cashRegister, new Position(Vector2.Zero));
-			World.Set(cashRegister, new Rectangle(0, 0, 32, 32));
+			World.Set(cashRegister, new Position(16, Dimensions.GAME_H - 16));
+			World.Set(cashRegister, new Rectangle(-16, -16, 32, 32));
+			World.Set(cashRegister, new CanInteract());
 			World.Set(cashRegister, new CanFillOrders());
 			World.Set(cashRegister, Color.ForestGreen);
 

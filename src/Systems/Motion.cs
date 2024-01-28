@@ -15,10 +15,11 @@ public class Motion : MoonTools.ECS.System
     MoonTools.ECS.Filter VelocityFilter;
 	MoonTools.ECS.Filter CanHoldFilter;
 	MoonTools.ECS.Filter CanBeHeldFilter;
+	MoonTools.ECS.Filter InteractFilter;
 	MoonTools.ECS.Filter SolidFilter;
 
-    Dictionary<(int, int), HashSet<Entity>> CanBeHeldSpatialHash = new();
-    HashSet<Entity> CanBeHeldResults = new();
+    Dictionary<(int, int), HashSet<Entity>> InteractSpatialHash = new();
+    HashSet<Entity> InteractResults = new();
 
 	Dictionary<(int, int), HashSet<Entity>> SolidSpatialHash = new();
 	HashSet<Entity> SolidResults = new HashSet<Entity>();
@@ -30,13 +31,14 @@ public class Motion : MoonTools.ECS.System
         VelocityFilter = FilterBuilder.Include<Position>().Include<Velocity>().Build();
 		CanHoldFilter = FilterBuilder.Include<Position>().Include<CanHold>().Build();
 		CanBeHeldFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Include<CanBeHeld>().Build();
+		InteractFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Include<CanInteract>().Build();
 		SolidFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Include<Solid>().Build();
     }
 
     void ClearCanBeHeldSpatialHash()
     {
         //don't remove the hashsets/clear the dict, we'll reuse them so we don't have to pressure the GC
-        foreach (var (k, v) in CanBeHeldSpatialHash)
+        foreach (var (k, v) in InteractSpatialHash)
         {
             v.Clear();
         }
@@ -183,15 +185,15 @@ public class Motion : MoonTools.ECS.System
         ClearCanBeHeldSpatialHash();
 		ClearSolidSpatialHash();
 
-        foreach (var entity in CanBeHeldFilter.Entities)
+        foreach (var entity in InteractFilter.Entities)
         {
             if (HasInRelation<Holding>(entity))
                 continue;
 
-            AddToHash(CanBeHeldSpatialHash, entity);
+            AddToHash(InteractSpatialHash, entity);
         }
 
-		foreach (var entity in CanHoldFilter.Entities)
+		foreach (var entity in InteractFilter.Entities)
 		{
 			foreach (var other in OutRelations<Colliding>(entity))
 			{
@@ -201,9 +203,9 @@ public class Motion : MoonTools.ECS.System
 			var position = Get<Position>(entity);
 			var rect = GetWorldRect(position, Get<Rectangle>(entity));
 
-			RetrieveFromHash(CanBeHeldSpatialHash, CanBeHeldResults, rect);
+			RetrieveFromHash(InteractSpatialHash, InteractResults, rect);
 
-			foreach (var other in CanBeHeldResults)
+			foreach (var other in InteractResults)
 			{
 				if (other != entity)
 				{

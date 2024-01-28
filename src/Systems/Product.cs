@@ -42,7 +42,8 @@ public class Product : MoonTools.ECS.Manipulator
         Set(entity, position);
         Set(entity, new Rectangle(-8, -8, 16, 16));
         Set(entity, new CanBeHeld());
-        Set(entity, new Depth(8));
+		Set(entity, new CanInteract());
+		Set(entity, new Depth(8));
         Set(entity, new SlowDownAnimation(15, 1));
 		var depth = MathHelper.Lerp(100, 10, position.Y / (float) Dimensions.GAME_H);
 		Set(entity, new Depth(depth));

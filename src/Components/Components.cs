@@ -7,6 +7,7 @@ namespace GGJ2024.Components;
 public readonly record struct GameTimer(float Time);
 public readonly record struct Player(int Index, int Score);
 public readonly record struct Orientation(float Angle);
+public readonly record struct CanInteract();
 public readonly record struct CanInspect();
 public readonly record struct CanBeHeld();
 public readonly record struct TryHold();
@@ -20,6 +21,7 @@ public readonly record struct TickerText(float Width);
 public readonly record struct ColorBlend(Color Color);
 public readonly record struct CanFillOrders();
 public readonly record struct CanGiveOrders();
+public readonly record struct IsOrder();
 
 public readonly record struct ColorSpeed(float RedSpeed, float GreenSpeed, float BlueSpeed);
 
