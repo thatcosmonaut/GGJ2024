@@ -9,11 +9,13 @@ public class Orders : MoonTools.ECS.System
 {
     Filter CategoryFilter;
     Filter IngredientFilter;
+    Product Product;
 
     public Orders(World world) : base(world)
     {
         CategoryFilter = FilterBuilder.Include<Category>().Build();
         IngredientFilter = FilterBuilder.Include<Ingredient>().Build();
+        Product = new Product(world);
     }
 
     public void GetNewOrder(Entity player)
@@ -36,6 +38,12 @@ public class Orders : MoonTools.ECS.System
             System.Console.WriteLine("Requires ingredient: " + Get<Ingredient>(OutRelationSingleton<RequiresIngredient>(entity)));
     }
 
+    private int CalculateScore(Entity product)
+    {
+        var price = Product.GetPrice(product);
+        return 300 - (int)MathF.Min(300, price);
+    }
+
     public bool TryFillOrder(Entity player)
     {
         if (!HasOutRelation<Holding>(player))
@@ -47,8 +55,15 @@ public class Orders : MoonTools.ECS.System
 
         if (filled)
         {
+            var p = Get<Player>(player);
+            var score = p.Score + CalculateScore(product);
+            System.Console.WriteLine($"score: {score}");
+
+            Set(player, new Player(p.Index, score));
+
             Destroy(order);
             Destroy(product);
+
         }
 
         return filled;

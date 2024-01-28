@@ -62,8 +62,8 @@ namespace GGJ2024
 
 			var player = World.CreateEntity();
 			World.Set(player, new Position(0f, Dimensions.GAME_H * 0.5f));
-			World.Set(player, new SpriteAnimation(Content.SpriteAnimations.Char_Walk_Down));
-			World.Set(player, new Player(0));
+			World.Set(player, new Rectangle(0, 0, 16, 16));
+			World.Set(player, new Player(0, 0));
 			World.Set(player, new CanHold());
 			World.Set(player, new Solid());
 			World.Set(player, Color.Green);
