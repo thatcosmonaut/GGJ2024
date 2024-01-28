@@ -233,7 +233,14 @@ public class Motion : MoonTools.ECS.System
                 Set(entity, result);
             }
             else
-                Set(entity, pos + vel * (float)delta.TotalSeconds);
+			{
+				var scaledVelocity = vel * (float) delta.TotalSeconds;
+				if (Has<ForceIntegerMovement>(entity))
+				{
+					scaledVelocity = new Vector2((int) scaledVelocity.X, (int) scaledVelocity.Y);
+				}
+                Set(entity, pos + scaledVelocity);
+			}
         }
     }
 }

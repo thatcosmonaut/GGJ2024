@@ -23,3 +23,4 @@ public readonly record struct Depth(int Value);
 public readonly record struct DrawAsRectangle();
 
 public readonly record struct TextDropShadow(int OffsetX, int OffsetY);
+public readonly record struct ForceIntegerMovement();

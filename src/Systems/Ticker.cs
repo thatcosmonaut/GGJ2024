@@ -21,8 +21,8 @@ public class Ticker : MoonTools.ECS.System
 
 	CategoriesAndIngredients CategoriesAndIngredients;
 
-	const int PRICE_SPEED = -35;
-	const int NEWS_SPEED = -35;
+	const int PRICE_SPEED = -60;
+	const int NEWS_SPEED = -60;
 	string[] News;
 	int NewsIndex = 0;
 
