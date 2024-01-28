@@ -73,6 +73,8 @@ namespace GGJ2024
 			World.Set(timer, new GameTimer(260));
 			World.Set(timer, new Position(Dimensions.GAME_W / 2, Dimensions.GAME_H * 3 / 4));
 
+			PlayerController.SpawnPlayer(0);
+			PlayerController.SpawnPlayer(1);
 		}
 
 		protected override void Update(System.TimeSpan dt)

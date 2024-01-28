@@ -1,225 +1,92 @@
-using System.Collections.Generic;
-using MoonWorks.Input;
 using MoonTools.ECS;
-using GGJ2024.Messages;
-using GGJ2024.Utility;
-using System.Text;
+using MoonWorks.Input;
 using GGJ2024.Components;
-using GGJ2024.Content;
+using System;
 
 namespace GGJ2024.Systems;
 
-public enum Actions
+public struct InputState
 {
-    MoveX,
-    MoveY,
-    Interact,
-    ChangeCard,
+	public ButtonState Left { get; set; }
+	public ButtonState Right { get; set; }
+	public ButtonState Up { get; set; }
+	public ButtonState Down { get; set; }
+	public ButtonState Interact { get; set; }
 }
 
-public enum ActionState
+public class ControlSet
 {
-    Off,
-    Pressed,
-    Held,
-    Released
-}
-
-
-public class GenericAxis
-{
-    public float Value;
-    public List<GenericInputs> Positive = new List<GenericInputs>();
-    public List<GenericInputs> Negative = new List<GenericInputs>();
+	public VirtualButton Left { get; set; } = new EmptyButton();
+	public VirtualButton Right { get; set; } = new EmptyButton();
+	public VirtualButton Up { get; set; } = new EmptyButton();
+	public VirtualButton Down { get; set; } = new EmptyButton();
+	public VirtualButton Interact { get; set; } = new EmptyButton();
 }
 
 public class Input : MoonTools.ECS.System
 {
-    Inputs Inputs;
-    public static Dictionary<Actions, GenericAxis> ActionBindings;
-    Filter PlayerFilter;
+	Inputs Inputs { get; }
 
-    public static string GetActionNames(Actions action)
-    {
-        var axis = ActionBindings[action];
-        var results = new StringBuilder();
+	Filter PlayerFilter { get; }
 
-        int i = 0;
-        results.Append("[");
+	ControlSet PlayerOneKeyboard = new ControlSet();
+	ControlSet PlayerOneGamepad = new ControlSet();
+	ControlSet PlayerTwoKeyboard = new ControlSet();
+	ControlSet PlayerTwoGamepad = new ControlSet();
 
-        foreach (var input in axis.Positive)
-        {
-            if (axis.Negative.Count > 0)
-            {
-                results.Append("+");
-            }
-            results.Append(input);
-            if ((i < axis.Positive.Count - 1 || axis.Negative.Count > 0))
-            {
-                results.Append(",");
-            }
-            i++;
-        }
-        i = 0;
+	public Input(World world, Inputs inputs) : base(world)
+	{
+		Inputs = inputs;
+		PlayerFilter = FilterBuilder.Include<Player>().Build();
 
-        foreach (var input in axis.Negative)
-        {
-            results.Append("-");
-            results.Append(input);
-            if (i < axis.Negative.Count - 1)
-            {
-                results.Append(",");
-            }
-            i++;
-        }
-        results.Append("]");
+		PlayerOneKeyboard.Up = Inputs.Keyboard.Button(KeyCode.W);
+		PlayerOneKeyboard.Down = Inputs.Keyboard.Button(KeyCode.S);
+		PlayerOneKeyboard.Left = Inputs.Keyboard.Button(KeyCode.A);
+		PlayerOneKeyboard.Right = Inputs.Keyboard.Button(KeyCode.D);
+		PlayerOneKeyboard.Interact = Inputs.Keyboard.Button(KeyCode.Space);
 
-        return results.ToString();
-    }
+		PlayerOneGamepad.Up = Inputs.GetGamepad(0).LeftYUp;
+		PlayerOneGamepad.Down = Inputs.GetGamepad(0).LeftYDown;
+		PlayerOneGamepad.Left = Inputs.GetGamepad(0).LeftXLeft;
+		PlayerOneGamepad.Right = Inputs.GetGamepad(0).LeftXRight;
+		PlayerOneGamepad.Interact = Inputs.GetGamepad(0).A;
 
-    Dictionary<Actions, ActionState>[] ActionStateDictionaries = new[]
-    {
-        new Dictionary<Actions, ActionState>(),
-        new Dictionary<Actions, ActionState>()
-    };
+		PlayerTwoKeyboard.Up = Inputs.Keyboard.Button(KeyCode.Up);
+		PlayerTwoKeyboard.Down = Inputs.Keyboard.Button(KeyCode.Down);
+		PlayerTwoKeyboard.Left = Inputs.Keyboard.Button(KeyCode.Left);
+		PlayerTwoKeyboard.Right = Inputs.Keyboard.Button(KeyCode.Right);
+		PlayerTwoKeyboard.Interact = Inputs.Keyboard.Button(KeyCode.Return);
 
-    public static void ResetActions()
-    {
-        ActionBindings = new Dictionary<Actions, GenericAxis>()
-            {
-                {Actions.MoveY, new GenericAxis{
-                    Positive = new List<GenericInputs>(){GenericInputs.S,  GenericInputs.LeftY},
-                    Negative = new List<GenericInputs>(){GenericInputs.W}
-                }},
-                {Actions.MoveX, new GenericAxis{
-                    Positive = new List<GenericInputs>(){GenericInputs.D, GenericInputs.LeftX},
-                    Negative = new List<GenericInputs>(){GenericInputs.A}
-                }},
-                {Actions.Interact, new GenericAxis{
-                    Positive = new List<GenericInputs>(){GenericInputs.Space, GenericInputs.AButton}
-                }},
-                {Actions.ChangeCard, new GenericAxis{
-                    Positive = new List<GenericInputs>(){GenericInputs.E, GenericInputs.RightShoulder},
-                    Negative = new List<GenericInputs>(){GenericInputs.Q, GenericInputs.LeftShoulder}
-                }},
-            };
-    }
+		PlayerTwoGamepad.Up = Inputs.GetGamepad(1).LeftYUp;
+		PlayerTwoGamepad.Down = Inputs.GetGamepad(1).LeftYDown;
+		PlayerTwoGamepad.Left = Inputs.GetGamepad(1).LeftXLeft;
+		PlayerTwoGamepad.Right = Inputs.GetGamepad(1).LeftXRight;
+		PlayerTwoGamepad.Interact = Inputs.GetGamepad(1).A;
+	}
 
-    public Input(World world, Inputs inputContext) : base(world)
-    {
-        Inputs = inputContext;
-        ResetActions();
+	public override void Update(TimeSpan timeSpan)
+	{
+		foreach (var playerEntity in PlayerFilter.Entities)
+		{
+			var index = Get<Player>(playerEntity).Index;
+			var controlSet = index == 0 ? PlayerOneKeyboard : PlayerTwoKeyboard;
+			var altControlSet = index == 0 ? PlayerOneGamepad : PlayerTwoGamepad;
 
-        foreach (var dict in ActionStateDictionaries)
-        {
-            foreach (var n in (Actions[])System.Enum.GetValues(typeof(Actions)))
-            {
-                dict[n] = ActionState.Off;
-            }
-        }
+			InputState inputState = InputState(controlSet, altControlSet);
 
-        PlayerFilter = FilterBuilder.Include<Player>().Build();
-    }
+			Set(playerEntity, inputState);
+		}
+	}
 
-    public override void Update(System.TimeSpan delta)
-    {
-        foreach (var player in PlayerFilter.Entities)
-        {
-            var index = Get<Player>(player).Index;
-            var actionStates = ActionStateDictionaries[index];
-
-            foreach (var (action, axis) in ActionBindings)
-            {
-                var value = 0.0f;
-
-                foreach (var input in axis.Positive)
-                {
-                    var v = InputHelper.Poll(Inputs, input, index);
-                    if (System.MathF.Abs(v) > 0.0f)
-                    {
-                        value = v;
-
-                        switch (actionStates[action])
-                        {
-                            case ActionState.Off:
-                                actionStates[action] = ActionState.Pressed;
-                                break;
-                            case ActionState.Pressed:
-                                actionStates[action] = ActionState.Held;
-                                break;
-                            case ActionState.Held:
-                                break;
-                            case ActionState.Released:
-                                actionStates[action] = ActionState.Pressed;
-                                break;
-                        }
-                        break;
-                    }
-                    else
-                    {
-                        switch (actionStates[action])
-                        {
-                            case ActionState.Off:
-                                break;
-                            case ActionState.Pressed:
-                                actionStates[action] = ActionState.Released;
-                                break;
-                            case ActionState.Held:
-                                actionStates[action] = ActionState.Released;
-                                break;
-                            case ActionState.Released:
-                                actionStates[action] = ActionState.Off;
-                                break;
-                        }
-                    }
-                }
-
-                foreach (var input in axis.Negative)
-                {
-                    var v = InputHelper.Poll(Inputs, input, index) * -1.0f;
-                    if (System.MathF.Abs(v) > 0.0f)
-                    {
-                        value += v;
-                        switch (actionStates[action])
-                        {
-                            case ActionState.Off:
-                                actionStates[action] = ActionState.Pressed;
-                                break;
-                            case ActionState.Pressed:
-                                actionStates[action] = ActionState.Held;
-                                break;
-                            case ActionState.Held:
-                                break;
-                            case ActionState.Released:
-                                actionStates[action] = ActionState.Pressed;
-                                break;
-                        }
-                        break;
-                    }
-                    else
-                    {
-                        switch (actionStates[action])
-                        {
-                            case ActionState.Off:
-                                break;
-                            case ActionState.Pressed:
-                                actionStates[action] = ActionState.Released;
-                                break;
-                            case ActionState.Held:
-                                actionStates[action] = ActionState.Released;
-                                break;
-                            case ActionState.Released:
-                                actionStates[action] = ActionState.Off;
-                                break;
-                        }
-                    }
-                }
-
-                if (System.MathF.Abs(value) > 0.0f)
-                {
-                    Send(new Action(value, action, actionStates[action], index));
-                }
-            }
-        }
-    }
+	private static InputState InputState(ControlSet controlSet, ControlSet altControlSet)
+	{
+		return new InputState
+		{
+			Left = controlSet.Left.State | altControlSet.Left.State,
+			Right = controlSet.Right.State | altControlSet.Right.State,
+			Up = controlSet.Up.State | altControlSet.Up.State,
+			Down = controlSet.Down.State | altControlSet.Down.State,
+			Interact = controlSet.Interact.State | altControlSet.Interact.State
+		};
+	}
 }

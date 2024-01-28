@@ -35,12 +35,6 @@ public class PlayerController : MoonTools.ECS.System
 
     public override void Update(System.TimeSpan delta)
     {
-        if (!Some<Player>())
-        {
-            SpawnPlayer(0);
-            SpawnPlayer(1);
-        }
-
         foreach (var entity in PlayerFilter.Entities)
         {
             var playerIndex = Get<Player>(entity).Index;
@@ -48,25 +42,30 @@ public class PlayerController : MoonTools.ECS.System
             if (Has<TryHold>(entity))
                 Remove<TryHold>(entity);
 
-            foreach (var action in ReadMessages<Action>())
-            {
-                if (action.Index == playerIndex)
-                {
-                    if (action.ActionType == Actions.MoveX)
-                    {
-                        direction.X += action.Value;
-                    }
-                    else if (action.ActionType == Actions.MoveY)
-                    {
-                        direction.Y += action.Value;
-                    }
+			var inputState = Get<InputState>(entity);
 
-                    if (action.ActionType == Actions.Interact && action.ActionState == ActionState.Pressed)
-                    {
-                        Set(entity, new TryHold());
-                    }
-                }
-            }
+			if (inputState.Left.IsDown)
+			{
+				direction.X = -1;
+			}
+			else if (inputState.Right.IsDown)
+			{
+				direction.X = 1;
+			}
+
+			if (inputState.Up.IsDown)
+			{
+				direction.Y = -1;
+			}
+			else if (inputState.Down.IsDown)
+			{
+				direction.Y = 1;
+			}
+
+			if (inputState.Interact.IsPressed)
+			{
+				Set(entity, new TryHold());
+			}
 
 			if (direction.LengthSquared() > 0)
 			{
