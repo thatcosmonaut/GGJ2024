@@ -20,6 +20,7 @@ public class ProductSpawner : MoonTools.ECS.System
         ProductFilter = FilterBuilder.Include<CanBeHeld>().Build();
         ProductSpawnerFilter = FilterBuilder.Include<CanSpawn>().Build();
         Categories = Enum.GetValues<Category>();
+        SpawnShelves();
     }
 
     public void SpawnShelves()
