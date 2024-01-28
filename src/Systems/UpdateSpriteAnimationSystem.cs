@@ -19,7 +19,7 @@ public class UpdateSpriteAnimationSystem : MoonTools.ECS.System
 	{
 		foreach (var entity in SpriteAnimationFilter.Entities)
 		{
-			UpdateSpriteAnimation(entity, (float) delta.TotalSeconds);
+			UpdateSpriteAnimation(entity, (float)delta.TotalSeconds);
 		}
 	}
 
