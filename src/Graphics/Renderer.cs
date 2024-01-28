@@ -16,13 +16,11 @@ public class Renderer : MoonTools.ECS.Renderer
 	GraphicsPipeline SpriteBatchPipeline;
 	GraphicsPipeline TextPipeline;
 
-	SpriteBatch RectangleSpriteBatch;
 	SpriteBatch ArtSpriteBatch;
 
 	Texture RenderTexture;
 	Texture DepthTexture;
 
-	Texture RectangleAtlasTexture;
 	Texture SpriteAtlasTexture;
 
 	Sampler PointSampler;
@@ -53,12 +51,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
 		RenderTexture = Texture.CreateTexture2D(GraphicsDevice, Dimensions.GAME_W, Dimensions.GAME_H, swapchainFormat, TextureUsageFlags.ColorTarget);
 		DepthTexture = Texture.CreateTexture2D(GraphicsDevice, Dimensions.GAME_W, Dimensions.GAME_H, TextureFormat.D16, TextureUsageFlags.DepthStencilTarget);
-
-		var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
-
-		RectangleAtlasTexture = Texture.CreateTexture2D(GraphicsDevice, 1, 1, TextureFormat.R8G8B8A8, TextureUsageFlags.Sampler);
-		commandBuffer.SetTextureData(RectangleAtlasTexture, new Color[] { Color.White });
-		GraphicsDevice.Submit(commandBuffer);
 
 		SpriteAtlasTexture = TextureAtlases.TP_Sprites.Texture;
 
@@ -112,7 +104,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
 		PointSampler = new Sampler(GraphicsDevice, SamplerCreateInfo.PointClamp);
 
-		RectangleSpriteBatch = new SpriteBatch(GraphicsDevice);
 		ArtSpriteBatch = new SpriteBatch(GraphicsDevice);
 	}
 
@@ -124,7 +115,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
 		if (swapchainTexture != null)
 		{
-			RectangleSpriteBatch.Reset();
 			ArtSpriteBatch.Reset();
 
 			foreach (var (batch, _) in ActiveBatchTransforms)
@@ -144,7 +134,9 @@ public class Renderer : MoonTools.ECS.Renderer
 				{
 					depth = -Get<Depth>(entity).Value;
 				}
-				RectangleSpriteBatch.Add(new Vector3(position.X + rectangle.X, position.Y + rectangle.Y, depth), orientation, new Vector2(rectangle.Width, rectangle.Height), color, new Vector2(0, 0), new Vector2(1, 1));
+
+				var sprite = SpriteAnimations.Pixel.Frames[0];
+				ArtSpriteBatch.Add(new Vector3(position.X + rectangle.X, position.Y + rectangle.Y, depth), orientation, new Vector2(rectangle.Width, rectangle.Height), color, sprite.UV.LeftTop, sprite.UV.Dimensions);
 			}
 
 			foreach (var entity in SpriteAnimationFilter.Entities)
@@ -217,11 +209,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
 			}
 
-			if (RectangleSpriteBatch.InstanceCount > 0)
-			{
-				RectangleSpriteBatch.Upload(commandBuffer);
-			}
-
 			if (ArtSpriteBatch.InstanceCount > 0)
 			{
 				ArtSpriteBatch.Upload(commandBuffer);
@@ -242,11 +229,6 @@ public class Renderer : MoonTools.ECS.Renderer
 			if (ArtSpriteBatch.InstanceCount > 0)
 			{
 				ArtSpriteBatch.Render(commandBuffer, SpriteBatchPipeline, SpriteAtlasTexture, PointSampler, viewProjectionMatrices);
-			}
-
-			if (RectangleSpriteBatch.InstanceCount > 0)
-			{
-				RectangleSpriteBatch.Render(commandBuffer, SpriteBatchPipeline, RectangleAtlasTexture, PointSampler, viewProjectionMatrices);
 			}
 
 			if (ActiveBatchTransforms.Count > 0)

@@ -32,3 +32,5 @@ public readonly record struct CanFunnyRun();
 
 public readonly record struct LastDirection(MoonWorks.Math.Float.Vector2 Direction);
 public readonly record struct SlowDownAnimation(int BaseSpeed, int step);
+
+public readonly record struct IsPopupBox(); // jank because we cant check relation type count
