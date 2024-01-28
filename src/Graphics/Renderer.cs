@@ -132,15 +132,18 @@ public class Renderer : MoonTools.ECS.Renderer
 				var orientation = Has<Orientation>(entity) ? Get<Orientation>(entity).Angle : 0.0f;
 				var color = Has<Color>(entity) ? Get<Color>(entity) : Color.White;
 
-				RectangleSpriteBatch.Add(new Vector3(position.X, position.Y, -2f), orientation, new Vector2(rectangle.Width, rectangle.Height), color, new Vector2(0, 0), new Vector2(1, 1));
+				RectangleSpriteBatch.Add(new Vector3(position.X + rectangle.X, position.Y + rectangle.Y, -2f), orientation, new Vector2(rectangle.Width, rectangle.Height), color, new Vector2(0, 0), new Vector2(1, 1));
 			}
 
 			foreach (var entity in SpriteAnimationFilter.Entities)
 			{
 				var position = Get<Position>(entity);
-				var sprite = Get<SpriteAnimation>(entity).CurrentSprite;
+				var animation = Get<SpriteAnimation>(entity);
+				var sprite = animation.CurrentSprite;
+				var origin = animation.Origin;
+				var offset = -origin - new Vector2(sprite.FrameRect.X, sprite.FrameRect.Y);
 
-				ArtSpriteBatch.Add(new Vector3(position.X, position.Y, -1f), 0, new Vector2(sprite.SliceRect.W, sprite.SliceRect.H), Color.White, sprite.UV.LeftTop, sprite.UV.Dimensions);
+				ArtSpriteBatch.Add(new Vector3(position.X + offset.X, position.Y + offset.Y, -1f), 0, new Vector2(sprite.SliceRect.W, sprite.SliceRect.H), Color.White, sprite.UV.LeftTop, sprite.UV.Dimensions);
 			}
 
 			foreach (var entity in TextFilter.Entities)

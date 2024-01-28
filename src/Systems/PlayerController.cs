@@ -27,7 +27,7 @@ public class PlayerController : MoonTools.ECS.System
         World.Set(player, new Position(Dimensions.GAME_W * 0.5f, Dimensions.GAME_H * 0.5f + index * 32.0f));
         World.Set(player, new SpriteAnimation(Content.SpriteAnimations.Char_Walk_Down, 0));
         World.Set(player, new Player(index, 0));
-		World.Set(player, new Rectangle(0, 0, 16, 16));
+		World.Set(player, new Rectangle(-8, -8, 16, 16));
         World.Set(player, new CanHold());
         World.Set(player, new Solid());
         World.Set(player, index == 0 ? Color.Green : Color.Blue);
