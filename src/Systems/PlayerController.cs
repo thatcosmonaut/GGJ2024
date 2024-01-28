@@ -9,7 +9,7 @@ namespace GGJ2024.Systems;
 public class PlayerController : MoonTools.ECS.System
 {
     MoonTools.ECS.Filter PlayerFilter;
-    float Speed = 32f;
+    float Speed = 1f;
 
     public PlayerController(World world) : base(world)
     {
