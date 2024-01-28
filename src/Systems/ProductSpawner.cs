@@ -35,8 +35,8 @@ public class ProductSpawner : MoonTools.ECS.System
         }
         Rando.Shuffle(Categories);
 
-        var x = 140;
-        var topShelfY = 110;
+        var x = 150;
+        var topShelfY = 115;
         var bottomShelfY = 250;
         SpawnVerticalDoubleShelf(x, topShelfY, 0);
         SpawnVerticalDoubleShelf(x, bottomShelfY, 2);
@@ -44,8 +44,8 @@ public class ProductSpawner : MoonTools.ECS.System
         SpawnVerticalDoubleShelf(x, topShelfY, 4);
         SpawnVerticalDoubleShelf(x, bottomShelfY, 6);
 
-        Product.SpawnShelf(320 - spawnStepDistance - 16, 200, 4, 2);
-        Product.SpawnShelf(640 - spawnStepDistance + 3, 170, 1, 4, Categories[9]);
+        Product.SpawnShelf(330 - spawnStepDistance - 16, 200, 4, 2);
+        Product.SpawnShelf(640 - spawnStepDistance + 10, 160, 1, 4, Categories[9]);
     }
 
     public void SpawnVerticalDoubleShelf(int x, int y, int categoryInt)
