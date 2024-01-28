@@ -66,6 +66,16 @@ namespace GGJ2024
 
 			Ticker = new Ticker(World, cats);
 
+			var uiTickerBackground = World.CreateEntity();
+			World.Set(uiTickerBackground, new Position(0, 0));
+			World.Set(uiTickerBackground, new Depth(10));
+			World.Set(uiTickerBackground, new SpriteAnimation(Content.SpriteAnimations.HUD_Ticker, 0));
+
+			var uiBottomBackground = World.CreateEntity();
+			World.Set(uiBottomBackground, new Position(0, Dimensions.GAME_H - 40));
+			World.Set(uiBottomBackground, new Depth(10));
+			World.Set(uiBottomBackground, new SpriteAnimation(Content.SpriteAnimations.HUD_Bottom, 0));
+
 			var cashRegister = World.CreateEntity();
 			World.Set(cashRegister, new Position(Vector2.Zero));
 			World.Set(cashRegister, new Rectangle(0, 0, 32, 32));
@@ -80,8 +90,8 @@ namespace GGJ2024
 			World.Set(ordersKiosk, Color.Orange);
 
 			var timer = World.CreateEntity();
-			World.Set(timer, new Components.GameTimer(260));
-			World.Set(timer, new Position(Dimensions.GAME_W / 2, Dimensions.GAME_H * 3 / 4));
+			World.Set(timer, new GameTimer(260));
+			World.Set(timer, new Position(Dimensions.GAME_W / 2 + 10, Dimensions.GAME_H - 20));
 
 			PlayerController.SpawnPlayer(0);
 			PlayerController.SpawnPlayer(1);

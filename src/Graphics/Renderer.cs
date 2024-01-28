@@ -125,6 +125,8 @@ public class Renderer : MoonTools.ECS.Renderer
 			}
 			ActiveBatchTransforms.Clear();
 
+			// NOTE: depth is Fucked Up, bigger number = closer to the camera, can't be 0
+
 			foreach (var entity in RectangleFilter.Entities)
 			{
 				var position = Get<Position>(entity);
@@ -142,8 +144,14 @@ public class Renderer : MoonTools.ECS.Renderer
 				var sprite = animation.CurrentSprite;
 				var origin = animation.Origin;
 				var offset = -origin - new Vector2(sprite.FrameRect.X, sprite.FrameRect.Y);
+				var depth = -1;
 
-				ArtSpriteBatch.Add(new Vector3(position.X + offset.X, position.Y + offset.Y, -1f), 0, new Vector2(sprite.SliceRect.W, sprite.SliceRect.H), Color.White, sprite.UV.LeftTop, sprite.UV.Dimensions);
+				if (Has<Depth>(entity))
+				{
+					depth = -Get<Depth>(entity).Value;
+				}
+
+				ArtSpriteBatch.Add(new Vector3(position.X + offset.X, position.Y + offset.Y, depth), 0, new Vector2(sprite.SliceRect.W, sprite.SliceRect.H), Color.White, sprite.UV.LeftTop, sprite.UV.Dimensions);
 			}
 
 			foreach (var entity in TextFilter.Entities)

@@ -23,6 +23,6 @@ public class GameTimer : MoonTools.ECS.System
 		var timeSpan = new TimeSpan(0, 0, (int)time);
 		var timeString = timeSpan.ToString(@"m\:ss"); // this is really bad for string memory usage but whatevsies lol -evan
 
-		Set(timerEntity, new Text(Fonts.KosugiID, 24, timeString, MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+		Set(timerEntity, new Text(Fonts.KosugiID, 16, timeString, MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 	}
 }

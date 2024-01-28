@@ -28,10 +28,11 @@ public class PlayerController : MoonTools.ECS.System
 		World.Set(player, new SpriteAnimation(index == 0 ? Content.SpriteAnimations.Char_Walk_Down : Content.SpriteAnimations.Char2_Walk_Down, 0));
 		World.Set(player, new Player(index, 0));
 		World.Set(player, new Rectangle(-8, -8, 16, 16));
-		World.Set(player, new CanHold());
-		World.Set(player, new Solid());
-		World.Set(player, index == 0 ? Color.Green : Color.Blue);
-	}
+        World.Set(player, new CanHold());
+        World.Set(player, new Solid());
+        World.Set(player, index == 0 ? Color.Green : Color.Blue);
+		World.Set(player, new Depth(5));
+    }
 
 	public override void Update(System.TimeSpan delta)
 	{
@@ -112,7 +113,7 @@ public class PlayerController : MoonTools.ECS.System
 				}
 				else if (direction.Y < 0)
 				{
-					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_Up : Content.SpriteAnimations.Char2_Walk_Down;
+					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_Up : Content.SpriteAnimations.Char2_Walk_Up;
 				}
 				else
 				{

@@ -16,3 +16,6 @@ public readonly record struct TickerText(float Width);
 public readonly record struct ColorBlend(Color Color);
 public readonly record struct CanFillOrders();
 public readonly record struct CanGiveOrders();
+
+// NOTE: depth is Fucked Up, bigger number = closer to the camera, can't be 0
+public readonly record struct Depth(int Value);
