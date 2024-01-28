@@ -50,9 +50,12 @@ public enum Ingredient
 public class CategoriesAndIngredients : Manipulator
 {
     const float MaxPriceDelta = 10.0f;
+    MoonTools.ECS.Filter IngredientFilter;
+
 
     public CategoriesAndIngredients(World world) : base(world)
     {
+        IngredientFilter = FilterBuilder.Include<Ingredient>().Build();
     }
 
     public static Ingredient GetIngredient(string s)
@@ -119,10 +122,19 @@ public class CategoriesAndIngredients : Manipulator
         };
     }
 
-    public float GetPriceChange()
+    public (float delta, Ingredient ingredient) ChangePrice()
     {
         float delta = Rando.Range(-MaxPriceDelta, MaxPriceDelta);
-        return delta;
+
+        foreach (var entity in IngredientFilter.EntitiesInRandomOrder)
+        {
+            var price = Get<Price>(entity).Value;
+            var ingredient = Get<Ingredient>(entity);
+            Set(entity, new Price(price + delta));
+            return (delta, ingredient);
+        }
+
+        return (0, Ingredient.None); // this should never happen!!
     }
 
     public void Initialize(World world)
