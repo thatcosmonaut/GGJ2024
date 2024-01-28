@@ -1254,7 +1254,7 @@ namespace GGJ2024.Content
 
 			foreach (var file in dataDir.GetFiles())
 			{
-				File.Copy(file.FullName, Path.Combine(dataOutputDir.FullName, file.Name));
+				File.Copy(file.FullName, Path.Combine(dataOutputDir.FullName, file.Name), true);
 			}
 		}
 
