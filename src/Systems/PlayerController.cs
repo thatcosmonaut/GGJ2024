@@ -43,10 +43,6 @@ public class PlayerController : MoonTools.ECS.System
 		World.Set(player, new Velocity(Vector2.Zero));
 		World.Set(player, new LastDirection(Vector2.Zero));
 
-		var footstepTimer = World.CreateEntity();
-		World.Set(footstepTimer, new Components.GameTimer(0));
-		World.Relate(player, footstepTimer, new TimingFootstepAudio());
-
 		return player;
 	}
 
@@ -225,14 +221,14 @@ public class PlayerController : MoonTools.ECS.System
 			}
 
 			#region walking sfx
-			var footstepTimer = OutRelationSingleton<TimingFootstepAudio>(entity);
-			var remainingDuration = Get<Timer>(footstepTimer).Time;
-			
-			if (remainingDuration <= 0 && framerate > 0)
+			if (!HasOutRelation<TimingFootstepAudio>(entity) && framerate > 0)
 			{
 				PlayRandomFootstep();
+				
+				var footstepTimer = World.CreateEntity();
 				var footstepDuration = Math.Clamp(1f - (framerate / 50f), .5f, 1f);
 				Set(footstepTimer, new Timer(footstepDuration));
+				World.Relate(entity, footstepTimer, new TimingFootstepAudio());
 			}
 			#endregion
 
