@@ -167,11 +167,11 @@ namespace GGJ2024
 			PlayerController.Update(dt);
 			Motion.Update(dt);
 			Hold.Update(dt);
-			Audio.Update(dt);
 			ProductSpawner.Update(dt);
 			Orders.Update(dt);
 			SetSpriteAnimationSystem.Update(dt);
 			ColorAnimation.Update(dt);
+			Audio.Update(dt);
 
 			World.FinishUpdate();
 		}

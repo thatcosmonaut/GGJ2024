@@ -55,6 +55,7 @@ public class Hold : MoonTools.ECS.System
 				{
 					holding = true;
 					Relate(e, o, new Holding());
+					Send(new PlayStaticSoundMessage(StaticAudio.PickUp));
 
 					var spriteInfo = Get<SpriteAnimation>(o).SpriteAnimationInfo;
 					Send(new SetAnimationMessage(
