@@ -15,7 +15,7 @@ public class Orders : MoonTools.ECS.System
     Filter IngredientFilter;
 	Filter OrderFilter;
 	Filter PlayerFilter;
-    Product Product;
+    Product ProductManipulator;
     float OrderWaitTime = 3.0f;
 
     public Orders(World world) : base(world)
@@ -24,7 +24,7 @@ public class Orders : MoonTools.ECS.System
         IngredientFilter = FilterBuilder.Include<Ingredient>().Build();
 		OrderFilter = FilterBuilder.Include<IsOrder>().Build();
 		PlayerFilter = FilterBuilder.Include<Player>().Include<CanHold>().Build();
-        Product = new Product(world);
+        ProductManipulator = new Product(world);
     }
 
     public void SetNewOrderDetails(Entity order)
@@ -77,13 +77,26 @@ public class Orders : MoonTools.ECS.System
         {
             var p = Get<Player>(player);
 			var scoreEntity = OutRelationSingleton<HasScore>(player);
-			var score = Get<Score>(scoreEntity).Value + CalculateScore(product);
+			var calculate = CalculateScore(product);
+            var score = Get<Score>(scoreEntity).Value + calculate;
+
 			Set(scoreEntity, new Score(score));
 			Set(scoreEntity, new Text(Fonts.KosugiID, 8, score.ToString()));
 			Send(new PlayStaticSoundMessage(StaticAudio.OrderComplete));
 
 			SetNewOrderDetails(order); // refill order
             Destroy(product);
+
+            var position = Get<Position>(player);
+            for(var i = 0; i < 5; i ++)
+            {
+                var anim = Content.SpriteAnimations.Effect_SpinningCoin;
+                if (calculate < 0)
+                {
+                    anim = Content.SpriteAnimations.Effect_SpinningSkull;
+                }
+                ProductManipulator.SpawnParticle(position.X, position.Y, new SpriteAnimation(anim, Rando.Int(30, 60), true, Rando.Int(0, 30)));
+            }
         }
 
         return filled;
