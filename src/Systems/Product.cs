@@ -120,7 +120,6 @@ public class Product : MoonTools.ECS.Manipulator
         var shelf = CreateEntity();
         Set(shelf, new Position(x, y));
         Set(shelf, new SpawnCategory(category));
-        Set(shelf, new CanSpawn(width, height));
 
 		for (var spawnerY = y; spawnerY < y + height * spawnStepDistance; spawnerY += spawnStepDistance)
 		{
@@ -140,7 +139,6 @@ public class Product : MoonTools.ECS.Manipulator
     {
         var shelf = CreateEntity();
         Set(shelf, new Position(x, y));
-        Set(shelf, new CanSpawn(width, height));
 
 		for (var spawnerY = y; spawnerY < y + height * spawnStepDistance; spawnerY += spawnStepDistance)
 		{
