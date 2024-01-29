@@ -161,7 +161,9 @@ namespace GGJ2024
 			World.Relate(playerOne, scoreOne, new HasScore());
 			World.Relate(playerTwo, scoreTwo, new HasScore());
 
-			GameLoopManipulator.Restart();
+			GameLoopManipulator.ShowTitleScreen();
+
+			//GameLoopManipulator.Restart();
 		}
 
 		protected override void Update(System.TimeSpan dt)

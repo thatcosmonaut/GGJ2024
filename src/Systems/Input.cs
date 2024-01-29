@@ -34,10 +34,14 @@ public class Input : MoonTools.ECS.System
 	ControlSet PlayerTwoKeyboard = new ControlSet();
 	ControlSet PlayerTwoGamepad = new ControlSet();
 
+	GameLoopManipulator GameLoopManipulator;
+
 	public Input(World world, Inputs inputs) : base(world)
 	{
 		Inputs = inputs;
 		PlayerFilter = FilterBuilder.Include<Player>().Build();
+
+		GameLoopManipulator = new GameLoopManipulator(world);
 
 		PlayerOneKeyboard.Up = Inputs.Keyboard.Button(KeyCode.W);
 		PlayerOneKeyboard.Down = Inputs.Keyboard.Button(KeyCode.S);
@@ -66,15 +70,29 @@ public class Input : MoonTools.ECS.System
 
 	public override void Update(TimeSpan timeSpan)
 	{
-		foreach (var playerEntity in PlayerFilter.Entities)
+		if (Some<IsTitleScreen>())
 		{
-			var index = Get<Player>(playerEntity).Index;
-			var controlSet = index == 0 ? PlayerOneKeyboard : PlayerTwoKeyboard;
-			var altControlSet = index == 0 ? PlayerOneGamepad : PlayerTwoGamepad;
+			if (
+				PlayerOneKeyboard.Interact.IsPressed ||
+				PlayerTwoKeyboard.Interact.IsPressed ||
+				PlayerOneGamepad.Interact.IsPressed ||
+				PlayerTwoGamepad.Interact.IsPressed
+			) {
+				GameLoopManipulator.Restart();
+			}
+		}
+		else
+		{
+			foreach (var playerEntity in PlayerFilter.Entities)
+			{
+				var index = Get<Player>(playerEntity).Index;
+				var controlSet = index == 0 ? PlayerOneKeyboard : PlayerTwoKeyboard;
+				var altControlSet = index == 0 ? PlayerOneGamepad : PlayerTwoGamepad;
 
-			InputState inputState = InputState(controlSet, altControlSet);
+				InputState inputState = InputState(controlSet, altControlSet);
 
-			Set(playerEntity, inputState);
+				Set(playerEntity, inputState);
+			}
 		}
 	}
 

@@ -22,8 +22,25 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		ProductSpawner = new ProductSpawner(world);
 	}
 
+	public void ShowTitleScreen()
+	{
+		var titleScreenEntity = CreateEntity();
+		Set(titleScreenEntity, new Position(0, 0));
+		Set(titleScreenEntity, new SpriteAnimation(SpriteAnimations.Title, 0));
+		Set(titleScreenEntity, new Depth(0.02f));
+		Set(titleScreenEntity, new IsTitleScreen());
+
+		Send(new PlayTitleMusic());
+		Send(new PlayStaticSoundMessage(StaticAudio.RollAndCash));
+	}
+
 	public void Restart()
 	{
+		if (Some<IsTitleScreen>())
+		{
+			Destroy(GetSingletonEntity<IsTitleScreen>());
+		}
+
 		Set(GameTimerFilter.NthEntity(0), new GGJ2024.Components.GameTimer(90));
 
 		var playerOne = PlayerFilter.NthEntity(0);

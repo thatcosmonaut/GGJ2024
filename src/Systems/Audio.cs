@@ -12,6 +12,7 @@ public class Audio : MoonTools.ECS.System
 	AudioDevice AudioDevice;
 
 	StreamingVoice MusicVoice;
+	StreamingVoice TitleMusicVoice;
 
 	StreamingSoundID[] GameplaySongs;
 
@@ -29,6 +30,9 @@ public class Audio : MoonTools.ECS.System
 		var streamingAudioData = StreamingAudio.Lookup(StreamingAudio.attention_shoppers_v1);
 		MusicVoice = AudioDevice.Obtain<StreamingVoice>(streamingAudioData.Format);
 		MusicVoice.SetVolume(0.5f);
+
+		TitleMusicVoice = AudioDevice.Obtain<StreamingVoice>(streamingAudioData.Format);
+		TitleMusicVoice.SetVolume(0.5f);
 	}
 
 	public override void Update(TimeSpan delta)
@@ -43,13 +47,24 @@ public class Audio : MoonTools.ECS.System
 			);
 		}
 
-		foreach (var songMessage in ReadMessages<PlaySongMessage>())
+		if (SomeMessage<PlaySongMessage>())
 		{
 			var streamingAudioData = StreamingAudio.Lookup(Rando.GetRandomItem(GameplaySongs));
 
+			TitleMusicVoice.Stop();
 			MusicVoice.Stop();
 			MusicVoice.Load(streamingAudioData);
 			MusicVoice.Play();
+		}
+
+		if (SomeMessage<PlayTitleMusic>())
+		{
+			var streamingAudioData = StreamingAudio.Lookup(StreamingAudio.roll_n_cash_grocery_lords);
+
+			MusicVoice.Stop();
+			TitleMusicVoice.Stop();
+			TitleMusicVoice.Load(streamingAudioData);
+			TitleMusicVoice.Play();
 		}
 	}
 

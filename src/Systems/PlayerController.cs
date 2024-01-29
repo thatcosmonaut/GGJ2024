@@ -42,6 +42,7 @@ public class PlayerController : MoonTools.ECS.System
 		World.Set(player, new MaxSpeed(128));
 		World.Set(player, new Velocity(Vector2.Zero));
 		World.Set(player, new LastDirection(Vector2.Zero));
+		World.Set(player, new InputState());
 
 		return player;
 	}
@@ -224,7 +225,7 @@ public class PlayerController : MoonTools.ECS.System
 			if (!HasOutRelation<TimingFootstepAudio>(entity) && framerate > 0)
 			{
 				PlayRandomFootstep();
-				
+
 				var footstepTimer = World.CreateEntity();
 				var footstepDuration = Math.Clamp(1f - (framerate / 50f), .5f, 1f);
 				Set(footstepTimer, new Timer(footstepDuration));

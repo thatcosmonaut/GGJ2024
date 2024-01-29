@@ -45,3 +45,5 @@ public readonly record struct SpawnCategory(Category Category);
 public readonly record struct CanSpawn(int Width, int Height);
 public readonly record struct FallSpeed(float Speed);
 public readonly record struct DestroyAtScreenBottom();
+
+public readonly record struct IsTitleScreen(); // bleeeh

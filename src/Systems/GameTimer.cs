@@ -1,8 +1,10 @@
 using System;
 using GGJ2024.Components;
 using GGJ2024.Content;
+using GGJ2024.Utility;
 using MoonTools.ECS;
 using MoonWorks;
+using MoonWorks.Input;
 
 namespace GGJ2024.Systems;
 
@@ -19,6 +21,7 @@ public class GameTimer : MoonTools.ECS.System
 
 	public override void Update(TimeSpan delta)
 	{
+
 		var timerEntity = GetSingletonEntity<Components.GameTimer>();
 		var time = Get<Components.GameTimer>(timerEntity).Time;
 
@@ -33,9 +36,27 @@ public class GameTimer : MoonTools.ECS.System
 
 		Set(timerEntity, new Text(Fonts.KosugiID, 16, timeString, MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
+		// title shake
+		if (Some<IsTitleScreen>())
+		{
+			var titleScreenEntity = GetSingletonEntity<IsTitleScreen>();
+			var pos = Get<Position>(titleScreenEntity);
+
+			if (OnTime(time, 0, (float) delta.TotalSeconds, (float) delta.TotalSeconds * 2))
+			{
+				Set(titleScreenEntity, new Position(pos.X + 1, pos.Y + 1));
+			}
+			else
+			{
+				Set(titleScreenEntity, new Position(pos.X - 1, pos.Y - 1));
+			}
+
+			return;
+		}
+
 		if (time <= 0)
 		{
-			GameLoopManipulator.Restart();
+			GameLoopManipulator.ShowTitleScreen();
 		}
 
 		if (OnTime(time, 0, (float)delta.TotalSeconds, 5))
