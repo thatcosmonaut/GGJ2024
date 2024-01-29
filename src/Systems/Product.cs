@@ -126,4 +126,17 @@ public class Product : MoonTools.ECS.Manipulator
         Set(e, new Position(x, y));
         Set(e, new CanSpawn(width, height));
     }
+
+    public void SpawnParticle(int x, int y, SpriteAnimation spriteAnimation)
+    {
+        var e = CreateEntity();
+        var speed = 200 + Rando.Value * 100;
+        Set(e, new Position(x, y));
+        Set(e, new Depth(1));
+        Set(e, spriteAnimation);
+        Set(e, new SlowDownAnimation(5, 1));
+        Set(e, new Velocity(Vector2.Rotate(Vector2.UnitX * speed, float.DegreesToRadians(Rando.Int(0, 360)))));
+        Set(e, new FallSpeed(10));
+        Set(e, new DestroyAtScreenBottom());
+    }
 }

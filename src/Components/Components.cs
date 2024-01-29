@@ -43,3 +43,5 @@ public readonly record struct SlowDownAnimation(int BaseSpeed, int step);
 public readonly record struct IsPopupBox(); // jank because we cant check relation type count
 public readonly record struct SpawnCategory(Category Category);
 public readonly record struct CanSpawn(int Width, int Height);
+public readonly record struct FallSpeed(float Speed);
+public readonly record struct DestroyAtScreenBottom();

@@ -245,6 +245,17 @@ public class Motion : MoonTools.ECS.System
 				}
                 Set(entity, pos + scaledVelocity);
 			}
+
+            if (Has<FallSpeed>(entity))
+            {
+                var fallspeed = Get<FallSpeed>(entity).Speed;
+                Set(entity, new Velocity(vel + Vector2.UnitY * fallspeed));
+            }
+
+            if (Has<DestroyAtScreenBottom>(entity) && pos.Y > 500)
+            {
+                Destroy(entity);
+            }
         }
 
 		foreach (var entity in SolidFilter.Entities)
