@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace GGJ2024.Data;
+namespace RollAndCash.Data;
 
 public struct CramTextureAtlasFile
 {
@@ -27,8 +27,8 @@ public struct CramTextureAtlasData
 	public Dictionary<string, CramTextureAtlasAnimationData> Animations { get; set; }
 }
 
-    public struct CramTextureAtlasImageData
-    {
+public struct CramTextureAtlasImageData
+{
 	public string Name { get; set; }
 	public int X { get; set; }
 	public int Y { get; set; }
@@ -38,7 +38,7 @@ public struct CramTextureAtlasData
 	public int TrimOffsetY { get; set; }
 	public int UntrimmedWidth { get; set; }
 	public int UntrimmedHeight { get; set; }
-    }
+}
 
 public struct CramTextureAtlasAnimationData
 {

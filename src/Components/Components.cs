@@ -1,8 +1,8 @@
 using MoonWorks.Math.Float;
 using MoonWorks.Graphics;
-using GGJ2024.Systems;
+using RollAndCash.Systems;
 
-namespace GGJ2024.Components;
+namespace RollAndCash.Components;
 
 public readonly record struct GameTimer(float Time);
 public readonly record struct Player(int Index);

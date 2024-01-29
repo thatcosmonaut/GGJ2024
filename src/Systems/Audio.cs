@@ -1,11 +1,11 @@
 using System;
-using GGJ2024.Content;
-using GGJ2024.Messages;
-using GGJ2024.Utility;
+using RollAndCash.Content;
+using RollAndCash.Messages;
+using RollAndCash.Utility;
 using MoonTools.ECS;
 using MoonWorks.Audio;
 
-namespace GGJ2024.Systems;
+namespace RollAndCash.Systems;
 
 public class Audio : MoonTools.ECS.System
 {
@@ -33,6 +33,7 @@ public class Audio : MoonTools.ECS.System
 
 		TitleMusicVoice = AudioDevice.Obtain<StreamingVoice>(streamingAudioData.Format);
 		TitleMusicVoice.SetVolume(0.5f);
+		TitleMusicVoice.Loop = true;
 	}
 
 	public override void Update(TimeSpan delta)
@@ -73,7 +74,8 @@ public class Audio : MoonTools.ECS.System
 		float volume,
 		float pitch,
 		float pan
-	) {
+	)
+	{
 		var voice = AudioDevice.Obtain<TransientVoice>(sound.Format);
 		voice.SetVolume(volume);
 		voice.SetPitch(pitch);

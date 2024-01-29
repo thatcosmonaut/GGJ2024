@@ -1,4 +1,4 @@
-namespace GGJ2024.Data
+namespace RollAndCash.Data
 {
 	public struct StaticAudioPackDataEntry
 	{

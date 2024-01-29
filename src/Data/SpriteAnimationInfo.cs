@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using GGJ2024.Components;
+using RollAndCash.Components;
 
-namespace GGJ2024.Data;
+namespace RollAndCash.Data;
 
 public readonly record struct SpriteAnimationInfoID(int ID);
 
@@ -36,7 +36,7 @@ public class SpriteAnimationInfo
 		OriginX = originX;
 		OriginY = originY;
 
-		lock(IDLookup)
+		lock (IDLookup)
 		{
 			ID = new SpriteAnimationInfoID(IDLookup.Count);
 			IDLookup.Add(this);

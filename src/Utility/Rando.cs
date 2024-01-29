@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using MoonWorks.Math.Float;
 
-namespace GGJ2024.Utility;
+namespace RollAndCash.Utility;
 public static class Rando
 {
     static Random Rand { get; } = new Random();
@@ -45,12 +45,12 @@ public static class Rando
 
     public static int Int(int min, int max)
     {
-		return Rand.Next(min, max);
+        return Rand.Next(min, max);
     }
 
     public static int IntInclusive(int min, int max)
     {
-		return Rand.Next(min, max + 1);
+        return Rand.Next(min, max + 1);
     }
 
     public static Vector2 OnUnitCircle()

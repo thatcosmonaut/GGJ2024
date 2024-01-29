@@ -1,12 +1,12 @@
 using System;
-using GGJ2024.Components;
-using GGJ2024.Content;
-using GGJ2024.Utility;
+using RollAndCash.Components;
+using RollAndCash.Content;
+using RollAndCash.Utility;
 using MoonTools.ECS;
 using MoonWorks;
 using MoonWorks.Input;
 
-namespace GGJ2024.Systems;
+namespace RollAndCash.Systems;
 
 public class GameTimer : MoonTools.ECS.System
 {
@@ -42,7 +42,7 @@ public class GameTimer : MoonTools.ECS.System
 			var titleScreenEntity = GetSingletonEntity<IsTitleScreen>();
 			var pos = Get<Position>(titleScreenEntity);
 
-			if (OnTime(time, 0, (float) delta.TotalSeconds, (float) delta.TotalSeconds * 2))
+			if (OnTime(time, 0, (float)delta.TotalSeconds, (float)delta.TotalSeconds * 2))
 			{
 				Set(titleScreenEntity, new Position(pos.X + 1, pos.Y + 1));
 			}
@@ -67,16 +67,16 @@ public class GameTimer : MoonTools.ECS.System
 	}
 
 	public static bool OnTime(float time, float triggerTime, float dt, float loopTime)
+	{
+		if (loopTime == 0)
 		{
-			if (loopTime == 0)
-			{
-				return false;
-			}
-
-			var t = time % loopTime;
-			return (
-				(t <= triggerTime && t + dt >= triggerTime) ||
-				(t <= triggerTime + loopTime && t + dt >= triggerTime + loopTime)
-				);
+			return false;
 		}
+
+		var t = time % loopTime;
+		return (
+			(t <= triggerTime && t + dt >= triggerTime) ||
+			(t <= triggerTime + loopTime && t + dt >= triggerTime + loopTime)
+			);
+	}
 }

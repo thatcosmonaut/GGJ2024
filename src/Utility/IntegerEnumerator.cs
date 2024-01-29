@@ -1,6 +1,6 @@
 using System;
 
-namespace GGJ2024.Utility;
+namespace RollAndCash.Utility;
 
 public ref struct IntegerEnumerator
 {

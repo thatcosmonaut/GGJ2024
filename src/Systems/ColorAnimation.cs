@@ -1,8 +1,8 @@
 using System;
-using GGJ2024.Components;
+using RollAndCash.Components;
 using MoonTools.ECS;
 
-namespace GGJ2024.Systems;
+namespace RollAndCash.Systems;
 
 public class ColorAnimation : MoonTools.ECS.System
 {
@@ -15,7 +15,7 @@ public class ColorAnimation : MoonTools.ECS.System
 
 	public override void Update(TimeSpan delta)
 	{
-		var dt = (float) delta.TotalSeconds;
+		var dt = (float)delta.TotalSeconds;
 
 		foreach (var colorAnimationEntity in ColorAnimationFilter.Entities)
 		{

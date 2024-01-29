@@ -3,14 +3,14 @@ using System;
 using MoonWorks.Math.Float;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
-using GGJ2024.Components;
-using GGJ2024.Data;
-using GGJ2024.Content;
-using GGJ2024.Relations;
+using RollAndCash.Components;
+using RollAndCash.Data;
+using RollAndCash.Content;
+using RollAndCash.Relations;
 using MoonWorks.Math;
-using GGJ2024.Messages;
+using RollAndCash.Messages;
 
-namespace GGJ2024.Systems;
+namespace RollAndCash.Systems;
 
 public class Hold : MoonTools.ECS.System
 {
@@ -103,7 +103,7 @@ public class Hold : MoonTools.ECS.System
 		var holderDirection = Get<LastDirection>(e).Direction;
 
 		Set(holding, holderPos + holderDirection * 16 + new Position(0, -10));
-		var depth = MathHelper.Lerp(100, 10, Get<Position>(holding).Y / (float) Dimensions.GAME_H);
+		var depth = MathHelper.Lerp(100, 10, Get<Position>(holding).Y / (float)Dimensions.GAME_H);
 		Set(holding, new Depth(depth));
 	}
 
@@ -293,7 +293,7 @@ public class Hold : MoonTools.ECS.System
 			{
 				SetHoldParameters(holder, (float)delta.TotalSeconds);
 			}
-        }
+		}
 
 		// real-time price updates
 		foreach (var (uiText, product) in Relations<DisplayingProductPrice>())
@@ -306,10 +306,10 @@ public class Hold : MoonTools.ECS.System
 			var ingredientPriceString = "$" + Get<Price>(ingredient).Value.ToString("F2");
 			Set(uiText, new Text(Fonts.KosugiID, 8, ingredientPriceString, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 		}
-    }
+	}
 
 	private static Rectangle TextRectangle(WellspringCS.Wellspring.Rectangle textBounds, Position position)
 	{
-		return new Rectangle((int) textBounds.X + position.X, (int) textBounds.Y + position.Y, (int) textBounds.W, (int) textBounds.H);
+		return new Rectangle((int)textBounds.X + position.X, (int)textBounds.Y + position.Y, (int)textBounds.W, (int)textBounds.H);
 	}
 }

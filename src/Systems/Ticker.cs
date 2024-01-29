@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using System.Text;
-using GGJ2024.Components;
-using GGJ2024.Content;
-using GGJ2024.Utility;
+using RollAndCash.Components;
+using RollAndCash.Content;
+using RollAndCash.Utility;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
 using MoonWorks.Graphics.Font;
 
-namespace GGJ2024.Systems;
+namespace RollAndCash.Systems;
 
 public class Ticker : MoonTools.ECS.System
 {
@@ -55,7 +55,7 @@ public class Ticker : MoonTools.ECS.System
 		foreach (var tickerTextEntity in TickerTextFilter.Entities)
 		{
 			var position = Get<Position>(tickerTextEntity);
-			var width = (int) Get<TickerText>(tickerTextEntity).Width;
+			var width = (int)Get<TickerText>(tickerTextEntity).Width;
 
 			if (position.X + width > farthestRight)
 			{
@@ -120,7 +120,7 @@ public class Ticker : MoonTools.ECS.System
 			World.Set(tickerSymbolText, new ColorSpeed(Random.NextSingle() * 10, Random.NextSingle() * 10, Random.NextSingle() * 10));
 		}
 
-		x += (int) textBounds.W + 5;
+		x += (int)textBounds.W + 5;
 
 		var tickerPriceText = World.CreateEntity();
 		World.Set(tickerPriceText, new Position(x, 5));
@@ -151,7 +151,7 @@ public class Ticker : MoonTools.ECS.System
 
 		World.Set(tickerPriceText, new TickerText(textBounds.W));
 
-		x += (int) textBounds.W + 5;
+		x += (int)textBounds.W + 5;
 
 		var tickerChangeText = World.CreateEntity();
 		World.Set(tickerChangeText, new Position(x, 5));

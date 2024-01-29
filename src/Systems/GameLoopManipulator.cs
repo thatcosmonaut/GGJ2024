@@ -1,8 +1,8 @@
-using GGJ2024;
-using GGJ2024.Components;
-using GGJ2024.Content;
-using GGJ2024.Messages;
-using GGJ2024.Systems;
+using RollAndCash;
+using RollAndCash.Components;
+using RollAndCash.Content;
+using RollAndCash.Messages;
+using RollAndCash.Systems;
 using MoonTools.ECS;
 
 public class GameLoopManipulator : MoonTools.ECS.Manipulator
@@ -17,7 +17,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 	{
 		PlayerFilter = FilterBuilder.Include<Player>().Build();
 		ScoreFilter = FilterBuilder.Include<Score>().Build();
-		GameTimerFilter = FilterBuilder.Include<GGJ2024.Components.GameTimer>().Build();
+		GameTimerFilter = FilterBuilder.Include<RollAndCash.Components.GameTimer>().Build();
 
 		ProductSpawner = new ProductSpawner(world);
 	}
@@ -41,7 +41,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 			Destroy(GetSingletonEntity<IsTitleScreen>());
 		}
 
-		Set(GameTimerFilter.NthEntity(0), new GGJ2024.Components.GameTimer(90));
+		Set(GameTimerFilter.NthEntity(0), new RollAndCash.Components.GameTimer(90));
 
 		var playerOne = PlayerFilter.NthEntity(0);
 		var playerTwo = PlayerFilter.NthEntity(1);

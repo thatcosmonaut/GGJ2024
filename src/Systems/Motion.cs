@@ -2,37 +2,37 @@ using System;
 using MoonWorks.Math.Float;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
-using GGJ2024.Utility;
+using RollAndCash.Utility;
 using System.Collections.Generic;
-using GGJ2024.Components;
+using RollAndCash.Components;
 using MoonWorks;
-using GGJ2024.Relations;
+using RollAndCash.Relations;
 
-namespace GGJ2024.Systems;
+namespace RollAndCash.Systems;
 
 public class Motion : MoonTools.ECS.System
 {
     MoonTools.ECS.Filter VelocityFilter;
-	MoonTools.ECS.Filter CanHoldFilter;
-	MoonTools.ECS.Filter CanBeHeldFilter;
-	MoonTools.ECS.Filter InteractFilter;
-	MoonTools.ECS.Filter SolidFilter;
+    MoonTools.ECS.Filter CanHoldFilter;
+    MoonTools.ECS.Filter CanBeHeldFilter;
+    MoonTools.ECS.Filter InteractFilter;
+    MoonTools.ECS.Filter SolidFilter;
 
     Dictionary<(int, int), HashSet<Entity>> InteractSpatialHash = new();
     HashSet<Entity> InteractResults = new();
 
-	Dictionary<(int, int), HashSet<Entity>> SolidSpatialHash = new();
-	HashSet<Entity> SolidResults = new HashSet<Entity>();
+    Dictionary<(int, int), HashSet<Entity>> SolidSpatialHash = new();
+    HashSet<Entity> SolidResults = new HashSet<Entity>();
 
     const int CellSize = 32;
 
     public Motion(World world) : base(world)
     {
         VelocityFilter = FilterBuilder.Include<Position>().Include<Velocity>().Build();
-		CanHoldFilter = FilterBuilder.Include<Position>().Include<CanHold>().Build();
-		CanBeHeldFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Include<CanBeHeld>().Build();
-		InteractFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Include<CanInteract>().Build();
-		SolidFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Include<Solid>().Build();
+        CanHoldFilter = FilterBuilder.Include<Position>().Include<CanHold>().Build();
+        CanBeHeldFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Include<CanBeHeld>().Build();
+        InteractFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Include<CanInteract>().Build();
+        SolidFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Include<Solid>().Build();
     }
 
     void ClearCanBeHeldSpatialHash()
@@ -44,13 +44,13 @@ public class Motion : MoonTools.ECS.System
         }
     }
 
-	void ClearSolidSpatialHash()
-	{
-		foreach (var (k, v) in SolidSpatialHash)
-		{
-			v.Clear();
-		}
-	}
+    void ClearSolidSpatialHash()
+    {
+        foreach (var (k, v) in SolidSpatialHash)
+        {
+            v.Clear();
+        }
+    }
 
     (int, int) GetHashKey(int x, int y)
     {
@@ -128,14 +128,14 @@ public class Motion : MoonTools.ECS.System
         var position = Get<Position>(e);
         var r = Get<Rectangle>(e);
 
-		var movement = new Vector2(velocity.X, velocity.Y) * dt;
-		var targetPosition = position + movement;
+        var movement = new Vector2(velocity.X, velocity.Y) * dt;
+        var targetPosition = position + movement;
 
         var xEnum = new IntegerEnumerator(position.X, targetPosition.X);
         var yEnum = new IntegerEnumerator(position.Y, targetPosition.Y);
 
-		int mostRecentValidXPosition = position.X;
-		int mostRecentValidYPosition = position.Y;
+        int mostRecentValidXPosition = position.X;
+        int mostRecentValidYPosition = position.Y;
 
         bool xHit = false;
         bool yHit = false;
@@ -150,13 +150,13 @@ public class Motion : MoonTools.ECS.System
             xHit = hit;
 
             if (xHit && Has<Solid>(other) && Has<Solid>(e))
-			{
-				movement.X = mostRecentValidXPosition - position.X;
-				position = position.SetX(position.X); // truncates x coord
-				break;
-			}
+            {
+                movement.X = mostRecentValidXPosition - position.X;
+                position = position.SetX(position.X); // truncates x coord
+                break;
+            }
 
-			mostRecentValidXPosition = x;
+            mostRecentValidXPosition = x;
         }
 
         foreach (var y in yEnum)
@@ -168,13 +168,13 @@ public class Motion : MoonTools.ECS.System
             yHit = hit;
 
             if (yHit && Has<Solid>(other) && Has<Solid>(e))
-			{
-				movement.Y = mostRecentValidYPosition - position.Y;
-				position = position.SetY(position.Y); // truncates y coord
-				break;
-			}
+            {
+                movement.Y = mostRecentValidYPosition - position.Y;
+                position = position.SetY(position.Y); // truncates y coord
+                break;
+            }
 
-			mostRecentValidYPosition = y;
+            mostRecentValidYPosition = y;
         }
 
         return position + movement;
@@ -183,7 +183,7 @@ public class Motion : MoonTools.ECS.System
     public override void Update(TimeSpan delta)
     {
         ClearCanBeHeldSpatialHash();
-		ClearSolidSpatialHash();
+        ClearSolidSpatialHash();
 
         foreach (var entity in InteractFilter.Entities)
         {
@@ -193,38 +193,38 @@ public class Motion : MoonTools.ECS.System
             AddToHash(InteractSpatialHash, entity);
         }
 
-		foreach (var entity in InteractFilter.Entities)
-		{
-			foreach (var other in OutRelations<Colliding>(entity))
-			{
-				Unrelate<Colliding>(entity, other);
-			}
+        foreach (var entity in InteractFilter.Entities)
+        {
+            foreach (var other in OutRelations<Colliding>(entity))
+            {
+                Unrelate<Colliding>(entity, other);
+            }
 
-			var position = Get<Position>(entity);
-			var rect = GetWorldRect(position, Get<Rectangle>(entity));
+            var position = Get<Position>(entity);
+            var rect = GetWorldRect(position, Get<Rectangle>(entity));
 
-			RetrieveFromHash(InteractSpatialHash, InteractResults, rect);
+            RetrieveFromHash(InteractSpatialHash, InteractResults, rect);
 
-			foreach (var other in InteractResults)
-			{
-				if (other != entity)
-				{
-					var otherR = Get<Rectangle>(other);
-					var otherP = Get<Position>(other);
-					var otherRect = GetWorldRect(otherP, otherR);
+            foreach (var other in InteractResults)
+            {
+                if (other != entity)
+                {
+                    var otherR = Get<Rectangle>(other);
+                    var otherP = Get<Position>(other);
+                    var otherRect = GetWorldRect(otherP, otherR);
 
-					if (rect.Intersects(otherRect))
-					{
-						Relate(entity, other, new Colliding());
-					}
-				}
-			}
-		}
+                    if (rect.Intersects(otherRect))
+                    {
+                        Relate(entity, other, new Colliding());
+                    }
+                }
+            }
+        }
 
-		foreach (var entity in SolidFilter.Entities)
-		{
-			AddToHash(SolidSpatialHash, entity);
-		}
+        foreach (var entity in SolidFilter.Entities)
+        {
+            AddToHash(SolidSpatialHash, entity);
+        }
 
         foreach (var entity in VelocityFilter.Entities)
         {
@@ -233,18 +233,18 @@ public class Motion : MoonTools.ECS.System
 
             if (Has<Rectangle>(entity))
             {
-                var result = SweepTest(entity, (float) delta.TotalSeconds);
+                var result = SweepTest(entity, (float)delta.TotalSeconds);
                 Set(entity, result);
             }
             else
-			{
-				var scaledVelocity = vel * (float) delta.TotalSeconds;
-				if (Has<ForceIntegerMovement>(entity))
-				{
-					scaledVelocity = new Vector2((int) scaledVelocity.X, (int) scaledVelocity.Y);
-				}
+            {
+                var scaledVelocity = vel * (float)delta.TotalSeconds;
+                if (Has<ForceIntegerMovement>(entity))
+                {
+                    scaledVelocity = new Vector2((int)scaledVelocity.X, (int)scaledVelocity.Y);
+                }
                 Set(entity, pos + scaledVelocity);
-			}
+            }
 
             if (Has<FallSpeed>(entity))
             {
@@ -258,34 +258,34 @@ public class Motion : MoonTools.ECS.System
             }
         }
 
-		foreach (var entity in SolidFilter.Entities)
-		{
-			var position = Get<Position>(entity);
-			var rectangle = Get<Rectangle>(entity);
+        foreach (var entity in SolidFilter.Entities)
+        {
+            var position = Get<Position>(entity);
+            var rectangle = Get<Rectangle>(entity);
 
-			var leftPos = new Position(position.X - 1, position.Y);
-			var rightPos = new Position(position.X + 1, position.Y);
-			var upPos = new Position(position.X, position.Y - 1);
-			var downPos = new Position(position.X, position.Y + 1);
+            var leftPos = new Position(position.X - 1, position.Y);
+            var rightPos = new Position(position.X + 1, position.Y);
+            var upPos = new Position(position.X, position.Y - 1);
+            var downPos = new Position(position.X, position.Y + 1);
 
-			var leftRectangle = GetWorldRect(leftPos, rectangle);
-			var rightRectangle = GetWorldRect(rightPos, rectangle);
-			var upRectangle = GetWorldRect(upPos, rectangle);
-			var downRectangle = GetWorldRect(downPos, rectangle);
+            var leftRectangle = GetWorldRect(leftPos, rectangle);
+            var rightRectangle = GetWorldRect(rightPos, rectangle);
+            var upRectangle = GetWorldRect(upPos, rectangle);
+            var downRectangle = GetWorldRect(downPos, rectangle);
 
-			var (_, leftCollided) = CheckSolidCollision(entity, leftRectangle);
-			var (_, rightCollided) = CheckSolidCollision(entity, rightRectangle);
-			var (_, upCollided) = CheckSolidCollision(entity, upRectangle);
-			var (_, downCollided) = CheckSolidCollision(entity, downRectangle);
+            var (_, leftCollided) = CheckSolidCollision(entity, leftRectangle);
+            var (_, rightCollided) = CheckSolidCollision(entity, rightRectangle);
+            var (_, upCollided) = CheckSolidCollision(entity, upRectangle);
+            var (_, downCollided) = CheckSolidCollision(entity, downRectangle);
 
-			if (leftCollided || rightCollided || upCollided || downCollided)
-			{
-				Set(entity, new TouchingSolid());
-			}
-			else
-			{
-				Remove<TouchingSolid>(entity);
-			}
-		}
+            if (leftCollided || rightCollided || upCollided || downCollided)
+            {
+                Set(entity, new TouchingSolid());
+            }
+            else
+            {
+                Remove<TouchingSolid>(entity);
+            }
+        }
     }
 }

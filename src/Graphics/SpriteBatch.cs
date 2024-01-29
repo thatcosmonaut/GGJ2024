@@ -1,7 +1,7 @@
 using MoonWorks.Graphics;
 using MoonWorks.Math.Float;
 
-namespace GGJ2024;
+namespace RollAndCash;
 
 public class SpriteBatch
 {
@@ -57,7 +57,8 @@ public class SpriteBatch
 		Color color,
 		Vector2 leftTopUV,
 		Vector2 dimensionsUV
-	) {
+	)
+	{
 		var left = leftTopUV.X;
 		var top = leftTopUV.Y;
 		var right = leftTopUV.X + dimensionsUV.X;

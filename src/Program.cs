@@ -3,10 +3,10 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MoonWorks;
 using MoonTools.ECS;
-using GGJ2024.Systems;
-using GGJ2024.Components;
+using RollAndCash.Systems;
+using RollAndCash.Components;
 
-namespace GGJ2024
+namespace RollAndCash
 {
 	class Program
 	{
@@ -25,7 +25,7 @@ namespace GGJ2024
 			{
 				WindowWidth = 1280,
 				WindowHeight = 720,
-				WindowTitle = "GGJ2024",
+				WindowTitle = "ROLL AND CASH: GROCERY LORDS: A LONDON JERRY STORY",
 				ScreenMode = ScreenMode.Fullscreen,
 				PresentMode = PresentMode.Immediate
 			};
@@ -42,7 +42,7 @@ namespace GGJ2024
 			debugMode = true;
 #endif
 
-			GGJ2024Game game = new GGJ2024Game(
+			RollAndCashGame game = new RollAndCashGame(
 				windowCreateInfo,
 				frameLimiterSettings,
 				debugMode
@@ -53,7 +53,7 @@ namespace GGJ2024
 
 		static void HandleUnhandledException(object sender, UnhandledExceptionEventArgs args)
 		{
-			Exception e = (Exception) args.ExceptionObject;
+			Exception e = (Exception)args.ExceptionObject;
 			Logger.LogError("Unhandled exception caught!");
 			Logger.LogError(e.ToString());
 

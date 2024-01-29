@@ -1,6 +1,6 @@
 using MoonWorks.Math.Float;
 
-namespace GGJ2024;
+namespace RollAndCash;
 
 public struct UV
 {

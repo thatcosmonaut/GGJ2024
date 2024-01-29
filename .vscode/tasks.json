@@ -26,7 +26,7 @@
 		"args": [
 			"watch",
 			"--project",
-			"${workspaceFolder}/GGJ2024.csproj"
+			"${workspaceFolder}/RollAndCash.csproj"
 		],
 		"type": "process",
 		"group": {
@@ -54,7 +54,7 @@
       "command": "dotnet",
       "args": [
         "build",
-        "./GGJ2024.csproj",
+        "./RollAndCash.csproj",
         "-p:SolutionDir=${workspaceFolder}/"
       ],
       "type": "shell",
@@ -66,9 +66,9 @@
     },
     {
       "label": "Run: .NET 8 Debug",
-      "command": "GGJ2024",
+      "command": "RollAndCash",
       "windows": {
-		"command": "GGJ2024.exe"
+		"command": "RollAndCash.exe"
 	  },
       "options": {
         "cwd": "${workspaceFolder}/bin/Debug/net8.0"
@@ -85,7 +85,7 @@
       "command": "dotnet",
       "args": [
         "build",
-        "./GGJ2024.csproj",
+        "./RollAndCash.csproj",
         "--configuration",
         "Release",
         "-p:SolutionDir=${workspaceFolder}/"
@@ -99,9 +99,9 @@
     },
     {
       "label": "Run: .NET 8 Release",
-      "command": "GGJ2024",
+      "command": "RollAndCash",
       "windows": {
-        "command": "GGJ2024.exe"
+        "command": "RollAndCash.exe"
       },
       "options": {
         "cwd": "${workspaceFolder}/bin/Release/net8.0"

@@ -1,4 +1,4 @@
-namespace GGJ2024;
+namespace RollAndCash;
 
 public static class Dimensions
 {

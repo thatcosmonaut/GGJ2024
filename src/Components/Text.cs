@@ -1,7 +1,7 @@
-using GGJ2024.Content;
+using RollAndCash.Content;
 using MoonWorks.Graphics.Font;
 
-namespace GGJ2024;
+namespace RollAndCash;
 
 public struct Text
 {
@@ -17,7 +17,8 @@ public struct Text
 		string text,
 		HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left,
 		VerticalAlignment verticalAlignment = VerticalAlignment.Baseline
-	) {
+	)
+	{
 		FontID = packID;
 		Size = size;
 		TextID = Data.TextStorage.GetID(text);
@@ -31,7 +32,8 @@ public struct Text
 		int textID,
 		HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left,
 		VerticalAlignment verticalAlignment = VerticalAlignment.Baseline
-	) {
+	)
+	{
 		FontID = packID;
 		Size = size;
 		TextID = textID;

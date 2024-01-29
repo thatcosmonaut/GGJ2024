@@ -1,9 +1,9 @@
 using MoonWorks.Math.Float;
-using GGJ2024.Data;
+using RollAndCash.Data;
 using System;
 using MoonWorks.Math;
 
-namespace GGJ2024.Components;
+namespace RollAndCash.Components;
 
 public struct SpriteAnimation
 {
@@ -18,7 +18,7 @@ public struct SpriteAnimation
 	{
 		get
 		{
-			var integerIndex = (int) (MathF.Sign(RawFrameIndex) * MathF.Ceiling(MathF.Abs((RawFrameIndex))));
+			var integerIndex = (int)(MathF.Sign(RawFrameIndex) * MathF.Ceiling(MathF.Abs((RawFrameIndex))));
 			var framesLength = SpriteAnimationInfo.Frames.Length;
 			if (Loop)
 			{
@@ -45,7 +45,8 @@ public struct SpriteAnimation
 	public static SpriteAnimation ForceFrame(
 		SpriteAnimationInfo spriteAnimationInfo,
 		int frameIndex
-	) {
+	)
+	{
 		return new SpriteAnimation(
 			spriteAnimationInfo,
 			0,
@@ -66,7 +67,8 @@ public struct SpriteAnimation
 
 	public SpriteAnimation(
 		SpriteAnimationInfo spriteAnimationInfo
-	) {
+	)
+	{
 		SpriteAnimationInfoID = spriteAnimationInfo.ID;
 		FrameRate = spriteAnimationInfo.FrameRate;
 		Loop = true;
@@ -77,7 +79,8 @@ public struct SpriteAnimation
 	public SpriteAnimation(
 		SpriteAnimationInfo spriteAnimationInfo,
 		Vector2 origin
-	) {
+	)
+	{
 		SpriteAnimationInfoID = spriteAnimationInfo.ID;
 		FrameRate = spriteAnimationInfo.FrameRate;
 		Loop = false;
@@ -88,7 +91,8 @@ public struct SpriteAnimation
 	public SpriteAnimation(
 		SpriteAnimationInfo spriteAnimationInfo,
 		bool loop
-	) {
+	)
+	{
 		SpriteAnimationInfoID = spriteAnimationInfo.ID;
 		FrameRate = spriteAnimationInfo.FrameRate;
 		Loop = loop;
@@ -99,7 +103,8 @@ public struct SpriteAnimation
 	public SpriteAnimation(
 		SpriteAnimationInfo spriteAnimationInfo,
 		int frameRate
-	) {
+	)
+	{
 		SpriteAnimationInfoID = spriteAnimationInfo.ID;
 		FrameRate = frameRate;
 		Loop = true;
@@ -111,7 +116,8 @@ public struct SpriteAnimation
 		SpriteAnimationInfo spriteAnimationInfo,
 		int frameRate,
 		bool loop
-	) {
+	)
+	{
 		SpriteAnimationInfoID = spriteAnimationInfo.ID;
 		FrameRate = frameRate;
 		Loop = loop;
@@ -124,7 +130,8 @@ public struct SpriteAnimation
 		int frameRate,
 		bool loop,
 		int frameIndex
-	) {
+	)
+	{
 		SpriteAnimationInfoID = spriteAnimationInfo.ID;
 		FrameRate = frameRate;
 		Loop = loop;
@@ -137,7 +144,8 @@ public struct SpriteAnimation
 		int frameRate,
 		bool loop,
 		float rawFrameIndex
-	) {
+	)
+	{
 		SpriteAnimationInfoID = spriteAnimationInfo.ID;
 		FrameRate = frameRate;
 		Loop = loop;
@@ -151,7 +159,8 @@ public struct SpriteAnimation
 		bool loop,
 		float rawFrameIndex,
 		Vector2 origin
-	) {
+	)
+	{
 		SpriteAnimationInfoID = spriteAnimationInfo.ID;
 		FrameRate = frameRate;
 		Loop = loop;

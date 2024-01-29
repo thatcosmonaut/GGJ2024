@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace GGJ2024.Data
+namespace RollAndCash.Data
 {
 	// We can't store strings in ECS because they are managed types!
 	public static class TextStorage

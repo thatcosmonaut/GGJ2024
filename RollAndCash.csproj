@@ -3,12 +3,12 @@
 		<OutputType Condition="'$(Configuration)' == 'Debug'">Exe</OutputType>
 		<OutputType Condition="'$(Configuration)' == 'Release'">WinExe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
-		<TargetName>GGJ2024</TargetName>
+		<TargetName>RollAndCash</TargetName>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-		<StartupObject>GGJ2024.Program</StartupObject>
-		<AssemblyName>GGJ2024</AssemblyName>
-		<RootNamespace>GGJ2024</RootNamespace>
+		<StartupObject>RollAndCash.Program</StartupObject>
+		<AssemblyName>RollAndCash</AssemblyName>
+		<RootNamespace>RollAndCash</RootNamespace>
 		<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<ApplicationIcon />

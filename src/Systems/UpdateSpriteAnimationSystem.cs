@@ -1,8 +1,8 @@
 using System;
-using GGJ2024.Components;
+using RollAndCash.Components;
 using MoonTools.ECS;
 
-namespace GGJ2024.Systems;
+namespace RollAndCash.Systems;
 
 public class UpdateSpriteAnimationSystem : MoonTools.ECS.System
 {

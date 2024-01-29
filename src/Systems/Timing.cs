@@ -1,6 +1,6 @@
 using System;
 using MoonTools.ECS;
-using Timer = GGJ2024.Components.Timer;
+using Timer = RollAndCash.Components.Timer;
 
 namespace LD54.Systems;
 

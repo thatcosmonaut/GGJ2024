@@ -647,7 +647,7 @@ using System.IO;
 using MoonWorks.Graphics;
 using MoonWorks.Graphics.Font;
 
-namespace GGJ2024.Content
+namespace RollAndCash.Content
 {{
     public static class Fonts
     {{
@@ -705,9 +705,9 @@ namespace GGJ2024.Content
 
 			var textureAtlasesClassCode = $@"
 using System.IO;
-using GGJ2024.Data;
+using RollAndCash.Data;
 
-namespace GGJ2024.Content
+namespace RollAndCash.Content
 {{
 	public static class TextureAtlases
 	{{
@@ -759,9 +759,9 @@ namespace GGJ2024.Content
 
 			var spriteAnimationsClassCode = $@"
 using System.Collections.Generic;
-using GGJ2024.Data;
+using RollAndCash.Data;
 
-namespace GGJ2024.Content
+namespace RollAndCash.Content
 {{
 	public static class SpriteAnimations
 	{{
@@ -842,10 +842,10 @@ namespace GGJ2024.Content
 
 			var textureAtlasesClassCode = $@"
 using System.IO;
-using GGJ2024.Data;
+using RollAndCash.Data;
 using System.Collections.Generic;
 
-namespace GGJ2024.Content
+namespace RollAndCash.Content
 {{
 	public static class Levels
 	{{
@@ -984,7 +984,7 @@ using System.IO;
 using MoonWorks.Video;
 using MoonWorks.Graphics;
 
-namespace GGJ2024.Content
+namespace RollAndCash.Content
 {{
 	public static class Videos
 	{{
@@ -1024,9 +1024,9 @@ namespace GGJ2024.Content
 			var staticAudioClassCode = $@"
 using System.IO;
 using MoonWorks.Audio;
-using GGJ2024.Data;
+using RollAndCash.Data;
 
-namespace GGJ2024.Content
+namespace RollAndCash.Content
 {{
 	public static class StaticAudioPacks
 	{{
@@ -1090,7 +1090,7 @@ using System.IO;
 using MoonWorks.Audio;
 using System.Collections.Generic;
 
-namespace GGJ2024.Content
+namespace RollAndCash.Content
 {{
 	public record struct StaticSoundID(int ID);
 
@@ -1151,7 +1151,7 @@ using System.IO;
 using MoonWorks.Audio;
 using System.Collections.Generic;
 
-namespace GGJ2024.Content
+namespace RollAndCash.Content
 {{
 	public record struct StreamingSoundID(int ID);
 
@@ -1216,7 +1216,7 @@ namespace GGJ2024.Content
 			var musicStemsClassClode = $@"
 using System.IO;
 
-namespace GGJ2024.Content
+namespace RollAndCash.Content
 {{
 	public static class MusicStems
 	{{

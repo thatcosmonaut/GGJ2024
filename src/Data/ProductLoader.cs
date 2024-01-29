@@ -1,15 +1,15 @@
 using System;
 using MoonTools.ECS;
-using GGJ2024.Utility;
-using GGJ2024.Components;
+using RollAndCash.Utility;
+using RollAndCash.Components;
 using MoonWorks.Math.Float;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using GGJ2024.Data;
-using GGJ2024.Relations;
+using RollAndCash.Data;
+using RollAndCash.Relations;
 
-namespace GGJ2024.Systems;
+namespace RollAndCash.Systems;
 
 public static class ProductLoader
 {

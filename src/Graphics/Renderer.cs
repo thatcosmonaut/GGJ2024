@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using System.IO;
-using GGJ2024.Components;
-using GGJ2024.Content;
+using RollAndCash.Components;
+using RollAndCash.Content;
 using MoonTools.ECS;
 using MoonWorks;
 using MoonWorks.Graphics;
 using MoonWorks.Graphics.Font;
 using MoonWorks.Math.Float;
 
-namespace GGJ2024;
+namespace RollAndCash;
 
 public class Renderer : MoonTools.ECS.Renderer
 {

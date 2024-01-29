@@ -1,8 +1,8 @@
 using MoonWorks.Graphics;
 using MoonWorks.Math.Float;
-using GGJ2024.Data;
+using RollAndCash.Data;
 
-namespace GGJ2024.Components;
+namespace RollAndCash.Components;
 
 public struct Sprite
 {
@@ -24,8 +24,8 @@ public struct Sprite
 		SliceRect = sliceRect;
 		FrameRect = frameRect;
 		UV = new UV(
-			new Vector2((float) sliceRect.X / texturePage.Width, (float) sliceRect.Y / texturePage.Height),
-			new Vector2((float) sliceRect.W / texturePage.Width, (float) sliceRect.H / texturePage.Height)
+			new Vector2((float)sliceRect.X / texturePage.Width, (float)sliceRect.Y / texturePage.Height),
+			new Vector2((float)sliceRect.W / texturePage.Width, (float)sliceRect.H / texturePage.Height)
 		);
 	}
 

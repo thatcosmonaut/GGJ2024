@@ -1,10 +1,10 @@
 using System;
 using System.Security.Cryptography.X509Certificates;
-using GGJ2024.Components;
-using GGJ2024.Messages;
+using RollAndCash.Components;
+using RollAndCash.Messages;
 using MoonTools.ECS;
 
-namespace GGJ2024.Systems;
+namespace RollAndCash.Systems;
 
 public class SetSpriteAnimationSystem : MoonTools.ECS.System
 {

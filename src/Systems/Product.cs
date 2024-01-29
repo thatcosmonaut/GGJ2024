@@ -1,16 +1,16 @@
 using System;
 using MoonTools.ECS;
-using GGJ2024.Utility;
-using GGJ2024.Components;
+using RollAndCash.Utility;
+using RollAndCash.Components;
 using MoonWorks.Math.Float;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using GGJ2024.Data;
-using GGJ2024.Relations;
+using RollAndCash.Data;
+using RollAndCash.Relations;
 using MoonWorks.Math;
 
-namespace GGJ2024.Systems;
+namespace RollAndCash.Systems;
 
 public readonly record struct ProductData(string Name, Category Category, Ingredient[] Ingredients);
 
@@ -42,11 +42,11 @@ public class Product : MoonTools.ECS.Manipulator
         Set(entity, position);
         Set(entity, new Rectangle(-8, -8, 16, 16));
         Set(entity, new CanBeHeld());
-		Set(entity, new CanInteract());
-		Set(entity, new Depth(8));
+        Set(entity, new CanInteract());
+        Set(entity, new Depth(8));
         Set(entity, new SlowDownAnimation(15, 1));
-		var depth = MathHelper.Lerp(100, 10, position.Y / (float) Dimensions.GAME_H);
-		Set(entity, new Depth(depth));
+        var depth = MathHelper.Lerp(100, 10, position.Y / (float)Dimensions.GAME_H);
+        Set(entity, new Depth(depth));
 
         var product = ProductLoader.CategoryToProductList[category].GetRandomItem();
 
@@ -111,7 +111,7 @@ public class Product : MoonTools.ECS.Manipulator
             }
         }
 
-		return entity;
+        return entity;
     }
 
     int spawnStepDistance = 32;
@@ -121,18 +121,18 @@ public class Product : MoonTools.ECS.Manipulator
         Set(shelf, new Position(x, y));
         Set(shelf, new SpawnCategory(category));
 
-		for (var spawnerY = y; spawnerY < y + height * spawnStepDistance; spawnerY += spawnStepDistance)
-		{
-			for (var spawnerX = x; spawnerX < x + width * spawnStepDistance; spawnerX += spawnStepDistance)
-			{
-				var productSpawnerEntity = CreateEntity();
-				Set(productSpawnerEntity, new Position(spawnerX, spawnerY));
-				Set(productSpawnerEntity, new CanSpawn());
-				Set(productSpawnerEntity, new SpawnCategory(category));
+        for (var spawnerY = y; spawnerY < y + height * spawnStepDistance; spawnerY += spawnStepDistance)
+        {
+            for (var spawnerX = x; spawnerX < x + width * spawnStepDistance; spawnerX += spawnStepDistance)
+            {
+                var productSpawnerEntity = CreateEntity();
+                Set(productSpawnerEntity, new Position(spawnerX, spawnerY));
+                Set(productSpawnerEntity, new CanSpawn());
+                Set(productSpawnerEntity, new SpawnCategory(category));
 
-				Relate(shelf, productSpawnerEntity, new Relations.ProductSpawner());
-			}
-		}
+                Relate(shelf, productSpawnerEntity, new Relations.ProductSpawner());
+            }
+        }
     }
 
     public void SpawnShelf(int x, int y, int width, int height)
@@ -140,17 +140,17 @@ public class Product : MoonTools.ECS.Manipulator
         var shelf = CreateEntity();
         Set(shelf, new Position(x, y));
 
-		for (var spawnerY = y; spawnerY < y + height * spawnStepDistance; spawnerY += spawnStepDistance)
-		{
-			for (var spawnerX = x; spawnerX < x + width * spawnStepDistance; spawnerX += spawnStepDistance)
-			{
-				var productSpawnerEntity = CreateEntity();
-				Set(productSpawnerEntity, new Position(spawnerX, spawnerY));
-				Set(productSpawnerEntity, new CanSpawn());
+        for (var spawnerY = y; spawnerY < y + height * spawnStepDistance; spawnerY += spawnStepDistance)
+        {
+            for (var spawnerX = x; spawnerX < x + width * spawnStepDistance; spawnerX += spawnStepDistance)
+            {
+                var productSpawnerEntity = CreateEntity();
+                Set(productSpawnerEntity, new Position(spawnerX, spawnerY));
+                Set(productSpawnerEntity, new CanSpawn());
 
-				Relate(shelf, productSpawnerEntity, new Relations.ProductSpawner());
-			}
-		}
+                Relate(shelf, productSpawnerEntity, new Relations.ProductSpawner());
+            }
+        }
     }
 
     public void SpawnParticle(int x, int y, SpriteAnimation spriteAnimation)

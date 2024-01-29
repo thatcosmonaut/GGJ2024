@@ -19,7 +19,7 @@ public enum DirectoryType
     Fonts,
     Shaders,
     Textures,
-	Data
+    Data
 }
 
 public class TrackedDirectory
@@ -108,7 +108,7 @@ public static class Operations
     public static Preferences Preferences;
 
     public static string PreferencesFolderLocation =
-        $"{Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "GGJ2024ContentBuilder")}";
+        $"{Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "RollAndCashContentBuilder")}";
 
     private static string PreferencesFileLocation =
         Path.Combine(
@@ -131,7 +131,7 @@ public static class Operations
         if (!Path.Exists(path)) return false;
         if (!Directory.Exists(path)) return false;
 
-        if (File.Exists(Path.Combine(path, "GGJ2024.sln")))
+        if (File.Exists(Path.Combine(path, "RollAndCash.sln")))
         {
             Preferences.GameDirectoryPath = path;
             InitializeTrackedDirectories();
@@ -203,8 +203,8 @@ public static class Operations
         // Shaders
         TrackDirectory(Path.Combine(contentDir, "Shaders"), DirectoryType.Shaders);
 
-		// Data
-		TrackDirectory(Path.Combine(contentDir, "Data"), DirectoryType.Data);
+        // Data
+        TrackDirectory(Path.Combine(contentDir, "Data"), DirectoryType.Data);
     }
 
     private static void TrackDirectory(string path, DirectoryType directoryType)
@@ -219,7 +219,8 @@ public static class Operations
         else if (
             directoryType == DirectoryType.AudioStatic ||
             directoryType == DirectoryType.AudioStreaming
-        ) {
+        )
+        {
             Audio.Add(trackedDirectory);
         }
         else if (directoryType == DirectoryType.Fonts)
@@ -315,9 +316,9 @@ public static class Operations
                 Processor.ProcessTextures(source, output);
                 break;
 
-			case DirectoryType.Data:
-				Processor.CopyData(source, output);
-				break;
+            case DirectoryType.Data:
+                Processor.CopyData(source, output);
+                break;
 
             default:
                 trackedDirectory.BuildStatus = BuildStatus.OutOfDate;

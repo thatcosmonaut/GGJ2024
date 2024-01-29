@@ -1,6 +1,6 @@
 
 
-namespace GGJ2024.Components;
+namespace RollAndCash.Components;
 
 public readonly record struct Timer(float Time, float Max)
 {

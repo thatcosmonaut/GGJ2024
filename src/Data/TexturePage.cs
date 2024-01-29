@@ -3,9 +3,9 @@ using System.IO;
 using System.IO.Compression;
 using MoonWorks;
 using MoonWorks.Graphics;
-using GGJ2024.Components;
+using RollAndCash.Components;
 
-namespace GGJ2024.Data;
+namespace RollAndCash.Data;
 
 public readonly record struct TexturePageID(int ID);
 
@@ -17,8 +17,8 @@ public class TexturePage
 	CramTextureAtlasFile AtlasFile { get; }
 	public Texture Texture { get; private set; } = null;
 	public bool Loaded => Texture != null;
-	public uint Width => (uint) AtlasFile.Data.Width;
-	public uint Height => (uint) AtlasFile.Data.Height;
+	public uint Width => (uint)AtlasFile.Data.Width;
+	public uint Height => (uint)AtlasFile.Data.Height;
 
 	private Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
 	private Dictionary<string, SpriteAnimationInfo> animationInfos = new Dictionary<string, SpriteAnimationInfo>();

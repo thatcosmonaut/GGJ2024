@@ -1,9 +1,9 @@
 using MoonTools.ECS;
 using MoonWorks.Input;
-using GGJ2024.Components;
+using RollAndCash.Components;
 using System;
 
-namespace GGJ2024.Systems;
+namespace RollAndCash.Systems;
 
 public struct InputState
 {
@@ -77,7 +77,8 @@ public class Input : MoonTools.ECS.System
 				PlayerTwoKeyboard.Interact.IsPressed ||
 				PlayerOneGamepad.Interact.IsPressed ||
 				PlayerTwoGamepad.Interact.IsPressed
-			) {
+			)
+			{
 				GameLoopManipulator.Restart();
 			}
 		}

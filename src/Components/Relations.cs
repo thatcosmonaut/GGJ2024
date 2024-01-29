@@ -1,4 +1,4 @@
-namespace GGJ2024.Relations;
+namespace RollAndCash.Relations;
 
 public readonly record struct Colliding();
 public readonly record struct Holding();

@@ -1,11 +1,11 @@
 using System;
 using MoonWorks;
-using GGJ2024.Components;
+using RollAndCash.Components;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
-using GGJ2024.Utility;
+using RollAndCash.Utility;
 
-namespace GGJ2024.Systems;
+namespace RollAndCash.Systems;
 
 public enum Category
 {

@@ -1,10 +1,10 @@
-using GGJ2024.Content;
-using GGJ2024.Systems;
+using RollAndCash.Content;
+using RollAndCash.Systems;
 using MoonTools.ECS;
 using MoonWorks.Audio;
-using GGJ2024.Components;
+using RollAndCash.Components;
 
-namespace GGJ2024.Messages;
+namespace RollAndCash.Messages;
 
 public readonly record struct PlayStaticSoundMessage(
 	StaticSoundID StaticSoundID,

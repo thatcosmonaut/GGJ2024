@@ -1,19 +1,19 @@
 using MoonWorks.Graphics;
 using MoonWorks;
 using MoonTools.ECS;
-using GGJ2024.Systems;
+using RollAndCash.Systems;
 using MoonWorks.Math.Float;
-using GGJ2024.Content;
-using GGJ2024.Components;
-using GGJ2024.Utility;
-using GGJ2024.Data;
-using GGJ2024.Messages;
-using GGJ2024.Relations;
+using RollAndCash.Content;
+using RollAndCash.Components;
+using RollAndCash.Utility;
+using RollAndCash.Data;
+using RollAndCash.Messages;
+using RollAndCash.Relations;
 using LD54.Systems;
 
-namespace GGJ2024
+namespace RollAndCash
 {
-	class GGJ2024Game : Game
+	class RollAndCashGame : Game
 	{
 		Renderer Renderer;
 		World World = new World();
@@ -21,7 +21,7 @@ namespace GGJ2024
 		Motion Motion;
 		Audio Audio;
 		Hold Hold;
-		GGJ2024.Systems.ProductSpawner ProductSpawner;
+		RollAndCash.Systems.ProductSpawner ProductSpawner;
 		Product ProductManipulator;
 		Ticker Ticker;
 		Systems.GameTimer GameTimer;
@@ -35,7 +35,7 @@ namespace GGJ2024
 
 		GameLoopManipulator GameLoopManipulator;
 
-		public GGJ2024Game(
+		public RollAndCashGame(
 			WindowCreateInfo windowCreateInfo,
 			FrameLimiterSettings frameLimiterSettings,
 			bool debugMode
@@ -64,7 +64,7 @@ namespace GGJ2024
 			PlayerController = new PlayerController(World);
 			Hold = new Hold(World);
 			Orders = new Orders(World);
-			ProductSpawner = new GGJ2024.Systems.ProductSpawner(World);
+			ProductSpawner = new RollAndCash.Systems.ProductSpawner(World);
 			ProductManipulator = new Product(World);
 			SetSpriteAnimationSystem = new SetSpriteAnimationSystem(World);
 			UpdateSpriteAnimationSystem = new UpdateSpriteAnimationSystem(World);

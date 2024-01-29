@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using MoonWorks.Audio;
 
-namespace GGJ2024.Data
+namespace RollAndCash.Data
 {
 	[JsonSerializable(typeof(Dictionary<string, StaticAudioPackDataEntry>))]
 	internal partial class StaticAudioPackDictionaryContext : JsonSerializerContext
@@ -53,7 +53,7 @@ namespace GGJ2024.Data
 
 			foreach (var (name, dataEntry) in entries)
 			{
-				AudioBuffers[name] = MainBuffer.Slice(dataEntry.Start, (uint) dataEntry.Length);
+				AudioBuffers[name] = MainBuffer.Slice(dataEntry.Start, (uint)dataEntry.Length);
 			}
 		}
 
