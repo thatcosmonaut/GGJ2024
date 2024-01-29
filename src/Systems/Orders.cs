@@ -2,6 +2,7 @@ using System;
 using System.IO.IsolatedStorage;
 using GGJ2024.Components;
 using GGJ2024.Content;
+using GGJ2024.Messages;
 using GGJ2024.Relations;
 using GGJ2024.Utility;
 using MoonTools.ECS;
@@ -79,6 +80,7 @@ public class Orders : MoonTools.ECS.System
 			var score = Get<Score>(scoreEntity).Value + CalculateScore(product);
 			Set(scoreEntity, new Score(score));
 			Set(scoreEntity, new Text(Fonts.KosugiID, 8, score.ToString()));
+			Send(new PlayStaticSoundMessage(StaticAudio.OrderComplete));
 
 			SetNewOrderDetails(order); // refill order
             Destroy(product);

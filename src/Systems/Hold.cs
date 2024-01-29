@@ -85,6 +85,8 @@ public class Hold : MoonTools.ECS.System
 			var holding = OutRelationSingleton<Holding>(e);
 			Remove<Velocity>(holding);
 			UnrelateAll<Holding>(e);
+			Send(new PlayStaticSoundMessage(StaticAudio.PutDown));
+
 			var spriteInfo = Get<SpriteAnimation>(holding).SpriteAnimationInfo;
 			Send(new SetAnimationMessage(
 				holding,
