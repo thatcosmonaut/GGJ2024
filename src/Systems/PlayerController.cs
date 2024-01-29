@@ -226,12 +226,13 @@ public class PlayerController : MoonTools.ECS.System
 
 			#region walking sfx
 			var footstepTimer = OutRelationSingleton<TimingFootstepAudio>(entity);
-			var footstepTime = Get<Components.GameTimer>(footstepTimer).Time;
-			if (footstepTime <= 0 && framerate > 0)
+			var remainingDuration = Get<Timer>(footstepTimer).Time;
+			
+			if (remainingDuration <= 0 && framerate > 0)
 			{
 				PlayRandomFootstep();
-				var footstepTiming = 1f - (framerate / 50f);
-				Set(footstepTimer, new Components.GameTimer(footstepTiming));
+				var footstepDuration = Math.Clamp(1f - (framerate / 50f), .5f, 1f);
+				Set(footstepTimer, new Timer(footstepDuration));
 			}
 			#endregion
 
