@@ -78,15 +78,15 @@ namespace GGJ2024
 			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
 
 			var orderOne = World.CreateEntity();
-			World.Set(orderOne, new Position(240, 280));
+			World.Set(orderOne, new Position(195, 345));
 			World.Set(orderOne, new IsOrder());
 
 			var orderTwo = World.CreateEntity();
-			World.Set(orderTwo, new Position(320, 280));
+			World.Set(orderTwo, new Position(320, 345));
 			World.Set(orderTwo, new IsOrder());
 
 			var orderThree = World.CreateEntity();
-			World.Set(orderThree, new Position(400, 280));
+			World.Set(orderThree, new Position(440, 345));
 			World.Set(orderThree, new IsOrder());
 
 			Orders.SetNewOrderDetails(orderOne);
@@ -143,15 +143,15 @@ namespace GGJ2024
 
 			var timer = World.CreateEntity();
 			World.Set(timer, new Components.GameTimer(90));
-			World.Set(timer, new Position(Dimensions.GAME_W / 2 + 10, Dimensions.GAME_H - 20));
+			World.Set(timer, new Position(Dimensions.GAME_W - 40, 38));
 
 			var scoreOne = World.CreateEntity();
-			World.Set(scoreOne, new Position(100, 280));
+			World.Set(scoreOne, new Position(80, 345));
 			World.Set(scoreOne, new Score(0));
 			World.Set(scoreOne, new Text(Fonts.KosugiID, 8, "0"));
 
 			var scoreTwo = World.CreateEntity();
-			World.Set(scoreTwo, new Position(540, 280));
+			World.Set(scoreTwo, new Position(560, 345));
 			World.Set(scoreTwo, new Score(0));
 			World.Set(scoreTwo, new Text(Fonts.KosugiID, 8, "0"));
 
