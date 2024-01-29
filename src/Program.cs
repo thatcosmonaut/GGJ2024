@@ -17,7 +17,7 @@ namespace GGJ2024
 				WindowWidth = 1280,
 				WindowHeight = 720,
 				WindowTitle = "GGJ2024",
-				ScreenMode = ScreenMode.Windowed,
+				ScreenMode = ScreenMode.Fullscreen,
 				PresentMode = PresentMode.FIFORelaxed
 			};
 

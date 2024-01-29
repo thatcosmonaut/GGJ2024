@@ -1,5 +1,6 @@
 using GGJ2024;
 using GGJ2024.Components;
+using GGJ2024.Content;
 using GGJ2024.Messages;
 using GGJ2024.Systems;
 using MoonTools.ECS;
@@ -34,6 +35,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		foreach (var entity in ScoreFilter.Entities)
 		{
 			Set(entity, new Score(0));
+			Set(entity, new Text(Fonts.KosugiID, 8, "0"));
 		}
 
 		World.Send(new PlaySongMessage());
