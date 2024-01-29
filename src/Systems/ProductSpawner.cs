@@ -6,7 +6,7 @@ using MoonTools.ECS;
 
 namespace GGJ2024.Systems;
 
-public class ProductSpawner : MoonTools.ECS.System
+public class ProductSpawner : MoonTools.ECS.Manipulator
 {
     Product Product;
     Filter ProductSpawnerFilter;
@@ -55,47 +55,39 @@ public class ProductSpawner : MoonTools.ECS.System
         Product.SpawnShelf(x + spawnStepDistance, y, 1, verticalProductAmount, Categories[categoryInt + 1]);
     }
 
-    float time = 0;
-    public override void Update(TimeSpan delta)
-    {
-        // This is for auto refresh level editing
-        if (false)
-        {
-            var respawnTime = .5f;
-            time += (float)delta.TotalSeconds;
-            if (time > respawnTime)
-            {
-                time -= respawnTime;
-                SpawnShelves();
-            }
-        }
+	public void ClearProducts()
+	{
+		foreach (var entity in ProductFilter.Entities)
+		{
+			Destroy(entity);
+		}
+	}
 
-        if (!Some<Components.CanBeHeld>())
-        {
-            foreach (var entity in ProductSpawnerFilter.Entities)
-            {
-                var position = Get<Position>(entity);
-                var canSpawn = Get<CanSpawn>(entity);
+	public void SpawnProducts()
+	{
+		foreach (var entity in ProductSpawnerFilter.Entities)
+		{
+			var position = Get<Position>(entity);
+			var canSpawn = Get<CanSpawn>(entity);
 
-                var spawnAsCategory = Has<SpawnCategory>(entity);
+			var spawnAsCategory = Has<SpawnCategory>(entity);
 
-                for (var y = position.Y; y < position.Y + canSpawn.Height * spawnStepDistance; y += spawnStepDistance)
-                {
-                    for (var x = position.X; x < position.X + canSpawn.Width * spawnStepDistance; x += spawnStepDistance)
-                    {
-                        if (spawnAsCategory)
-                        {
-                            var category = Get<SpawnCategory>(entity).Category;
-                            Product.SpawnProduct(new Position(x, y), category);
-                        }
-                        else
-                        {
-                            var category = Rando.GetRandomItem(Categories);
-                            Product.SpawnProduct(new Position(x, y), category);
-                        }
-                    }
-                }
-            }
-        }
-    }
+			for (var y = position.Y; y < position.Y + canSpawn.Height * spawnStepDistance; y += spawnStepDistance)
+			{
+				for (var x = position.X; x < position.X + canSpawn.Width * spawnStepDistance; x += spawnStepDistance)
+				{
+					if (spawnAsCategory)
+					{
+						var category = Get<SpawnCategory>(entity).Category;
+						Product.SpawnProduct(new Position(x, y), category);
+					}
+					else
+					{
+						var category = Rando.GetRandomItem(Categories);
+						Product.SpawnProduct(new Position(x, y), category);
+					}
+				}
+			}
+		}
+	}
 }

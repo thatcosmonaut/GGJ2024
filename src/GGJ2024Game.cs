@@ -33,6 +33,8 @@ namespace GGJ2024
 
 		PlayerController PlayerController;
 
+		GameLoopManipulator GameLoopManipulator;
+
 		public GGJ2024Game(
 			WindowCreateInfo windowCreateInfo,
 			FrameLimiterSettings frameLimiterSettings,
@@ -51,6 +53,8 @@ namespace GGJ2024
 			StaticAudio.LoadAll();
 			StreamingAudio.InitAll(AudioDevice);
 			Fonts.LoadAll(GraphicsDevice);
+
+			GameLoopManipulator = new GameLoopManipulator(World);
 
 			GameTimer = new(World);
 			Timing = new(World);
@@ -157,7 +161,7 @@ namespace GGJ2024
 			World.Relate(playerOne, scoreOne, new HasScore());
 			World.Relate(playerTwo, scoreTwo, new HasScore());
 
-			World.Send(new PlaySongMessage());
+			GameLoopManipulator.Restart();
 		}
 
 		protected override void Update(System.TimeSpan dt)
@@ -170,7 +174,6 @@ namespace GGJ2024
 			PlayerController.Update(dt);
 			Motion.Update(dt);
 			Hold.Update(dt);
-			ProductSpawner.Update(dt);
 			Orders.Update(dt);
 			SetSpriteAnimationSystem.Update(dt);
 			ColorAnimation.Update(dt);
