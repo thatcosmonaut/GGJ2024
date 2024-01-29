@@ -82,7 +82,15 @@ public class Orders : MoonTools.ECS.System
 
 			Set(scoreEntity, new Score(score));
 			Set(scoreEntity, new Text(Fonts.KosugiID, 8, score.ToString()));
-			Send(new PlayStaticSoundMessage(StaticAudio.OrderComplete));
+
+			if (calculate < 0)
+			{
+				Send(new PlayStaticSoundMessage(StaticAudio.CursedCoin));
+			}
+			else
+			{
+				Send(new PlayStaticSoundMessage(StaticAudio.OrderComplete));
+			}
 
 			SetNewOrderDetails(order); // refill order
             Destroy(product);
