@@ -49,6 +49,7 @@ namespace GGJ2024
 
 			StaticAudioPacks.LoadAll(AudioDevice);
 			StaticAudio.LoadAll();
+			StreamingAudio.InitAll(AudioDevice);
 			Fonts.LoadAll(GraphicsDevice);
 
 			GameTimer = new(World);
@@ -155,6 +156,8 @@ namespace GGJ2024
 
 			World.Relate(playerOne, scoreOne, new HasScore());
 			World.Relate(playerTwo, scoreTwo, new HasScore());
+
+			World.Send(new PlaySongMessage());
 		}
 
 		protected override void Update(System.TimeSpan dt)

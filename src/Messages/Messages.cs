@@ -21,3 +21,5 @@ public readonly record struct SetAnimationMessage(
 	SpriteAnimation Animation,
 	bool ForceUpdate = false
 );
+
+public readonly record struct PlaySongMessage();
