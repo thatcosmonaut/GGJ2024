@@ -11,3 +11,4 @@ public readonly record struct ShowingPopup();
 public readonly record struct DisplayingProductPrice();
 public readonly record struct DisplayingIngredientPrice();
 public readonly record struct HasScore();
+public readonly record struct TimingFootstepAudio();

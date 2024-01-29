@@ -1,5 +1,6 @@
 using System;
 using GGJ2024.Components;
+using GGJ2024.Content;
 using GGJ2024.Data;
 using GGJ2024.Messages;
 using GGJ2024.Relations;
@@ -41,6 +42,10 @@ public class PlayerController : MoonTools.ECS.System
 		World.Set(player, new MaxSpeed(128));
 		World.Set(player, new Velocity(Vector2.Zero));
 		World.Set(player, new LastDirection(Vector2.Zero));
+
+		var footstepTimer = World.CreateEntity();
+		World.Set(footstepTimer, new Components.GameTimer(0));
+		World.Relate(player, footstepTimer, new TimingFootstepAudio());
 
 		return player;
 	}
@@ -211,6 +216,7 @@ public class PlayerController : MoonTools.ECS.System
 			}
 			else
 			{
+				framerate = 0;
 				Send(new SetAnimationMessage(
 					entity,
 					new SpriteAnimation(animation, 0, true, 0),
@@ -218,9 +224,38 @@ public class PlayerController : MoonTools.ECS.System
 				));
 			}
 
+			#region walking sfx
+			var footstepTimer = OutRelationSingleton<TimingFootstepAudio>(entity);
+			var footstepTime = Get<Components.GameTimer>(footstepTimer).Time;
+			if (footstepTime <= 0 && framerate > 0)
+			{
+				PlayRandomFootstep();
+				var footstepTiming = 1f - (framerate / 50f);
+				Set(footstepTimer, new Components.GameTimer(footstepTiming));
+			}
+			#endregion
+
 			Set(entity, new Velocity(velocity));
 			var depth = MathHelper.Lerp(100, 10, Get<Position>(entity).Y / (float) Dimensions.GAME_H);
 			Set(entity, new Depth(depth));
 		}
+	}
+
+	private void PlayRandomFootstep()
+	{
+		Send(
+			new PlayStaticSoundMessage(
+				new StaticSoundID[]
+				{
+					StaticAudio.Footstep1,
+					StaticAudio.Footstep2,
+					StaticAudio.Footstep3,
+					StaticAudio.Footstep4,
+					StaticAudio.Footstep5,
+				}.GetRandomItem<StaticSoundID>(),
+			Rando.Range(0.4f, 0.6f),
+			Rando.Range(-.05f, .05f)
+			)
+		);
 	}
 }
