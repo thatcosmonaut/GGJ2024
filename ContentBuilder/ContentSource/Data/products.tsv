@@ -18,6 +18,9 @@ Guard Dolphin	microplastics,glass,shrimp,animals
 Enhanced Lobster	gems,elastic,milk,animals
 Chimera Ant	silicon,carbon,uranium,animals
 Luxury Penguin	gems,carbon,shrimp,animals
+Talking Housecat	carbon,mint,spirits,animals
+Multipurpose Utility Worm	elastic,kelp,shrimp,animals
+Beta 0.56 Fish	blueberry,carbon,shrimp,animals
 Chastity Belt	elastic,glass,oatmeal,clothes
 Punk Jacket	bones,microplastics,glass,clothes
 Thermal Winter Necktie	silicon,elastic,oatmeal,clothes
@@ -38,6 +41,9 @@ Space Horror Onesie	ectoplasm,elastic,spirits,clothes
 Sin-Chilla Fur Vest	fungus,elastic,carbon,clothes
 Membrane Protectors	microplastics,shrimp,uranium,clothes
 Transparent Pants	kelp,glass,helium,clothes
+Crimefighter Leotard	silicon,blueberry,elastic,clothes
+Podcast Socks	gems,kelp,microplastics,clothes
+Bulletproof Bikini	silicon,elastic,carbon,shrimp,clothes
 Sulfur Facial Mask	mint,booze,kelp,cosmetics
 Uranium Facial Mask	booze,kelp,uranium,cosmetics
 Ass Polish	blueberry,fungus,milk,kelp,cosmetics
@@ -54,10 +60,13 @@ Face Mud	ectoplasm,silicon,blueberry,gems,fungus,elastic,carbon,milk,mint,bones,
 Nose Remover	spirits,glass,uranium,cosmetics
 Wolf Spider Fuck Cream	blueberry,milk,oatmeal,cosmetics
 Pore Exploder	helium,shrimp,uranium,cosmetics
-Gut Purification Elixr	fungus,milk,mint,cosmetics
+Hair-Cladding Elixr	fungus,milk,mint,cosmetics
 Relaxation Ooze	elastic,mint,booze,cosmetics
 Beneficial Skin Fungus	fungus,spirits,oatmeal,cosmetics
 Holographic Eyelashes	silicon,gems,gold,cosmetics
+Fingernail Softener	elastic,mint,uranium,cosmetics
+"Speedy Lips" Zero-Friction Lipstick	silicon,glass,gold,cosmetics
+Third Eye (Temporary)	gems,spirits,kelp,cosmetics
 Mindlink Neurogun	silicon,spirits,helium,electronics
 Atomic Bomb	helium,uranium,electronics
 Turbo Dialysis Machine	carbon,milk,bones,electronics
@@ -75,9 +84,12 @@ Theremin - Amateur	bones,helium,oatmeal,electronics
 Theremin - Advanced	helium,uranium,gold,electronics
 Antique MP3 Player	silicon,bones,microplastics,electronics
 Playstation 46	silicon,microplastics,gold,oatmeal,electronics
-Robotic Dog	silicon,carbon,oatmeal,electronics
+Childsafe Robotic Dog	silicon,carbon,oatmeal,electronics
 Digital Pet Egg	silicon,kelp,oatmeal,electronics
 Translator Device	elastic,milk,booze,electronics
+XL Immersion Blender	silicon,microplastics,uranium,electronics
+Carbonated Bidet	ectoplasm,milk,glass,electronics
+3D Kelp Printer	silicon,kelp,shrimp,electronics
 Pizza - Offal	blueberry,fungus,carbon,kelp,food
 Pizza - Human Hearts	fungus,carbon,milk,kelp,food
 Carbon-Flavored Milkshake	fungus,carbon,oatmeal,food
@@ -98,6 +110,9 @@ Tater Tots - Cupcake Flavor	blueberry,fungus,mint,oatmeal,food
 Tater Tots - Carbon Flavor	fungus,spirits,kelp,oatmeal,food
 Tater Tots - Protein Flavor	fungus,microplastics,shrimp,oatmeal,food
 Crispbread	fungus,carbon,oatmeal,food
+Glass of Milk	mint,spirits,glass,food
+KPop Themed Donut	fungus,milk,bones,food
+Plastic-Flavored IPA	mint,booze,microplastics,food
 Mating Chamber	silicon,bones,booze,furniture
 Whiteboards	blueberry,kelp,microplastics,furniture
 Beach Umbrella	elastic,kelp,shrimp,furniture
@@ -118,6 +133,9 @@ Velvet Painting	elastic,microplastics,shrimp,furniture
 Toilet	silicon,bones,gold,furniture
 Display Tree - Heads And Skulls	carbon,bones,spirits,furniture
 Stock Market Manipulation Altar	silicon,blueberry,booze,furniture
+Antique IKEA BILLY	carbon,microplastics,oatmeal,furniture
+Anti-Light Room Dimming Lamp	ectoplasm,fungus,spirits,furniture
+HoverRug	elastic,kelp,helium,furniture
 Rage Spray	ectoplasm,helium,uranium,gold,gasses
 Frozen Gasses	blueberry,milk,booze,gasses
 Preservative Gasses	booze,microplastics,helium,gasses
@@ -138,6 +156,9 @@ Spray-On Iron Plating	silicon,elastic,booze,gasses
 Anesthesia In A Can	fungus,mint,booze,oatmeal,gasses
 Nitrous Oxide (Recreational)	gems,microplastics,glass,gasses
 Aesthetic Gasses	ectoplasm,gems,helium,gasses
+Bottled Memory - Christmas 1994	mint,booze,gold,gasses
+Bottled Memory - Chased By Bullies	bones,glass,shrimp,gasses
+Spray-On Charisma	gems,helium,uranium,gasses
 Single: "Crawling - Taylor's Version"	bones,booze,gold,ip
 Party Flyers: Galactic Hoedown on Pulpo Prime	fungus,carbon,microplastics,ip
 Sponsorship Agreements	glass,uranium,gold,ip
@@ -156,8 +177,11 @@ Anime: "To the Lighthouse" adaption	ectoplasm,milk,bones,ip
 Truffle Skate Video - "Vizionz of Azzfalt"	glass,shrimp,uranium,ip
 Book: "Oil And Meringue: The Life Of A Killbot Clown"	blueberry,fungus,helium,ip
 VR Experience: "Shark Dream: Eating The Whale"	silicon,bones,shrimp,ip
-Anime: "Un Chien Andalou" adaptation	gems,spirits,booze,ip
+Anime: "Un Chien Andalou" Adaptation	gems,spirits,booze,ip
 VR Experience: "Being Rich"	silicon,gems,gold,ip
+VR Experience: "Being a Blueberry"	silicon,blueberry,ip
+TV: "Rude Doctor Season 14"	gems,bones,microplastics,ip
+Zine: "A Soft Boy's Guide to Martian Mushrooms"	fungus,carbon,mint,oatmeal,ip
 Healing Reeds and Grasses	carbon,mint,oatmeal,pharmacy
 Ass Lengthener	silicon,fungus,elastic,pharmacy
 Uranium Suppository	glass,shrimp,uranium,pharmacy
@@ -174,10 +198,13 @@ Fur Styling Gel	mint,kelp,oatmeal,pharmacy
 Flaming Boozoil	spirits,glass,helium,pharmacy
 Nutritious Boozoil	blueberry,spirits,kelp,pharmacy
 Wound Grubs	fungus,carbon,microplastics,pharmacy
-Tomato Face Tonic	carbon,mint,oatmeal,pharmacy
+Wombat Turd Face Tonic	carbon,mint,oatmeal,pharmacy
 Dank Herbs	spirits,kelp,helium,pharmacy
 Patch-A-Hole Frontline First Aid Kit	silicon,elastic,uranium,pharmacy
 Iridescent Oils	gems,mint,gold,pharmacy
+Pancreas-In-A-Jar	carbon,booze,gold,pharmacy
+Stool Hardener	gems,carbon,glass,pharmacy
+Gamer Vitamins	blueberry,microplastics,uranium,pharmacy
 Grimoires	bones,spirits,shrimp,relics
 Illuminated Manuscripts	milk,spirits,kelp,relics
 "I've Been To Ohiho" commemorative magnet	blueberry,microplastics,helium,relics
@@ -198,3 +225,6 @@ Curse Orb	ectoplasm,spirits,glass,relics
 Curvy Dagger	silicon,bones,gold,relics
 Bloodstained Blade	silicon,gems,carbon,relics
 Inscribed Helmet	gems,microplastics,uranium,relics
+Ancient Coin	ectoplasm,spirits,gold,relics
+Ever-Beating Human Heart	carbon,spirits,oatmeal,relics
+Base Set 1 Holo Charizard	gems,microplastics,gold,relics
