@@ -1,6 +1,7 @@
 
 using System;
 using GGJ2024.Components;
+using GGJ2024.Relations;
 using GGJ2024.Utility;
 using MoonTools.ECS;
 
@@ -18,7 +19,7 @@ public class ProductSpawner : MoonTools.ECS.Manipulator
     {
         Product = new Product(world);
         ProductFilter = FilterBuilder.Include<CanBeHeld>().Build();
-        ProductSpawnerFilter = FilterBuilder.Include<CanSpawn>().Build();
+        ProductSpawnerFilter = FilterBuilder.Include<Position>().Include<CanSpawn>().Build();
         Categories = Enum.GetValues<Category>();
         SpawnShelves();
     }
@@ -67,27 +68,40 @@ public class ProductSpawner : MoonTools.ECS.Manipulator
 	{
 		foreach (var entity in ProductSpawnerFilter.Entities)
 		{
-			var position = Get<Position>(entity);
-			var canSpawn = Get<CanSpawn>(entity);
-
-			var spawnAsCategory = Has<SpawnCategory>(entity);
-
-			for (var y = position.Y; y < position.Y + canSpawn.Height * spawnStepDistance; y += spawnStepDistance)
+			if (!HasInRelation<BelongsToProductSpawner>(entity))
 			{
-				for (var x = position.X; x < position.X + canSpawn.Width * spawnStepDistance; x += spawnStepDistance)
+				var position = Get<Position>(entity);
+
+				Category category;
+				if (Has<SpawnCategory>(entity))
 				{
-					if (spawnAsCategory)
-					{
-						var category = Get<SpawnCategory>(entity).Category;
-						Product.SpawnProduct(new Position(x, y), category);
-					}
-					else
-					{
-						var category = Rando.GetRandomItem(Categories);
-						Product.SpawnProduct(new Position(x, y), category);
-					}
+					category = Get<SpawnCategory>(entity).Category;
 				}
+				else
+				{
+					category = Rando.GetRandomItem(Categories);
+				}
+
+				var product = Product.SpawnProduct(position, category);
+				Relate(product, entity, new BelongsToProductSpawner());
 			}
+
+			// for (var y = position.Y; y < position.Y + canSpawn.Height * spawnStepDistance; y += spawnStepDistance)
+			// {
+			// 	for (var x = position.X; x < position.X + canSpawn.Width * spawnStepDistance; x += spawnStepDistance)
+			// 	{
+			// 		if (spawnAsCategory)
+			// 		{
+			// 			var category = Get<SpawnCategory>(entity).Category;
+			// 			Product.SpawnProduct(new Position(x, y), category);
+			// 		}
+			// 		else
+			// 		{
+			// 			var category = Rando.GetRandomItem(Categories);
+			// 			Product.SpawnProduct(new Position(x, y), category);
+			// 		}
+			// 	}
+			// }
 		}
 	}
 }

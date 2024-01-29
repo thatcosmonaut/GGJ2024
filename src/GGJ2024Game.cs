@@ -21,7 +21,7 @@ namespace GGJ2024
 		Motion Motion;
 		Audio Audio;
 		Hold Hold;
-		ProductSpawner ProductSpawner;
+		GGJ2024.Systems.ProductSpawner ProductSpawner;
 		Product ProductManipulator;
 		Ticker Ticker;
 		Systems.GameTimer GameTimer;
@@ -64,7 +64,7 @@ namespace GGJ2024
 			PlayerController = new PlayerController(World);
 			Hold = new Hold(World);
 			Orders = new Orders(World);
-			ProductSpawner = new ProductSpawner(World);
+			ProductSpawner = new GGJ2024.Systems.ProductSpawner(World);
 			ProductManipulator = new Product(World);
 			SetSpriteAnimationSystem = new SetSpriteAnimationSystem(World);
 			UpdateSpriteAnimationSystem = new UpdateSpriteAnimationSystem(World);

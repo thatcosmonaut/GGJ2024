@@ -9,16 +9,20 @@ namespace GGJ2024.Systems;
 public class GameTimer : MoonTools.ECS.System
 {
 	GameLoopManipulator GameLoopManipulator;
+	ProductSpawner ProductSpawner;
 
 	public GameTimer(World world) : base(world)
 	{
 		GameLoopManipulator = new GameLoopManipulator(world);
+		ProductSpawner = new ProductSpawner(world);
 	}
 
 	public override void Update(TimeSpan delta)
 	{
 		var timerEntity = GetSingletonEntity<Components.GameTimer>();
 		var time = Get<Components.GameTimer>(timerEntity).Time;
+
+		var timeBefore = time;
 
 		time -= (float)delta.TotalSeconds;
 
@@ -33,5 +37,25 @@ public class GameTimer : MoonTools.ECS.System
 		{
 			GameLoopManipulator.Restart();
 		}
+
+		if (OnTime(time, 0, (float)delta.TotalSeconds, 5))
+		{
+			// respawn products
+			ProductSpawner.SpawnProducts();
+		}
 	}
+
+	public static bool OnTime(float time, float triggerTime, float dt, float loopTime)
+		{
+			if (loopTime == 0)
+			{
+				return false;
+			}
+
+			var t = time % loopTime;
+			return (
+				(t <= triggerTime && t + dt >= triggerTime) ||
+				(t <= triggerTime + loopTime && t + dt >= triggerTime + loopTime)
+				);
+		}
 }

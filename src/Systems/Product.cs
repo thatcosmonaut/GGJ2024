@@ -36,7 +36,7 @@ public class Product : MoonTools.ECS.Manipulator
         return MathF.Round(MathF.Max(float.Epsilon, total), 2);
     }
 
-    public void SpawnProduct(Position position, Category category)
+    public Entity SpawnProduct(Position position, Category category)
     {
         var entity = CreateEntity();
         Set(entity, position);
@@ -110,21 +110,49 @@ public class Product : MoonTools.ECS.Manipulator
                 Relate(entity, ingredient, new HasIngredient());
             }
         }
+
+		return entity;
     }
 
+    int spawnStepDistance = 32;
     public void SpawnShelf(int x, int y, int width, int height, Category category)
     {
-        var e = CreateEntity();
-        Set(e, new Position(x, y));
-        Set(e, new SpawnCategory(category));
-        Set(e, new CanSpawn(width, height));
+        var shelf = CreateEntity();
+        Set(shelf, new Position(x, y));
+        Set(shelf, new SpawnCategory(category));
+        Set(shelf, new CanSpawn(width, height));
+
+		for (var spawnerY = y; spawnerY < y + height * spawnStepDistance; spawnerY += spawnStepDistance)
+		{
+			for (var spawnerX = x; spawnerX < x + width * spawnStepDistance; spawnerX += spawnStepDistance)
+			{
+				var productSpawnerEntity = CreateEntity();
+				Set(productSpawnerEntity, new Position(spawnerX, spawnerY));
+				Set(productSpawnerEntity, new CanSpawn());
+				Set(productSpawnerEntity, new SpawnCategory(category));
+
+				Relate(shelf, productSpawnerEntity, new Relations.ProductSpawner());
+			}
+		}
     }
 
     public void SpawnShelf(int x, int y, int width, int height)
     {
-        var e = CreateEntity();
-        Set(e, new Position(x, y));
-        Set(e, new CanSpawn(width, height));
+        var shelf = CreateEntity();
+        Set(shelf, new Position(x, y));
+        Set(shelf, new CanSpawn(width, height));
+
+		for (var spawnerY = y; spawnerY < y + height * spawnStepDistance; spawnerY += spawnStepDistance)
+		{
+			for (var spawnerX = x; spawnerX < x + width * spawnStepDistance; spawnerX += spawnStepDistance)
+			{
+				var productSpawnerEntity = CreateEntity();
+				Set(productSpawnerEntity, new Position(spawnerX, spawnerY));
+				Set(productSpawnerEntity, new CanSpawn());
+
+				Relate(shelf, productSpawnerEntity, new Relations.ProductSpawner());
+			}
+		}
     }
 
     public void SpawnParticle(int x, int y, SpriteAnimation spriteAnimation)
