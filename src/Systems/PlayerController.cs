@@ -88,7 +88,7 @@ public class PlayerController : MoonTools.ECS.System
 			// Movement
 			var velocity = Get<Velocity>(entity).Value;
 
-			var accelSpeed = 64f;
+			var accelSpeed = 128f;
 
 			velocity += direction * accelSpeed * deltaTime * 60;
 
@@ -123,7 +123,7 @@ public class PlayerController : MoonTools.ECS.System
 
 				direction = Vector2.Normalize(direction);
 
-				var maxAdd = deltaTime * 60;
+				var maxAdd = deltaTime * 30;
 				if (HasOutRelation<Holding>(entity))
 				{
 					maxAdd /= 2;
@@ -137,7 +137,7 @@ public class PlayerController : MoonTools.ECS.System
 			{
 				Set(entity, new CanFunnyRun());
 				var speed = Get<Velocity>(entity).Value.Length();
-				speed = Math.Max(speed - (20 * deltaTime * 60), 0);
+				speed = Math.Max(speed - (accelSpeed * deltaTime * 60), 0);
 				velocity = Vector2.Normalize(velocity) * speed;
 				Set(entity, new MaxSpeed(MaxSpeedBase));
 			}
