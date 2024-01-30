@@ -29,7 +29,7 @@ namespace ContentProcessor
 
 #if WINDOWS
 			var refreshCompilerExecutable = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "refreshc.exe"));
-#elif LINUX // linux
+#elif LINUX || OSX // linux
 			var refreshCompilerExecutable = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "refreshc"));
 #endif
 
@@ -372,7 +372,7 @@ namespace ContentProcessor
 
 #if WINDOWS
 			var qoaExe = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "qoaconv.exe"));
-#elif LINUX
+#elif LINUX || OSX
 			var qoaExe = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "qoaconv"));
 #endif
 			ConvertStreamingAudio(streamingAudioDir.GetFiles("*.flac", new EnumerationOptions { RecurseSubdirectories = true }), streamingAudioOutputDir, qoaExe);
@@ -425,7 +425,7 @@ namespace ContentProcessor
 
 #if WINDOWS
 			var msdfAtlasGenInfo = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "msdf-atlas-gen.exe"));
-#elif LINUX
+#elif LINUX || OSX
 			var msdfAtlasGenInfo = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "msdf-atlas-gen"));
 #endif
 
@@ -476,6 +476,8 @@ namespace ContentProcessor
 #elif LINUX
 			// on linux, just assume system has ffmpeg installed
 			var ffmpegExecutablePath = new FileInfo("/usr/bin/ffmpeg");
+#elif OSX
+			var ffmpegExecutablePath = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "ffmpeg"));
 #endif
 			ConvertVideos(videoDir, videoOutputDir, ffmpegExecutablePath);
 			GenerateVideosClass(videoDir, videoOutputDir, classOutputDir, ffmpegExecutablePath);
@@ -516,7 +518,7 @@ namespace ContentProcessor
 
 #if WINDOWS
 			var cramInfo = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "cramcli.exe"));
-#elif LINUX
+#elif LINUX || OSX
 			var cramInfo = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "cramcli"));
 #endif
 
@@ -590,7 +592,7 @@ namespace ContentProcessor
 			{
 #if WINDOWS
 				var compressionEncoderInfo = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "bc7enc.exe"));
-#elif LINUX
+#elif LINUX || OSX
 				var compressionEncoderInfo = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "bc7enc"));
 #endif
 

@@ -267,6 +267,7 @@ public static class Operations
 
         Task.Run(() => Parallel.ForEach(AllTrackedDirectories, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (trackedDirectory) =>
         {
+            WriteOutput("Processing: " + trackedDirectory.DirectoryPath);
             ProcessTrackedDir(trackedDirectory);
         }));
     }

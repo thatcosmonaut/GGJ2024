@@ -131,11 +131,11 @@ namespace ContentBuilderUI
 		protected override void Update(System.TimeSpan dt)
 		{
 			var io = ImGui.GetIO();
-			io.MousePos = new System.Numerics.Vector2(Inputs.Mouse.X, Inputs.Mouse.Y);
-			io.MouseDown[0] = Inputs.Mouse.LeftButton.IsDown;
-			io.MouseDown[1] = Inputs.Mouse.RightButton.IsDown;
-			io.MouseDown[2] = Inputs.Mouse.MiddleButton.IsDown;
-			io.MouseWheel = Inputs.Mouse.Wheel; //Inputs.Mouse.Wheel > 0 ? 1 : Inputs.Mouse.Wheel < 0 ? -1 : 0;
+			io.AddMousePosEvent(Inputs.Mouse.X, Inputs.Mouse.Y);
+			io.AddMouseButtonEvent(0, Inputs.Mouse.LeftButton.IsDown);
+			io.AddMouseButtonEvent(1, Inputs.Mouse.RightButton.IsDown);
+			io.AddMouseButtonEvent(2, Inputs.Mouse.MiddleButton.IsDown);
+			io.AddMouseWheelEvent(0f, Inputs.Mouse.Wheel);
 
 			// TODO: set up io.AddKeyEvents for keyboard keys
 
@@ -173,7 +173,7 @@ namespace ContentBuilderUI
 
 			// Style
 			var hover = UIColors.RGB255(73, 46, 46);
-			ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 3);
+			ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 1);
 			ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 3);
 			ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
 			ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new System.Numerics.Vector2(15, 15));
@@ -204,11 +204,11 @@ namespace ContentBuilderUI
 			ImGui.PushStyleColor(ImGuiCol.Border, BoolToColor(ContentPathValid));
 			ImGui.Text(BoolToEmoji(ContentPathValid));
 			ImGui.SameLine();
-			ImGui.PushStyleColor(ImGuiCol.Text, UIColors.Text);
 			if (ImGui.InputText("Unprocessed Content Path", ref unprocessedContentPath, 255))
 			{
 				ContentPathValid = Operations.ValidateSourceContentDirectory(unprocessedContentPath);
 			}
+			ImGui.PopStyleColor(2);
 			#endregion
 
 			#region Project Path
@@ -216,20 +216,18 @@ namespace ContentBuilderUI
 			ImGui.PushStyleColor(ImGuiCol.Border, BoolToColor(ProjectPathValid));
 			ImGui.Text(BoolToEmoji(ProjectPathValid));
 			ImGui.SameLine();
-			ImGui.PushStyleColor(ImGuiCol.Text, UIColors.Text);
 			if (ImGui.InputText("Project Path", ref projectPath, 255))
 			{
 				ProjectPathValid = Operations.ValidateGameProjectDirectory(projectPath);
 			}
+			ImGui.PopStyleColor(2);
 			#endregion
 
 			ImGui.Spacing();
 			ImGui.Spacing();
 
 			#region Buttons
-			ImGui.PushStyleColor(ImGuiCol.Border, UIColors.Border);
-			ImGui.Columns(0, "Buttons", true);
-			ImGui.PushStyleColor(ImGuiCol.Text, UIColors.Text);
+			ImGui.Columns(1, "Buttons", true);
 			if (ContentPathValid && ProjectPathValid)
 			{
 				if (ImGui.Button("Check Content Directories"))
@@ -253,7 +251,6 @@ namespace ContentBuilderUI
 			}
 			else
 			{
-				ImGui.PushStyleColor(ImGuiCol.Text, UIColors.Text);
 				ImGui.Text("Enter Content and Project Paths to continue");
 			}
 
@@ -279,6 +276,8 @@ namespace ContentBuilderUI
 				}
 			}
 
+			ImGui.PopStyleVar(5);
+			ImGui.PopStyleColor(14);
 			ImGui.End();
 			ImGui.EndFrame();
 		}
@@ -309,8 +308,6 @@ namespace ContentBuilderUI
 		private void DrawTrackedDirectory(TrackedDirectory trackedDirectory)
 		{
 			var name = Path.GetFileName(trackedDirectory.DirectoryPath);
-			ImGui.PushStyleColor(ImGuiCol.Text, UIColors.Text);
-			ImGui.PushStyleColor(ImGuiCol.Border, UIColors.Transparent);
 			if (trackedDirectory.BuildStatus != BuildStatus.InProgress)
 			{
 				if (ImGui.Button(name))
