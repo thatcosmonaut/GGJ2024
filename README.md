@@ -1,10 +1,3 @@
-# GGJ20204
+# ROLL AND CASH: GROCERY LORDS
 
-3...2...1... let's jam.
-
-## Developing
-
-- Open the project directory in VSCode
-- Press Ctrl-Shift-B to open the build tasks menu
-- Tasks use .NET 8.0 to build and run
-- Press F5 to build and run step debugger
+A game made in 48 hours for Global Game Jam 2024. Available [on itch.io](https://prophetgoddess.itch.io/roll-and-cash-grocery-lords). 
