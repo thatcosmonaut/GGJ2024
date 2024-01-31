@@ -14,21 +14,11 @@ namespace RollAndCash.Systems;
 
 public class Hold : MoonTools.ECS.System
 {
-	MoonTools.ECS.Filter TryHoldFilter;
 	MoonTools.ECS.Filter CanHoldFilter;
-	MoonTools.ECS.Filter CanBeHeldFilter;
-	float HoldSpeed = 300.0f;
 	Product Product;
 
 	public Hold(World world) : base(world)
 	{
-		TryHoldFilter =
-			FilterBuilder
-			.Include<Rectangle>()
-			.Include<Position>()
-			.Include<CanHold>()
-			.Include<TryHold>()
-			.Build();
 
 		CanHoldFilter =
 			FilterBuilder
@@ -36,9 +26,6 @@ public class Hold : MoonTools.ECS.System
 			.Include<Position>()
 			.Include<CanHold>()
 			.Build();
-
-		CanBeHeldFilter =
-			FilterBuilder.Include<CanBeHeld>().Build();
 
 		Product = new Product(world);
 	}
