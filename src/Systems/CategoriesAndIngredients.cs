@@ -50,7 +50,6 @@ public class CategoriesAndIngredients : Manipulator
     const float MaxPriceDelta = 10.0f;
     MoonTools.ECS.Filter IngredientFilter;
 
-
     public CategoriesAndIngredients(World world) : base(world)
     {
         IngredientFilter = FilterBuilder.Include<Ingredient>().Build();
@@ -97,6 +96,33 @@ public class CategoriesAndIngredients : Manipulator
             "ip" => Category.IntellectualProperty,
             "pharmacy" => Category.Pharmacy,
             "relics" => Category.Relics
+        };
+    }
+
+    public static string GetDisplayName(Ingredient ingredient)
+    {
+        return ingredient switch
+        {
+            Ingredient.Ectoplasm => "Ectoplasm",
+            Ingredient.Silicon => "Silicon",
+            Ingredient.Blueberry => "Blueberry",
+            Ingredient.Gems => "Gems",
+            Ingredient.Fungus => "Fungus",
+            Ingredient.Elastic => "Elastic",
+            Ingredient.Carbon => "Carbon",
+            Ingredient.Mint => "Mint",
+            Ingredient.Milk => "Milk",
+            Ingredient.Bones => "Bones",
+            Ingredient.Spirits => "Spirits (Supernatural)",
+            Ingredient.Booze => "Spirits (Booze)",
+            Ingredient.Kelp => "Kelp",
+            Ingredient.Microplastics => "Microplastics",
+            Ingredient.Glass => "Glass Shards",
+            Ingredient.Helium => "Helium",
+            Ingredient.Shrimp => "Brine Shrimp",
+            Ingredient.Uranium => "Uranium",
+            Ingredient.Gold => "Gold",
+            Ingredient.Oatmeal => "Oatmeal"
         };
     }
 

@@ -191,7 +191,7 @@ public class Hold : MoonTools.ECS.System
 
 		foreach (var ingredient in OutRelations<HasIngredient>(product))
 		{
-			var ingredientString = Get<Ingredient>(ingredient).ToString();
+			var ingredientString = CategoriesAndIngredients.GetDisplayName(Get<Ingredient>(ingredient));
 			var ingredientPriceString = "$" + Get<Price>(ingredient).Value.ToString("F2");
 
 			var ingredientName = CreateEntity();
