@@ -21,6 +21,16 @@ namespace RollAndCash
 
 			AppDomain.CurrentDomain.UnhandledException += HandleUnhandledException;
 
+#if DEBUG
+			WindowCreateInfo windowCreateInfo = new WindowCreateInfo
+			{
+				WindowWidth = 1280,
+				WindowHeight = 720,
+				WindowTitle = "ROLL AND CASH: GROCERY LORDS: A LONDON JERRY STORY",
+				ScreenMode = ScreenMode.Windowed,
+				PresentMode = PresentMode.Immediate
+			};
+#else
 			WindowCreateInfo windowCreateInfo = new WindowCreateInfo
 			{
 				WindowWidth = 1280,
@@ -29,6 +39,7 @@ namespace RollAndCash
 				ScreenMode = ScreenMode.Fullscreen,
 				PresentMode = PresentMode.Immediate
 			};
+#endif
 
 			FrameLimiterSettings frameLimiterSettings = new FrameLimiterSettings
 			{
