@@ -14,6 +14,11 @@ public class NPCController : MoonTools.ECS.System
     MoonTools.ECS.Filter NPCFilter;
     const float NPCSpeed = 64.0f;
     const float PickUpChance = 0.5f;
+    const float MinSpawnTime = 3.0f;
+    const float MaxSpawnTime = 10.0f;
+    const float MinTimeInStore = 5.0f;
+    const float LeaveStoreChance = 0.66f;
+    const int MaxNPCs = 4;
 
     Vector2[] Directions = new[]
     {
@@ -24,8 +29,7 @@ public class NPCController : MoonTools.ECS.System
         Vector2.UnitX + Vector2.UnitY,
         Vector2.UnitX - Vector2.UnitY,
         -Vector2.UnitX + Vector2.UnitY,
-        -Vector2.UnitX - Vector2.UnitY,
-        Vector2.Zero
+        -Vector2.UnitX - Vector2.UnitY
     };
 
     public NPCController(World world) : base(world)
@@ -44,7 +48,7 @@ public class NPCController : MoonTools.ECS.System
     public Entity SpawnNPC()
     {
         var NPC = World.CreateEntity();
-        Set(NPC, new Position(Dimensions.GAME_W * 0.5f, Dimensions.GAME_H * 0.33f));
+        Set(NPC, new Position(Dimensions.GAME_W * 0.5f, Dimensions.GAME_H * 0.25f));
         Set(NPC, new SpriteAnimation(Content.SpriteAnimations.NPC_Bizazss_Walk_Down, 0));
         Set(NPC, new Rectangle(-8, -8, 16, 16));
         Set(NPC, new CanInteract());
@@ -66,12 +70,9 @@ public class NPCController : MoonTools.ECS.System
             Content.SpriteAnimations.NPC_Bizazss_Walk_UpLeft.ID
         ));
 
-        var wallDetector = World.CreateEntity();
-        Set(wallDetector, Get<Position>(NPC) + Get<LastDirection>(NPC).Direction * NPCSpeed * 0.5f);
-        Set(wallDetector, new Rectangle(0, 0, 1, 1));
-        Set(wallDetector, new CanInteract());
-
-        Relate(NPC, wallDetector, new HasWallDetector());
+        var timer = CreateEntity();
+        Set(timer, new Timer(MinTimeInStore));
+        Relate(NPC, timer, new CantLeaveStore());
 
         return NPC;
     }
@@ -79,7 +80,23 @@ public class NPCController : MoonTools.ECS.System
     public override void Update(TimeSpan delta)
     {
         if (Some<IsTitleScreen>())
+        {
+            foreach (var npc in NPCFilter.Entities)
+            {
+                Destroy(npc);
+            }
             return;
+        }
+
+        if (!Some<DontSpawnNPCs>() && NPCFilter.Count < MaxNPCs)
+        {
+            SpawnNPC();
+
+            var time = Rando.Range(MinSpawnTime, MaxSpawnTime);
+            var timer = CreateEntity();
+            Set(timer, new DontSpawnNPCs());
+            Set(timer, new Timer(time));
+        }
 
         float deltaTime = (float)delta.TotalSeconds;
 
@@ -101,9 +118,11 @@ public class NPCController : MoonTools.ECS.System
                 UnrelateAll<ConsideredProduct>(entity);
             }
 
-            if (!HasOutRelation<Holding>(entity))
+            bool destroyed = false;
+
+            foreach (var other in OutRelations<Colliding>(entity))
             {
-                foreach (var other in OutRelations<Colliding>(entity))
+                if (!HasOutRelation<Holding>(entity))
                 {
                     if (Has<CanBeHeld>(other) && !Related<ConsideredProduct>(entity, other))
                     {
@@ -116,17 +135,30 @@ public class NPCController : MoonTools.ECS.System
                         Relate(entity, other, new ConsideredProduct());
                     }
                 }
+
+                if (Has<StoreExit>(other) && !HasOutRelation<CantLeaveStore>(entity) && Rando.Value <= LeaveStoreChance)
+                {
+                    destroyed = true;
+                    if (HasOutRelation<Holding>(entity))
+                        Destroy(OutRelationSingleton<Holding>(entity));
+
+                    Destroy(entity);
+                }
             }
-            else
+
+            if (!destroyed)
             {
-                UnrelateAll<BelongsToProductSpawner>(OutRelationSingleton<Holding>(entity));
+                if (HasOutRelation<Holding>(entity))
+                {
+                    UnrelateAll<BelongsToProductSpawner>(OutRelationSingleton<Holding>(entity));
+                }
+
+                Set(entity, new Velocity(direction * NPCSpeed));
+                Set(entity, new LastDirection(direction));
+
+                var depth = MathHelper.Lerp(100, 10, Get<Position>(entity).Y / (float)Dimensions.GAME_H);
+                Set(entity, new Depth(depth));
             }
-
-            Set(entity, new Velocity(direction * NPCSpeed));
-            Set(entity, new LastDirection(direction));
-
-            var depth = MathHelper.Lerp(100, 10, Get<Position>(entity).Y / (float)Dimensions.GAME_H);
-            Set(entity, new Depth(depth));
         }
     }
 }

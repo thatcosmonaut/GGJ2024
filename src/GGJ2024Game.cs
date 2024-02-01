@@ -141,6 +141,12 @@ namespace RollAndCash
 			World.Set(cashRegister, new CanFillOrders());
 			World.Set(cashRegister, Color.ForestGreen);
 
+			var exit = World.CreateEntity();
+			World.Set(exit, new Position(Dimensions.GAME_W * 0.5f - 44, 0));
+			World.Set(exit, new Rectangle(0, 0, 88, 88));
+			World.Set(exit, new StoreExit());
+			World.Set(exit, new CanInteract());
+
 			var timer = World.CreateEntity();
 			World.Set(timer, new Components.GameTimer(90));
 			World.Set(timer, new Position(Dimensions.GAME_W - 40, 38));

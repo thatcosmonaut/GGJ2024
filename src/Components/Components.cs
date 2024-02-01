@@ -61,3 +61,5 @@ public readonly record struct DirectionalSprites(
     );
 
 public readonly record struct CanTalk();
+public readonly record struct DontSpawnNPCs();
+public readonly record struct StoreExit();
