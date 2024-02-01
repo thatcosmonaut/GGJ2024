@@ -28,6 +28,7 @@ namespace RollAndCash
 		Timing Timing;
 		Orders Orders;
 		SetSpriteAnimationSystem SetSpriteAnimationSystem;
+		DirectionalAnimation DirectionalAnimation;
 		UpdateSpriteAnimationSystem UpdateSpriteAnimationSystem;
 		ColorAnimation ColorAnimation;
 
@@ -69,6 +70,7 @@ namespace RollAndCash
 			SetSpriteAnimationSystem = new SetSpriteAnimationSystem(World);
 			UpdateSpriteAnimationSystem = new UpdateSpriteAnimationSystem(World);
 			ColorAnimation = new ColorAnimation(World);
+			DirectionalAnimation = new DirectionalAnimation(World);
 
 			CategoriesAndIngredients cats = new CategoriesAndIngredients(World);
 			cats.Initialize(World);
@@ -177,6 +179,7 @@ namespace RollAndCash
 			Motion.Update(dt);
 			Hold.Update(dt);
 			Orders.Update(dt);
+			DirectionalAnimation.Update(dt);
 			SetSpriteAnimationSystem.Update(dt);
 			ColorAnimation.Update(dt);
 			Audio.Update(dt);

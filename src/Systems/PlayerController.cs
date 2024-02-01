@@ -43,6 +43,17 @@ public class PlayerController : MoonTools.ECS.System
 		World.Set(player, new Velocity(Vector2.Zero));
 		World.Set(player, new LastDirection(Vector2.Zero));
 		World.Set(player, new InputState());
+		World.Set(player, new Direction(Vector2.Zero));
+		World.Set(player, new DirectionalSprites(
+			index == 0 ? Content.SpriteAnimations.Char_Walk_Up.ID : Content.SpriteAnimations.Char2_Walk_Up.ID,
+			index == 0 ? Content.SpriteAnimations.Char_Walk_UpRight.ID : Content.SpriteAnimations.Char2_Walk_UpRight.ID,
+			index == 0 ? Content.SpriteAnimations.Char_Walk_Right.ID : Content.SpriteAnimations.Char2_Walk_Right.ID,
+			index == 0 ? Content.SpriteAnimations.Char_Walk_DownRight.ID : Content.SpriteAnimations.Char2_Walk_DownRight.ID,
+			index == 0 ? Content.SpriteAnimations.Char_Walk_Down.ID : Content.SpriteAnimations.Char2_Walk_Down.ID,
+			index == 0 ? Content.SpriteAnimations.Char_Walk_DownLeft.ID : Content.SpriteAnimations.Char2_Walk_DownLeft.ID,
+			index == 0 ? Content.SpriteAnimations.Char_Walk_Left.ID : Content.SpriteAnimations.Char2_Walk_Left.ID,
+			index == 0 ? Content.SpriteAnimations.Char_Walk_UpLeft.ID : Content.SpriteAnimations.Char2_Walk_UpLeft.ID
+		));
 
 		return player;
 	}
@@ -80,6 +91,8 @@ public class PlayerController : MoonTools.ECS.System
 			}
 			#endregion
 
+			Set(entity, new Direction(direction));
+
 			if (inputState.Interact.IsPressed)
 			{
 				Set(entity, new TryHold());
@@ -106,6 +119,13 @@ public class PlayerController : MoonTools.ECS.System
 			}
 
 			var maxSpeed = Get<MaxSpeed>(entity).Value;
+
+			// limit max speed
+			if (velocity.Length() > maxSpeed)
+			{
+				velocity = Vector2.Normalize(velocity) * maxSpeed;
+			}
+
 			if (direction.LengthSquared() > 0)
 			{
 				var dot = Vector2.Dot(Vector2.Normalize(direction), Vector2.Normalize(Get<LastDirection>(entity).Direction));
@@ -142,96 +162,17 @@ public class PlayerController : MoonTools.ECS.System
 				Set(entity, new MaxSpeed(MaxSpeedBase));
 			}
 
-			#region Animation
-			SpriteAnimationInfo animation;
+			// #region walking sfx
+			// if (!HasOutRelation<TimingFootstepAudio>(entity) && framerate > 0)
+			// {
+			// 	PlayRandomFootstep();
 
-			if (direction.X > 0)
-			{
-				if (direction.Y > 0)
-				{
-					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_DownRight : Content.SpriteAnimations.Char2_Walk_DownRight;
-				}
-				else if (direction.Y < 0)
-				{
-					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_UpRight : Content.SpriteAnimations.Char2_Walk_UpRight;
-				}
-				else
-				{
-					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_Right : Content.SpriteAnimations.Char2_Walk_Right;
-				}
-			}
-			else if (direction.X < 0)
-			{
-				if (direction.Y > 0)
-				{
-					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_DownLeft : Content.SpriteAnimations.Char2_Walk_DownLeft;
-				}
-				else if (direction.Y < 0)
-				{
-					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_UpLeft : Content.SpriteAnimations.Char2_Walk_UpLeft;
-				}
-				else
-				{
-					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_Left : Content.SpriteAnimations.Char2_Walk_Left;
-				}
-			}
-			else
-			{
-				if (direction.Y > 0)
-				{
-					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_Down : Content.SpriteAnimations.Char2_Walk_Down;
-				}
-				else if (direction.Y < 0)
-				{
-					animation = playerIndex == 0 ? Content.SpriteAnimations.Char_Walk_Up : Content.SpriteAnimations.Char2_Walk_Up;
-				}
-				else
-				{
-					animation = Get<SpriteAnimation>(entity).SpriteAnimationInfo;
-				}
-			}
-			#endregion
-
-			// limit max speed
-			if (velocity.Length() > maxSpeed)
-			{
-				velocity = Vector2.Normalize(velocity) * maxSpeed;
-			}
-
-			int framerate = (int)(velocity.Length() / 20f);
-			if (Has<FunnyRunTimer>(entity))
-			{
-				framerate = 25;
-			}
-
-			if (direction.LengthSquared() > 0)
-			{
-				Send(new SetAnimationMessage(
-					entity,
-					new SpriteAnimation(animation, framerate, true)
-				));
-			}
-			else
-			{
-				framerate = 0;
-				Send(new SetAnimationMessage(
-					entity,
-					new SpriteAnimation(animation, 0, true, 0),
-					true
-				));
-			}
-
-			#region walking sfx
-			if (!HasOutRelation<TimingFootstepAudio>(entity) && framerate > 0)
-			{
-				PlayRandomFootstep();
-
-				var footstepTimer = World.CreateEntity();
-				var footstepDuration = Math.Clamp(1f - (framerate / 50f), .5f, 1f);
-				Set(footstepTimer, new Timer(footstepDuration));
-				World.Relate(entity, footstepTimer, new TimingFootstepAudio());
-			}
-			#endregion
+			// 	var footstepTimer = World.CreateEntity();
+			// 	var footstepDuration = Math.Clamp(1f - (framerate / 50f), .5f, 1f);
+			// 	Set(footstepTimer, new Timer(footstepDuration));
+			// 	World.Relate(entity, footstepTimer, new TimingFootstepAudio());
+			// }
+			// #endregion
 
 			Set(entity, new Velocity(velocity));
 			var depth = MathHelper.Lerp(100, 10, Get<Position>(entity).Y / (float)Dimensions.GAME_H);

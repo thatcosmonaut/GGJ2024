@@ -1,6 +1,7 @@
 using MoonWorks.Math.Float;
 using MoonWorks.Graphics;
 using RollAndCash.Systems;
+using RollAndCash.Data;
 
 namespace RollAndCash.Components;
 
@@ -47,3 +48,16 @@ public readonly record struct FallSpeed(float Speed);
 public readonly record struct DestroyAtScreenBottom();
 
 public readonly record struct IsTitleScreen(); // bleeeh
+
+public readonly record struct Direction(Vector2 Value);
+
+public readonly record struct DirectionalSprites(
+    SpriteAnimationInfoID Up,
+    SpriteAnimationInfoID UpRight,
+    SpriteAnimationInfoID Right,
+    SpriteAnimationInfoID DownRight,
+    SpriteAnimationInfoID Down,
+    SpriteAnimationInfoID DownLeft,
+    SpriteAnimationInfoID Left,
+    SpriteAnimationInfoID UpLeft
+    );
