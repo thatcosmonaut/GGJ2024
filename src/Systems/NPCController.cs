@@ -23,7 +23,7 @@ public class NPCController : MoonTools.ECS.System
     const float MaxSpawnTime = 10.0f;
     const float MinTimeInStore = 5.0f;
     const float LeaveStoreChance = 0.66f;
-    const float TalkTime = 3.0f;
+    const float TalkTime = 5.0f;
     const int MaxTextWidth = 160;
     const int MaxNPCs = 4;
 
@@ -250,8 +250,8 @@ public class NPCController : MoonTools.ECS.System
                 foreach (var popup in OutRelations<ShowingPopup>(entity))
                 {
                     var timer = Get<Timer>(popup);
-                    System.Console.WriteLine(timer.Remaining);
-                    Set(popup, new ColorBlend(new Color(1.0f, 1.0f, 1.0f, timer.Remaining)));
+                    float t = Easing.OutExpo(timer.Remaining);
+                    Set(popup, new ColorBlend(new Color(t, t, t, t)));
                 }
             }
 
