@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
 using MoonWorks.Math;
@@ -23,6 +24,7 @@ public class NPCController : MoonTools.ECS.System
     const float MinTimeInStore = 5.0f;
     const float LeaveStoreChance = 0.66f;
     const float TalkTime = 3.0f;
+    const int MaxTextWidth = 160;
     const int MaxNPCs = 4;
 
     string[] Dialogue;
@@ -126,51 +128,75 @@ public class NPCController : MoonTools.ECS.System
         var font = Fonts.FromID(Fonts.KosugiID);
         var position = Get<Position>(entity);
 
-
         var xOffset = position.X < Dimensions.GAME_W * 3 / 4 ? 10 : -100;
         var yOffset = position.Y > Dimensions.GAME_H * 3 / 4 ? -100 : -30;
 
-        var backgroundRect = CreateEntity();
-        Set(backgroundRect, position + new Position(xOffset - 5, yOffset - 5));
-        Set(backgroundRect, new DrawAsRectangle());
-        Set(backgroundRect, new Depth(8 - index * 4));
-        Set(backgroundRect, new IsPopupBox());
-        Set(backgroundRect, new Timer(3.0f));
+        // var backgroundRect = CreateEntity();
+        // Set(backgroundRect, position + new Position(xOffset - 5, yOffset - 5));
+        // Set(backgroundRect, new DrawAsRectangle());
+        // Set(backgroundRect, new Depth(8 - index * 4));
+        // Set(backgroundRect, new IsPopupBox());
+        // Set(backgroundRect, new Timer(3.0f));
 
-        if (playerIndex == 0)
+        // if (playerIndex == 0)
+        // {
+        //     Set(backgroundRect, new ColorBlend(Color.DarkGreen));
+        // }
+        // else
+        // {
+        //     Set(backgroundRect, new ColorBlend(new Color(0, 52, 139)));
+        // }
+
+        // Relate(entity, backgroundRect, new ShowingPopup());
+
+
+        var dialogue = Dialogue[DialogueIndex].Split(' ');
+        var builder = new StringBuilder();
+
+        foreach (var word in dialogue)
         {
-            Set(backgroundRect, new ColorBlend(Color.DarkGreen));
+            builder.Append(word);
+            builder.Append(" ");
+            font.TextBounds(
+                builder.ToString(),
+                10,
+                MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+                MoonWorks.Graphics.Font.VerticalAlignment.Top,
+                out var testBounds
+            );
+            if (testBounds.W > MaxTextWidth)
+            {
+                var builderIndex = builder.Length - (word.Length + 1);
+                builder.Remove(builderIndex, word.Length + 1);
+
+                var text = CreateEntity();
+                Set(text, position + new Position(xOffset, yOffset));
+                Set(text, new Text(Fonts.KosugiID, 10, TextStorage.GetID(builder.ToString()), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
+                Set(text, new TextDropShadow(1, 1));
+                Set(text, new Depth(6 - index * 4));
+                Set(text, new Timer(TalkTime));
+                Relate(entity, text, new ShowingPopup());
+                yOffset += 15;
+                builder.Clear();
+                builder.Append(word);
+                builder.Append(" ");
+            }
         }
-        else
+
+        if (builder.Length > 0)
         {
-            Set(backgroundRect, new ColorBlend(new Color(0, 52, 139)));
+            var text = CreateEntity();
+            Set(text, position + new Position(xOffset, yOffset));
+            Set(text, new Text(Fonts.KosugiID, 10, TextStorage.GetID(builder.ToString()), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
+            Set(text, new TextDropShadow(1, 1));
+            Set(text, new Depth(6 - index * 4));
+            Set(text, new Timer(TalkTime));
+            Relate(entity, text, new ShowingPopup());
         }
 
-        Relate(entity, backgroundRect, new ShowingPopup());
 
-        var text = CreateEntity();
-        var dialogue = Dialogue[DialogueIndex];
-        Set(text, position + new Position(xOffset, yOffset));
-        Set(text, new Text(Fonts.KosugiID, 10, TextStorage.GetID(dialogue), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
-        Set(text, new TextDropShadow(1, 1));
-        Set(text, new Depth(6 - index * 4));
-        Set(text, new Timer(TalkTime));
         DialogueIndex++;
         DialogueIndex = DialogueIndex % Dialogue.Length;
-
-        Relate(entity, text, new ShowingPopup());
-
-        font.TextBounds(
-            dialogue,
-            10,
-            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
-            MoonWorks.Graphics.Font.VerticalAlignment.Top,
-            out var textBounds
-        );
-
-        var textBoundsRectangle = TextRectangle(textBounds, new Position(xOffset - 5, yOffset - 5));
-        textBoundsRectangle.Inflate(5, 5);
-        Set(backgroundRect, new Rectangle(0, 0, textBoundsRectangle.Width, textBoundsRectangle.Height));
 
         var timer = CreateEntity();
         Set(timer, new Timer(TalkTime));
