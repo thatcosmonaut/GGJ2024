@@ -7,6 +7,7 @@ using MoonWorks;
 using MoonWorks.Graphics;
 using MoonWorks.Graphics.Font;
 using MoonWorks.Math.Float;
+using System;
 
 namespace RollAndCash;
 
@@ -163,7 +164,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
 				var str = Data.TextStorage.GetString(text.TextID);
 				var font = Fonts.FromID(text.FontID);
-				var color = Color.White;
+				var color = Has<Color>(entity) ? Get<Color>(entity) : Color.White;
 				var depth = -1f;
 
 				if (Has<ColorBlend>(entity))
@@ -189,7 +190,7 @@ public class Renderer : MoonTools.ECS.Renderer
 					dropShadowBatch.Add(
 						str,
 						text.Size,
-						Color.Black,
+						new Color(0, 0, 0, color.A),
 						text.HorizontalAlignment,
 						text.VerticalAlignment
 					);

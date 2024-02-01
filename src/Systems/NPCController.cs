@@ -131,25 +131,6 @@ public class NPCController : MoonTools.ECS.System
         var xOffset = position.X < Dimensions.GAME_W * 3 / 4 ? 10 : -100;
         var yOffset = position.Y > Dimensions.GAME_H * 3 / 4 ? -100 : -30;
 
-        // var backgroundRect = CreateEntity();
-        // Set(backgroundRect, position + new Position(xOffset - 5, yOffset - 5));
-        // Set(backgroundRect, new DrawAsRectangle());
-        // Set(backgroundRect, new Depth(8 - index * 4));
-        // Set(backgroundRect, new IsPopupBox());
-        // Set(backgroundRect, new Timer(3.0f));
-
-        // if (playerIndex == 0)
-        // {
-        //     Set(backgroundRect, new ColorBlend(Color.DarkGreen));
-        // }
-        // else
-        // {
-        //     Set(backgroundRect, new ColorBlend(new Color(0, 52, 139)));
-        // }
-
-        // Relate(entity, backgroundRect, new ShowingPopup());
-
-
         var dialogue = Dialogue[DialogueIndex].Split(' ');
         var builder = new StringBuilder();
 
@@ -264,6 +245,16 @@ public class NPCController : MoonTools.ECS.System
                 UnrelateAll<ConsideredProduct>(entity);
             }
 
+            if (HasOutRelation<ShowingPopup>(entity))
+            {
+                foreach (var popup in OutRelations<ShowingPopup>(entity))
+                {
+                    var timer = Get<Timer>(popup);
+                    System.Console.WriteLine(timer.Remaining);
+                    Set(popup, new ColorBlend(new Color(1.0f, 1.0f, 1.0f, timer.Remaining)));
+                }
+            }
+
             bool destroyed = false;
 
             foreach (var other in OutRelations<Colliding>(entity))
@@ -272,7 +263,6 @@ public class NPCController : MoonTools.ECS.System
                 {
                     if (Has<CanBeHeld>(other) && !Related<ConsideredProduct>(entity, other))
                     {
-                        System.Console.WriteLine(TextStorage.GetString(Get<Name>(other).TextID));
                         if (Rando.Value <= PickUpChance)
                         {
                             Set(entity, new TryHold());
