@@ -110,13 +110,16 @@ public class NPCController : MoonTools.ECS.System
                         System.Console.WriteLine(TextStorage.GetString(Get<Name>(other).TextID));
                         if (Rando.Value <= PickUpChance)
                         {
-                            System.Console.WriteLine("Pick up item");
                             Set(entity, new TryHold());
                         }
 
                         Relate(entity, other, new ConsideredProduct());
                     }
                 }
+            }
+            else
+            {
+                UnrelateAll<BelongsToProductSpawner>(OutRelationSingleton<Holding>(entity));
             }
 
             Set(entity, new Velocity(direction * NPCSpeed));
