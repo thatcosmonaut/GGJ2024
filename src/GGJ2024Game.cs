@@ -143,7 +143,7 @@ namespace RollAndCash
 
 			var exit = World.CreateEntity();
 			World.Set(exit, new Position(Dimensions.GAME_W * 0.5f - 44, 0));
-			World.Set(exit, new Rectangle(0, 0, 88, 88));
+			World.Set(exit, new Rectangle(0, 0, 80, 88));
 			World.Set(exit, new StoreExit());
 			World.Set(exit, new CanInteract());
 

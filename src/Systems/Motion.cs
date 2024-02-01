@@ -256,6 +256,7 @@ public class Motion : MoonTools.ECS.System
 
         foreach (var entity in SolidFilter.Entities)
         {
+            UnrelateAll<TouchingSolid>(entity);
             var position = Get<Position>(entity);
             var rectangle = Get<Rectangle>(entity);
 
@@ -269,18 +270,28 @@ public class Motion : MoonTools.ECS.System
             var upRectangle = GetWorldRect(upPos, rectangle);
             var downRectangle = GetWorldRect(downPos, rectangle);
 
-            var (_, leftCollided) = CheckSolidCollision(entity, leftRectangle);
-            var (_, rightCollided) = CheckSolidCollision(entity, rightRectangle);
-            var (_, upCollided) = CheckSolidCollision(entity, upRectangle);
-            var (_, downCollided) = CheckSolidCollision(entity, downRectangle);
+            var (leftOther, leftCollided) = CheckSolidCollision(entity, leftRectangle);
+            var (rightOther, rightCollided) = CheckSolidCollision(entity, rightRectangle);
+            var (upOther, upCollided) = CheckSolidCollision(entity, upRectangle);
+            var (downOther, downCollided) = CheckSolidCollision(entity, downRectangle);
 
-            if (leftCollided || rightCollided || upCollided || downCollided)
+            if (leftCollided)
             {
-                Set(entity, new TouchingSolid());
+                Relate(entity, leftOther, new TouchingSolid());
             }
-            else
+
+            if (rightCollided)
             {
-                Remove<TouchingSolid>(entity);
+                Relate(entity, rightOther, new TouchingSolid());
+            }
+
+            if (upCollided)
+            {
+                Relate(entity, upOther, new TouchingSolid());
+            }
+            if (downCollided)
+            {
+                Relate(entity, downOther, new TouchingSolid());
             }
         }
     }

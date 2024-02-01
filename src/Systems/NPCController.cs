@@ -1,9 +1,13 @@
 using System;
+using System.IO;
 using MoonTools.ECS;
+using MoonWorks.Graphics;
 using MoonWorks.Math;
 using MoonWorks.Math.Float;
 using RollAndCash.Components;
+using RollAndCash.Content;
 using RollAndCash.Data;
+using RollAndCash.Messages;
 using RollAndCash.Relations;
 using RollAndCash.Utility;
 
@@ -18,7 +22,11 @@ public class NPCController : MoonTools.ECS.System
     const float MaxSpawnTime = 10.0f;
     const float MinTimeInStore = 5.0f;
     const float LeaveStoreChance = 0.66f;
+    const float TalkTime = 3.0f;
     const int MaxNPCs = 4;
+
+    string[] Dialogue;
+    int DialogueIndex = 0;
 
     Vector2[] Directions = new[]
     {
@@ -44,6 +52,16 @@ public class NPCController : MoonTools.ECS.System
             .Exclude<Player>()
             .Include<DirectionalSprites>()
             .Build();
+
+        var dialogueFilePath = Path.Combine(
+            System.AppContext.BaseDirectory,
+            "Content",
+            "Data",
+            "dialogue"
+        );
+
+        Dialogue = File.ReadAllLines(dialogueFilePath);
+        Dialogue.Shuffle();
     }
     public Entity SpawnNPC()
     {
@@ -77,6 +95,93 @@ public class NPCController : MoonTools.ECS.System
         return NPC;
     }
 
+    public void Talk(Entity entity, Entity player)
+    {
+        if (HasOutRelation<CantTalk>(entity))
+            return;
+
+        var playerIndex = Get<Player>(player).Index;
+        Send(new PlayStaticSoundMessage(StaticAudio.BubbleOpen, 0.5f));
+
+        var index = 0;
+        if (Some<IsPopupBox>())
+        {
+            // jank to push old boxes farther back
+            foreach (var (_, uiElement) in Relations<ShowingPopup>())
+            {
+                if (Has<IsPopupBox>(uiElement))
+                {
+                    Set(uiElement, new Depth(8));
+                }
+                else
+                {
+                    Set(uiElement, new Depth(6));
+                }
+            }
+
+            // newly created popups will draw on top of older ones
+            index = 1;
+        }
+
+        var font = Fonts.FromID(Fonts.KosugiID);
+        var position = Get<Position>(entity);
+
+
+        var xOffset = position.X < Dimensions.GAME_W * 3 / 4 ? 10 : -100;
+        var yOffset = position.Y > Dimensions.GAME_H * 3 / 4 ? -100 : -30;
+
+        var backgroundRect = CreateEntity();
+        Set(backgroundRect, position + new Position(xOffset - 5, yOffset - 5));
+        Set(backgroundRect, new DrawAsRectangle());
+        Set(backgroundRect, new Depth(8 - index * 4));
+        Set(backgroundRect, new IsPopupBox());
+        Set(backgroundRect, new Timer(3.0f));
+
+        if (playerIndex == 0)
+        {
+            Set(backgroundRect, new ColorBlend(Color.DarkGreen));
+        }
+        else
+        {
+            Set(backgroundRect, new ColorBlend(new Color(0, 52, 139)));
+        }
+
+        Relate(entity, backgroundRect, new ShowingPopup());
+
+        var text = CreateEntity();
+        var dialogue = Dialogue[DialogueIndex];
+        Set(text, position + new Position(xOffset, yOffset));
+        Set(text, new Text(Fonts.KosugiID, 10, TextStorage.GetID(dialogue), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
+        Set(text, new TextDropShadow(1, 1));
+        Set(text, new Depth(6 - index * 4));
+        Set(text, new Timer(TalkTime));
+        DialogueIndex++;
+        DialogueIndex = DialogueIndex % Dialogue.Length;
+
+        Relate(entity, text, new ShowingPopup());
+
+        font.TextBounds(
+            dialogue,
+            10,
+            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+            MoonWorks.Graphics.Font.VerticalAlignment.Top,
+            out var textBounds
+        );
+
+        var textBoundsRectangle = TextRectangle(textBounds, new Position(xOffset - 5, yOffset - 5));
+        textBoundsRectangle.Inflate(5, 5);
+        Set(backgroundRect, new Rectangle(0, 0, textBoundsRectangle.Width, textBoundsRectangle.Height));
+
+        var timer = CreateEntity();
+        Set(timer, new Timer(TalkTime));
+        Relate(entity, timer, new CantTalk());
+    }
+
+    private static Rectangle TextRectangle(WellspringCS.Wellspring.Rectangle textBounds, Position position)
+    {
+        return new Rectangle((int)textBounds.X + position.X, (int)textBounds.Y + position.Y, (int)textBounds.W, (int)textBounds.H);
+    }
+
     public override void Update(TimeSpan delta)
     {
         if (Some<IsTitleScreen>())
@@ -108,9 +213,24 @@ public class NPCController : MoonTools.ECS.System
             if (Has<TryHold>(entity))
                 Remove<TryHold>(entity);
 
-            if (Has<TouchingSolid>(entity))
+            if (HasOutRelation<TouchingSolid>(entity) || HasInRelation<TouchingSolid>(entity))
             {
                 direction = Vector2.Normalize(Directions.GetRandomItem());
+
+                foreach (var other in OutRelations<TouchingSolid>(entity))
+                {
+                    if (Has<Player>(other))
+                    {
+                        Talk(entity, other);
+                    }
+                }
+                foreach (var other in InRelations<TouchingSolid>(entity))
+                {
+                    if (Has<Player>(other))
+                    {
+                        Talk(entity, other);
+                    }
+                }
             }
 
             if (!HasOutRelation<Colliding>(entity))
