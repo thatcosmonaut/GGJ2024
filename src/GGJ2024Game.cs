@@ -31,6 +31,7 @@ namespace RollAndCash
 		DirectionalAnimation DirectionalAnimation;
 		UpdateSpriteAnimationSystem UpdateSpriteAnimationSystem;
 		ColorAnimation ColorAnimation;
+		NPCController NPCController;
 
 		PlayerController PlayerController;
 
@@ -71,6 +72,9 @@ namespace RollAndCash
 			UpdateSpriteAnimationSystem = new UpdateSpriteAnimationSystem(World);
 			ColorAnimation = new ColorAnimation(World);
 			DirectionalAnimation = new DirectionalAnimation(World);
+			NPCController = new NPCController(World);
+
+			NPCController.SpawnNPC();
 
 			CategoriesAndIngredients cats = new CategoriesAndIngredients(World);
 			cats.Initialize(World);
@@ -137,12 +141,6 @@ namespace RollAndCash
 			World.Set(cashRegister, new CanFillOrders());
 			World.Set(cashRegister, Color.ForestGreen);
 
-			var ordersKiosk = World.CreateEntity();
-			World.Set(ordersKiosk, new Position(Dimensions.GAME_W - 32, Dimensions.GAME_H - 32));
-			World.Set(ordersKiosk, new Rectangle(0, 0, 32, 32));
-			World.Set(ordersKiosk, new CanGiveOrders());
-			World.Set(ordersKiosk, Color.Orange);
-
 			var timer = World.CreateEntity();
 			World.Set(timer, new Components.GameTimer(90));
 			World.Set(timer, new Position(Dimensions.GAME_W - 40, 38));
@@ -176,6 +174,7 @@ namespace RollAndCash
 			Ticker.Update(dt);
 			Input.Update(dt);
 			PlayerController.Update(dt);
+			NPCController.Update(dt);
 			Motion.Update(dt);
 			Hold.Update(dt);
 			Orders.Update(dt);

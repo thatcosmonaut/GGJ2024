@@ -49,8 +49,6 @@ public readonly record struct DestroyAtScreenBottom();
 
 public readonly record struct IsTitleScreen(); // bleeeh
 
-public readonly record struct Direction(Vector2 Value);
-
 public readonly record struct DirectionalSprites(
     SpriteAnimationInfoID Up,
     SpriteAnimationInfoID UpRight,
@@ -61,3 +59,5 @@ public readonly record struct DirectionalSprites(
     SpriteAnimationInfoID Left,
     SpriteAnimationInfoID UpLeft
     );
+
+public readonly record struct CanTalk();

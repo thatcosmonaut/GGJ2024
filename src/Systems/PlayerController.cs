@@ -43,7 +43,6 @@ public class PlayerController : MoonTools.ECS.System
 		World.Set(player, new Velocity(Vector2.Zero));
 		World.Set(player, new LastDirection(Vector2.Zero));
 		World.Set(player, new InputState());
-		World.Set(player, new Direction(Vector2.Zero));
 		World.Set(player, new DirectionalSprites(
 			index == 0 ? Content.SpriteAnimations.Char_Walk_Up.ID : Content.SpriteAnimations.Char2_Walk_Up.ID,
 			index == 0 ? Content.SpriteAnimations.Char_Walk_UpRight.ID : Content.SpriteAnimations.Char2_Walk_UpRight.ID,
@@ -90,8 +89,6 @@ public class PlayerController : MoonTools.ECS.System
 				direction.Y = 1;
 			}
 			#endregion
-
-			Set(entity, new Direction(direction));
 
 			if (inputState.Interact.IsPressed)
 			{

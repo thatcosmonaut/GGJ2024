@@ -14,7 +14,7 @@ public class DirectionalAnimation : MoonTools.ECS.System
     public DirectionalAnimation(World world) : base(world)
     {
         DirectionFilter = FilterBuilder
-        .Include<Direction>()
+        .Include<LastDirection>()
         .Include<DirectionalSprites>()
         .Build();
     }
@@ -24,7 +24,7 @@ public class DirectionalAnimation : MoonTools.ECS.System
         foreach (var entity in DirectionFilter.Entities)
         {
             SpriteAnimationInfo animation = Has<SpriteAnimation>(entity) ? Get<SpriteAnimation>(entity).SpriteAnimationInfo : null;
-            var direction = Get<Direction>(entity).Value;
+            var direction = Get<LastDirection>(entity).Direction;
             var animations = Get<DirectionalSprites>(entity);
 
             if (direction.X > 0)
@@ -74,7 +74,6 @@ public class DirectionalAnimation : MoonTools.ECS.System
             }
 
             var velocity = Has<Velocity>(entity) ? (Vector2)Get<Velocity>(entity) : Vector2.Zero;
-
 
             int framerate = (int)(velocity.Length() / 20f);
             if (Has<FunnyRunTimer>(entity))
