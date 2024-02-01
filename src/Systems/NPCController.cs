@@ -251,7 +251,7 @@ public class NPCController : MoonTools.ECS.System
                 {
                     var timer = Get<Timer>(popup);
                     float t = Easing.OutExpo(timer.Remaining);
-                    Set(popup, new ColorBlend(new Color(t, t, t, t)));
+                    Set(popup, new Color(t, t, t, t));
                 }
             }
 
