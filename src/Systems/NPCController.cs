@@ -1,16 +1,30 @@
-
-
 using System;
 using MoonTools.ECS;
 using MoonWorks.Math;
 using MoonWorks.Math.Float;
 using RollAndCash.Components;
+using RollAndCash.Relations;
+using RollAndCash.Utility;
 
 namespace RollAndCash.Systems;
 
 public class NPCController : MoonTools.ECS.System
 {
     MoonTools.ECS.Filter NPCFilter;
+    const float NPCSpeed = 64.0f;
+
+    Vector2[] Directions = new[]
+    {
+        Vector2.UnitX,
+        Vector2.UnitY,
+        -Vector2.UnitX,
+        -Vector2.UnitY,
+        Vector2.UnitX + Vector2.UnitY,
+        Vector2.UnitX - Vector2.UnitY,
+        -Vector2.UnitX + Vector2.UnitY,
+        -Vector2.UnitX - Vector2.UnitY,
+        Vector2.Zero
+    };
 
     public NPCController(World world) : base(world)
     {
@@ -28,19 +42,18 @@ public class NPCController : MoonTools.ECS.System
     public Entity SpawnNPC()
     {
         var NPC = World.CreateEntity();
-        World.Set(NPC, new Position(Dimensions.GAME_W * 0.5f, Dimensions.GAME_H * 0.33f));
-        World.Set(NPC, new SpriteAnimation(Content.SpriteAnimations.NPC_Bizazss_Walk_Down, 0));
-        World.Set(NPC, new Rectangle(-8, -8, 16, 16));
-        World.Set(NPC, new CanInteract());
-        World.Set(NPC, new CanInspect());
-        World.Set(NPC, new CanHold());
-        World.Set(NPC, new Solid());
-        World.Set(NPC, new Depth(5));
-        World.Set(NPC, new MaxSpeed(128));
-        World.Set(NPC, new Velocity(Vector2.Zero));
-        World.Set(NPC, new LastDirection(Vector2.Zero));
-        World.Set(NPC, new CanTalk());
-        World.Set(NPC, new DirectionalSprites(
+        Set(NPC, new Position(Dimensions.GAME_W * 0.5f, Dimensions.GAME_H * 0.33f));
+        Set(NPC, new SpriteAnimation(Content.SpriteAnimations.NPC_Bizazss_Walk_Down, 0));
+        Set(NPC, new Rectangle(-8, -8, 16, 16));
+        Set(NPC, new CanInteract());
+        Set(NPC, new CanHold());
+        Set(NPC, new Solid());
+        Set(NPC, new Depth(5));
+        Set(NPC, new MaxSpeed(128));
+        Set(NPC, new Velocity(Vector2.Zero));
+        Set(NPC, new LastDirection(Vector2.UnitY));
+        Set(NPC, new CanTalk());
+        Set(NPC, new DirectionalSprites(
             Content.SpriteAnimations.NPC_Bizazss_Walk_Up.ID,
             Content.SpriteAnimations.NPC_Bizazss_Walk_UpRight.ID,
             Content.SpriteAnimations.NPC_Bizazss_Walk_Right.ID,
@@ -51,15 +64,36 @@ public class NPCController : MoonTools.ECS.System
             Content.SpriteAnimations.NPC_Bizazss_Walk_UpLeft.ID
         ));
 
+        var wallDetector = World.CreateEntity();
+        Set(wallDetector, Get<Position>(NPC) + Get<LastDirection>(NPC).Direction * NPCSpeed * 0.5f);
+        Set(wallDetector, new Rectangle(0, 0, 1, 1));
+        Set(wallDetector, new CanInteract());
+
+        Relate(NPC, wallDetector, new HasWallDetector());
+
         return NPC;
     }
 
     public override void Update(TimeSpan delta)
     {
+        if (Some<IsTitleScreen>())
+            return;
+
+        float deltaTime = (float)delta.TotalSeconds;
 
         foreach (var entity in NPCFilter.Entities)
         {
-            Set(entity, new LastDirection(-Vector2.UnitY));
+            var direction = Get<LastDirection>(entity).Direction;
+            var position = Get<Position>(entity);
+
+            if (Has<TouchingSolid>(entity))
+            {
+                direction = Vector2.Normalize(Directions.GetRandomItem());
+            }
+
+            Set(entity, new Velocity(direction * NPCSpeed));
+            Set(entity, new LastDirection(direction));
+
             var depth = MathHelper.Lerp(100, 10, Get<Position>(entity).Y / (float)Dimensions.GAME_H);
             Set(entity, new Depth(depth));
         }

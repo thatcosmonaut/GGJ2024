@@ -74,14 +74,14 @@ namespace RollAndCash
 			DirectionalAnimation = new DirectionalAnimation(World);
 			NPCController = new NPCController(World);
 
-			NPCController.SpawnNPC();
-
 			CategoriesAndIngredients cats = new CategoriesAndIngredients(World);
 			cats.Initialize(World);
 
 			Ticker = new Ticker(World, cats);
 
 			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
+
+			NPCController.SpawnNPC();
 
 			var orderOne = World.CreateEntity();
 			World.Set(orderOne, new Position(195, 345));

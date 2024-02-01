@@ -13,8 +13,6 @@ namespace RollAndCash.Systems;
 public class Motion : MoonTools.ECS.System
 {
     MoonTools.ECS.Filter VelocityFilter;
-    MoonTools.ECS.Filter CanHoldFilter;
-    MoonTools.ECS.Filter CanBeHeldFilter;
     MoonTools.ECS.Filter InteractFilter;
     MoonTools.ECS.Filter SolidFilter;
 
@@ -29,8 +27,6 @@ public class Motion : MoonTools.ECS.System
     public Motion(World world) : base(world)
     {
         VelocityFilter = FilterBuilder.Include<Position>().Include<Velocity>().Build();
-        CanHoldFilter = FilterBuilder.Include<Position>().Include<CanHold>().Build();
-        CanBeHeldFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Include<CanBeHeld>().Build();
         InteractFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Include<CanInteract>().Build();
         SolidFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Include<Solid>().Build();
     }
