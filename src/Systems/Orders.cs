@@ -6,6 +6,7 @@ using RollAndCash.Messages;
 using RollAndCash.Relations;
 using RollAndCash.Utility;
 using MoonTools.ECS;
+using MoonWorks.Math.Float;
 
 namespace RollAndCash.Systems;
 
@@ -15,8 +16,8 @@ public class Orders : MoonTools.ECS.System
     Filter IngredientFilter;
     Filter OrderFilter;
     Filter PlayerFilter;
+    Filter NPCFilter;
     Product ProductManipulator;
-    float OrderWaitTime = 3.0f;
 
     public Orders(World world) : base(world)
     {
@@ -25,6 +26,16 @@ public class Orders : MoonTools.ECS.System
         OrderFilter = FilterBuilder.Include<IsOrder>().Build();
         PlayerFilter = FilterBuilder.Include<Player>().Include<CanHold>().Build();
         ProductManipulator = new Product(world);
+        NPCFilter =
+            FilterBuilder
+            .Include<Position>()
+            .Include<SpriteAnimation>()
+            .Include<Rectangle>()
+            .Include<Solid>()
+            .Include<CanTalk>()
+            .Exclude<Player>()
+            .Include<DirectionalSprites>()
+            .Build();
     }
 
     public void SetNewOrderDetails(Entity order)
@@ -75,7 +86,6 @@ public class Orders : MoonTools.ECS.System
 
         if (filled)
         {
-            var p = Get<Player>(player);
             var scoreEntity = OutRelationSingleton<HasScore>(player);
             var calculate = CalculateScore(product);
             var score = Get<Score>(scoreEntity).Value + calculate;
@@ -109,6 +119,7 @@ public class Orders : MoonTools.ECS.System
 
         return filled;
     }
+
 
     public (Entity order, bool filled) CheckOrders(Entity product)
     {
@@ -158,6 +169,21 @@ public class Orders : MoonTools.ECS.System
                     if (colliding == cashRegister)
                     {
                         TryFillOrder(player);
+                    }
+                }
+            }
+        }
+
+        foreach (var npc in NPCFilter.Entities)
+        {
+            if (HasOutRelation<Holding>(npc))
+            {
+                foreach (var colliding in OutRelations<Colliding>(npc))
+                {
+                    if (colliding == cashRegister)
+                    {
+                        var product = OutRelationSingleton<Holding>(npc);
+                        Destroy(product);
                     }
                 }
             }

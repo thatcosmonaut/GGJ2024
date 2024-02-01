@@ -3,6 +3,7 @@ using MoonTools.ECS;
 using MoonWorks.Math;
 using MoonWorks.Math.Float;
 using RollAndCash.Components;
+using RollAndCash.Data;
 using RollAndCash.Relations;
 using RollAndCash.Utility;
 
@@ -12,6 +13,7 @@ public class NPCController : MoonTools.ECS.System
 {
     MoonTools.ECS.Filter NPCFilter;
     const float NPCSpeed = 64.0f;
+    const float PickUpChance = 0.5f;
 
     Vector2[] Directions = new[]
     {
@@ -86,9 +88,35 @@ public class NPCController : MoonTools.ECS.System
             var direction = Get<LastDirection>(entity).Direction;
             var position = Get<Position>(entity);
 
+            if (Has<TryHold>(entity))
+                Remove<TryHold>(entity);
+
             if (Has<TouchingSolid>(entity))
             {
                 direction = Vector2.Normalize(Directions.GetRandomItem());
+            }
+
+            if (!HasOutRelation<Colliding>(entity))
+            {
+                UnrelateAll<ConsideredProduct>(entity);
+            }
+
+            if (!HasOutRelation<Holding>(entity))
+            {
+                foreach (var other in OutRelations<Colliding>(entity))
+                {
+                    if (Has<CanBeHeld>(other) && !Related<ConsideredProduct>(entity, other))
+                    {
+                        System.Console.WriteLine(TextStorage.GetString(Get<Name>(other).TextID));
+                        if (Rando.Value <= PickUpChance)
+                        {
+                            System.Console.WriteLine("Pick up item");
+                            Set(entity, new TryHold());
+                        }
+
+                        Relate(entity, other, new ConsideredProduct());
+                    }
+                }
             }
 
             Set(entity, new Velocity(direction * NPCSpeed));

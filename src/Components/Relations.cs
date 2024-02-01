@@ -13,6 +13,6 @@ public readonly record struct DisplayingIngredientPrice();
 public readonly record struct HasScore();
 public readonly record struct TimingFootstepAudio();
 public readonly record struct HasWallDetector();
-
 public readonly record struct ProductSpawner();
 public readonly record struct BelongsToProductSpawner();
+public readonly record struct ConsideredProduct();
