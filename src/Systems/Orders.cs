@@ -123,7 +123,7 @@ public class Orders : MoonTools.ECS.System
         }
 
         var priceText = OutRelationSingleton<OrderPriceText>(order);
-        var priceString = $"(${Get<Price>(order).Value})";
+        var priceString = $"${Get<Price>(order).Value}";
         Set(priceText, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, priceString, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
 
         var timer = CreateEntity();
