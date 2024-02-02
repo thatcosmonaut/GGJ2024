@@ -4,6 +4,7 @@ using RollAndCash.Components;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
 using RollAndCash.Utility;
+using RollAndCash.Data;
 
 namespace RollAndCash.Systems;
 
@@ -141,6 +142,32 @@ public class CategoriesAndIngredients : Manipulator
             Category.IntellectualProperty => "Intellectual Property",
             Category.Pharmacy => "Pharmacy",
             Category.Relics => "Relics"
+        };
+    }
+
+    public static SpriteAnimationInfo GetIcon(Category category)
+    {
+        return category switch
+        {
+            Category.Animals => Content.SpriteAnimations.Item_Animal,
+
+            Category.Clothes => Content.SpriteAnimations.Item_Clothing,
+
+            Category.Cosmetics => Content.SpriteAnimations.Item_Cosmetics,
+
+            Category.Electronics => Content.SpriteAnimations.Item_Electronics,
+
+            Category.Food => Content.SpriteAnimations.Item_Food,
+
+            Category.Furniture => Content.SpriteAnimations.Item_Furniture,
+
+            Category.Gasses => Content.SpriteAnimations.Item_Gasses,
+
+            Category.IntellectualProperty => Content.SpriteAnimations.Item_IP,
+
+            Category.Pharmacy => Content.SpriteAnimations.Item_Pharmacy,
+
+            Category.Relics => Content.SpriteAnimations.Item_Relic,
         };
     }
 

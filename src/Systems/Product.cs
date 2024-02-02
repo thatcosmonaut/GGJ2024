@@ -51,47 +51,9 @@ public class Product : MoonTools.ECS.Manipulator
 
         Set(entity, new Name(TextStorage.GetID(product.Name)));
 
-        SpriteAnimationInfo animation = null;
-        switch (product.Category)
-        {
-            case Category.Animals:
-                animation = Content.SpriteAnimations.Item_Animal;
-                break;
-            case Category.Clothes:
-                animation = Content.SpriteAnimations.Item_Clothing;
-                break;
-            case Category.Cosmetics:
-                animation = Content.SpriteAnimations.Item_Cosmetics;
-                break;
-            case Category.Electronics:
-                animation = Content.SpriteAnimations.Item_Electronics;
-                break;
-            case Category.Food:
-                animation = Content.SpriteAnimations.Item_Food;
-                break;
-            case Category.Furniture:
-                animation = Content.SpriteAnimations.Item_Furniture;
-                break;
-            case Category.Gasses:
-                animation = Content.SpriteAnimations.Item_Gasses;
-                break;
-            case Category.IntellectualProperty:
-                animation = Content.SpriteAnimations.Item_IP;
-                break;
-            case Category.Pharmacy:
-                animation = Content.SpriteAnimations.Item_Pharmacy;
-                break;
-            case Category.Relics:
-                animation = Content.SpriteAnimations.Item_Relic;
-                break;
-            default:
-                break;
-        }
+        var animation = CategoriesAndIngredients.GetIcon(product.Category);
 
-        if (animation != null)
-        {
-            Set(entity, new SpriteAnimation(animation, 10, true, Rando.Int(0, animation.Frames.Length)));
-        }
+        Set(entity, new SpriteAnimation(animation, 10, true, Rando.Int(0, animation.Frames.Length)));
 
         foreach (var c in CategoryFilter.Entities)
         {

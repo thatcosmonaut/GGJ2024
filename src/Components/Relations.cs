@@ -19,3 +19,4 @@ public readonly record struct CantLeaveStore();
 public readonly record struct CantTalk();
 public readonly record struct OrderTimer();
 public readonly record struct OrderPriceText();
+public readonly record struct OrderIcon();

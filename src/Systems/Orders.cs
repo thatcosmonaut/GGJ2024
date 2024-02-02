@@ -115,7 +115,24 @@ public class Orders : MoonTools.ECS.System
                 Set(order, new Price(price));
 
                 var text = CategoriesAndIngredients.GetDisplayName(Get<Category>(category));
-                Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+                Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text, HorizontalAlignment.Center));
+
+                var animation = CategoriesAndIngredients.GetIcon(Get<Category>(category));
+
+                if (!HasOutRelation<OrderIcon>(order))
+                {
+                    var iconEntity = CreateEntity();
+                    Set(iconEntity, Get<Position>(order) + Vector2.UnitY * 16.0f);
+                    Set(iconEntity, new Depth(8));
+                    Relate(order, iconEntity, new OrderIcon());
+                }
+
+                Set(OutRelationSingleton<OrderIcon>(order), new SpriteAnimation(
+                    animation,
+                    10,
+                    true,
+                    0
+                ));
             }
             else
             { // require ingredient
@@ -128,11 +145,18 @@ public class Orders : MoonTools.ECS.System
                 if (HasInRelation<RequiresIngredient>(ingredient))
                     continue;
 
+                suitableCandidate = true;
+
                 Relate(order, ingredient, new RequiresIngredient());
                 var price = MathF.Round(Rando.Range(min, max), 2);
                 Set(order, new Price(price));
                 var text = CategoriesAndIngredients.GetDisplayName(Get<Ingredient>(ingredient));
                 Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+
+                if (HasOutRelation<OrderIcon>(order))
+                {
+                    Destroy(OutRelationSingleton<OrderIcon>(order));
+                }
             }
         }
 
@@ -161,7 +185,7 @@ public class Orders : MoonTools.ECS.System
 
         var priceText = OutRelationSingleton<OrderPriceText>(order);
         var priceString = $"${Get<Price>(order).Value}";
-        Set(priceText, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, priceString, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+        Set(priceText, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, priceString, HorizontalAlignment.Center));
 
         var timer = CreateEntity();
         Set(timer, new Timer(OrderTime));
