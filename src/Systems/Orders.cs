@@ -330,5 +330,18 @@ public class Orders : MoonTools.ECS.System
                 }
             }
         }
+
+        foreach (var entity in OrderFilter.Entities)
+        {
+            if (HasOutRelation<OrderTimer>(entity))
+            {
+                var timerEntity = OutRelationSingleton<OrderTimer>(entity);
+                float timeFactor = Get<Timer>(timerEntity).Remaining;
+                Set(entity, new Rectangle(-60, -18, (int) (timeFactor * 120f), 4));
+                Set(entity, new ColorBlend(MoonWorks.Graphics.Color.Red));
+                if (timeFactor < .1f && Math.Floor(Get<Timer>(timerEntity).Time * 10) % 2 == 0)
+                Set(entity, new ColorBlend(MoonWorks.Graphics.Color.Black));
+            }
+        }
     }
 }
