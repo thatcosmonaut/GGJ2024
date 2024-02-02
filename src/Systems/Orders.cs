@@ -121,6 +121,11 @@ public class Orders : MoonTools.ECS.System
             text.Append(")");
             Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text.ToString(), MoonWorks.Graphics.Font.HorizontalAlignment.Center));
         }
+
+
+        var timer = CreateEntity();
+        Set(timer, new Timer(30));
+        Relate(order, timer, new OrderTimer());
     }
 
     private int CalculateScore(Entity product, Entity order)
@@ -220,10 +225,6 @@ public class Orders : MoonTools.ECS.System
                 if (!HasOutRelation<OrderTimer>(order))
                 {
                     SetNewOrderDetails(order);
-
-                    var timer = CreateEntity();
-                    Set(timer, new Timer(30));
-                    Relate(order, timer, new OrderTimer());
                 }
             }
         }
