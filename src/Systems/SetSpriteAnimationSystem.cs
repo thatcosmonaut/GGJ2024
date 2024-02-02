@@ -13,7 +13,7 @@ public class SetSpriteAnimationSystem : MoonTools.ECS.System
 
 	public SetSpriteAnimationSystem(World world) : base(world)
 	{
-		SlowDownAnimationFilter = FilterBuilder.Include<SlowDownAnimation>().Build();
+		SlowDownAnimationFilter = FilterBuilder.Include<SlowDownAnimation>().Include<Position>().Build();
 	}
 
 	public override void Update(TimeSpan delta)

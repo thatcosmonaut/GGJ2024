@@ -126,4 +126,27 @@ public class Product : MoonTools.ECS.Manipulator
         Set(e, new FallSpeed(10));
         Set(e, new DestroyAtScreenBottom());
     }
+
+    public void SpawnScoreEffect(Entity owner, Position target, SpriteAnimation spriteAnimation, int amount)
+    {
+        var maxTime = ((amount / 60f / 2f) + .1f) / 2f;
+        for (var i = 0; i < amount; i++)
+        {
+            var e = CreateEntity();
+            Set(e, new Depth(1));
+            if (i % 2 == 0)
+                Set(e, spriteAnimation);
+            Set(e, new Velocity(new Vector2(Rando.Range(-10f, 10f), Rando.Range(-400f, -350f))));
+            Set(e, new DestroyAtScreenBottom());
+            Set(e, new AccelerateToPosition(target, 1300f, 1.01f));
+            Set(e, new DestroyAtGameEnd());
+            Relate(e, owner, new UpdateDisplayScoreOnDestroy());
+
+            var timer = CreateEntity();
+            float factor = (float)i / ((float)amount / 2);
+            Set(timer, new Timer(factor * factor * factor * maxTime));
+            Relate(timer, e, new TeleportToAtTimerEnd(owner));
+            Set(timer, new DestroyAtGameEnd());
+        }
+    }
 }

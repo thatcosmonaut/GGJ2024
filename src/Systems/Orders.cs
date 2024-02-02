@@ -211,9 +211,9 @@ public class Orders : MoonTools.ECS.System
             var scoreEntity = OutRelationSingleton<HasScore>(player);
             var calculate = CalculateScore(product, order);
             var score = Get<Score>(scoreEntity).Value + calculate;
+            var playerIndex = Get<Player>(player).Index;
 
             Set(scoreEntity, new Score(score));
-            Set(scoreEntity, new Text(Fonts.KosugiID, FontSizes.SCORE, score.ToString()));
 
             if (calculate < 0)
             {
@@ -221,6 +221,14 @@ public class Orders : MoonTools.ECS.System
             }
             else
             {
+                var x = playerIndex == 1? Dimensions.GAME_W - 100 : 100;
+                ProductManipulator.SpawnScoreEffect(
+                    player,
+                    new Position(x, Dimensions.GAME_H),
+                    new SpriteAnimation(Content.SpriteAnimations.Effect_SpinningCoin, Rando.Int(30, 60), true),
+                    calculate
+                );
+
                 Send(new PlayStaticSoundMessage(StaticAudio.OrderComplete));
             }
 

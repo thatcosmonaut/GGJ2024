@@ -1,5 +1,6 @@
 using System;
 using MoonTools.ECS;
+using RollAndCash.Relations;
 using Timer = RollAndCash.Components.Timer;
 
 namespace LD54.Systems;
@@ -24,6 +25,15 @@ public class Timing : MoonTools.ECS.System
 
             if (time <= 0)
             {
+                if (HasOutRelation<TeleportToAtTimerEnd>(entity))
+                {
+                    var outEntity = OutRelationSingleton<TeleportToAtTimerEnd>(entity);
+                    var data = World.GetRelationData<TeleportToAtTimerEnd>(entity, outEntity);
+                    var entityToTeleportTo = data.TeleportTo;
+                    var position = Get<Position>(entityToTeleportTo);
+                    Set(outEntity, position);
+                }
+
                 Destroy(entity);
                 return;
             }

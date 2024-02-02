@@ -12,6 +12,7 @@ public class UpdateSpriteAnimationSystem : MoonTools.ECS.System
 	{
 		SpriteAnimationFilter = FilterBuilder
 			.Include<SpriteAnimation>()
+			.Include<Position>()
 			.Build();
 	}
 
