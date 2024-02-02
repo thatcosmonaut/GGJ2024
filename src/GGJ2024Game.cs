@@ -95,10 +95,6 @@ namespace RollAndCash
 			World.Set(orderThree, new Position(440, 345));
 			World.Set(orderThree, new IsOrder());
 
-			Orders.SetNewOrderDetails(orderOne);
-			Orders.SetNewOrderDetails(orderTwo);
-			Orders.SetNewOrderDetails(orderThree);
-
 			var topBorder = World.CreateEntity();
 			World.Set(topBorder, new Position(0, 65));
 			World.Set(topBorder, new Rectangle(0, 0, Dimensions.GAME_W, 10));

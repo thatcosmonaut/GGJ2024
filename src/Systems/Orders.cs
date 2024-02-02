@@ -7,6 +7,7 @@ using RollAndCash.Relations;
 using RollAndCash.Utility;
 using MoonTools.ECS;
 using MoonWorks.Math.Float;
+using System.Text;
 
 namespace RollAndCash.Systems;
 
@@ -38,6 +39,45 @@ public class Orders : MoonTools.ECS.System
             .Build();
     }
 
+    (float min, float max) GetPriceRange(Entity e)
+    {
+
+        if (Has<Category>(e))
+        {
+            float min = float.PositiveInfinity;
+            float max = float.NegativeInfinity;
+            foreach (var product in InRelations<IsInCategory>(e))
+            {
+                var price = ProductManipulator.GetPrice(product);
+                if (price < min)
+                    min = price;
+
+                if (price > max)
+                    max = price;
+            }
+
+            return (min, max);
+        }
+        else if (Has<Ingredient>(e))
+        {
+            float min = float.PositiveInfinity;
+            float max = float.NegativeInfinity;
+            foreach (var product in InRelations<HasIngredient>(e))
+            {
+                var price = ProductManipulator.GetPrice(product);
+                if (price < min)
+                    min = price;
+
+                if (price > max)
+                    max = price;
+            }
+
+            return (min, max);
+        }
+
+        return (0, 0);
+    }
+
     public void SetNewOrderDetails(Entity order)
     {
         foreach (var categoryRequirement in OutRelations<RequiresCategory>(order))
@@ -54,28 +94,41 @@ public class Orders : MoonTools.ECS.System
         { // require category
             var category = CategoryFilter.RandomEntity;
             Relate(order, category, new RequiresCategory());
-            Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, Get<Category>(category).ToString(), MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+            var (min, max) = GetPriceRange(category);
+            var price = MathF.Round(Rando.Range(min, max), 2);
+            Set(order, new Price(price));
+
+            var text = new StringBuilder();
+            text.Append(CategoriesAndIngredients.GetDisplayName(Get<Category>(category)));
+            text.Append(" ($");
+            text.Append(price);
+            text.Append(")");
+            Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text.ToString(), MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+
         }
         else
         { // require ingredient
             var ingredient = IngredientFilter.RandomEntity;
             Relate(order, ingredient, new RequiresIngredient());
-            Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, Get<Ingredient>(ingredient).ToString(), MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+            var (min, max) = GetPriceRange(ingredient);
+            var price = MathF.Round(Rando.Range(min, max), 2);
+            Set(order, new Price(price));
+
+            var text = new StringBuilder();
+            text.Append(CategoriesAndIngredients.GetDisplayName(Get<Ingredient>(ingredient)));
+            text.Append(" ($");
+            text.Append(price);
+            text.Append(")");
+            Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text.ToString(), MoonWorks.Graphics.Font.HorizontalAlignment.Center));
         }
     }
 
-    private int CalculateScore(Entity product)
+    private int CalculateScore(Entity product, Entity order)
     {
-        var score = 0;
+        var price = ProductManipulator.GetPrice(product);
+        var bounty = Get<Price>(order).Value;
 
-        foreach (var productIngredientEntity in OutRelations<HasIngredient>(product))
-        {
-            var price = Get<Price>(productIngredientEntity).Value;
-            var ingredientScore = 50 - price;
-            score += (int)ingredientScore;
-        }
-
-        return score;
+        return (int)(bounty - price);
     }
 
     public bool TryFillOrder(Entity player)
@@ -87,7 +140,7 @@ public class Orders : MoonTools.ECS.System
         if (filled)
         {
             var scoreEntity = OutRelationSingleton<HasScore>(player);
-            var calculate = CalculateScore(product);
+            var calculate = CalculateScore(product, order);
             var score = Get<Score>(scoreEntity).Value + calculate;
 
             Set(scoreEntity, new Score(score));
@@ -159,6 +212,21 @@ public class Orders : MoonTools.ECS.System
     public override void Update(TimeSpan delta)
     {
         var cashRegister = GetSingletonEntity<CanFillOrders>();
+
+        if (!Some<IsTitleScreen>() && Some<Price>())
+        {
+            foreach (var order in OrderFilter.Entities)
+            {
+                if (!HasOutRelation<OrderTimer>(order))
+                {
+                    SetNewOrderDetails(order);
+
+                    var timer = CreateEntity();
+                    Set(timer, new Timer(30));
+                    Relate(order, timer, new OrderTimer());
+                }
+            }
+        }
 
         foreach (var player in PlayerFilter.Entities)
         {

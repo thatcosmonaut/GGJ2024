@@ -33,7 +33,7 @@ public class Product : MoonTools.ECS.Manipulator
             total += Get<Price>(ingredient).Value;
         }
 
-        return MathF.Round(MathF.Max(float.Epsilon, total), 2);
+        return MathF.Round(MathF.Max(1, total), 2);
     }
 
     public Entity SpawnProduct(Position position, Category category)

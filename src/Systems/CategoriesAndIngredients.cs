@@ -126,6 +126,24 @@ public class CategoriesAndIngredients : Manipulator
         };
     }
 
+
+    public static string GetDisplayName(Category category)
+    {
+        return category switch
+        {
+            Category.Animals => "Animals",
+            Category.Clothes => "Clothes",
+            Category.Cosmetics => "Cosmetics",
+            Category.Electronics => "Electronics",
+            Category.Food => "Food",
+            Category.Furniture => "Furniture",
+            Category.Gasses => "Gasses",
+            Category.IntellectualProperty => "Intellectual Property",
+            Category.Pharmacy => "Pharmacy",
+            Category.Relics => "Relics"
+        };
+    }
+
     public static Color GetColor(Category category)
     {
         return category switch
