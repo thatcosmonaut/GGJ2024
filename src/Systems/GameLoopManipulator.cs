@@ -4,9 +4,6 @@ using RollAndCash.Content;
 using RollAndCash.Messages;
 using RollAndCash.Systems;
 using MoonTools.ECS;
-using System.Reflection.Metadata;
-using Microsoft.VisualBasic;
-using System.Numerics;
 using MoonWorks.Graphics.Font;
 using RollAndCash.Relations;
 using System.IO;
@@ -18,6 +15,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 	Filter PlayerFilter;
 	Filter GameTimerFilter;
 	Filter ScoreScreenFilter;
+	Filter DestroyAtGameEndFilter;
 
 	RollAndCash.Systems.ProductSpawner ProductSpawner;
 
@@ -28,6 +26,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		ScoreFilter = FilterBuilder.Include<Score>().Build();
 		GameTimerFilter = FilterBuilder.Include<RollAndCash.Components.GameTimer>().Build();
 		ScoreScreenFilter = FilterBuilder.Include<IsScoreScreen>().Build();
+		DestroyAtGameEndFilter = FilterBuilder.Include<DestroyAtGameEnd>().Build();
 
 		ProductSpawner = new RollAndCash.Systems.ProductSpawner(world);
 
@@ -179,10 +178,17 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		foreach (var entity in ScoreFilter.Entities)
 		{
 			Set(entity, new Score(0));
+			Set(entity, new DisplayScore(0));
 			Set(entity, new Text(Fonts.KosugiID, FontSizes.SCORE, "0"));
 		}
 
 		World.Send(new PlaySongMessage());
+
+		
+		foreach (var entity in DestroyAtGameEndFilter.Entities)
+		{
+			Destroy(entity);
+		}
 
 		// respawn products
 

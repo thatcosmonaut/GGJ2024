@@ -1,11 +1,9 @@
 using System;
 using MoonWorks.Math.Float;
 using MoonTools.ECS;
-using MoonWorks.Graphics;
 using RollAndCash.Utility;
 using System.Collections.Generic;
 using RollAndCash.Components;
-using MoonWorks;
 using RollAndCash.Relations;
 
 namespace RollAndCash.Systems;
@@ -15,6 +13,7 @@ public class Motion : MoonTools.ECS.System
     MoonTools.ECS.Filter VelocityFilter;
     MoonTools.ECS.Filter InteractFilter;
     MoonTools.ECS.Filter SolidFilter;
+    MoonTools.ECS.Filter AccelerateToPositionFilter;
 
     Dictionary<(int, int), HashSet<Entity>> InteractSpatialHash = new();
     HashSet<Entity> InteractResults = new();
@@ -29,6 +28,7 @@ public class Motion : MoonTools.ECS.System
         VelocityFilter = FilterBuilder.Include<Position>().Include<Velocity>().Build();
         InteractFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Include<CanInteract>().Build();
         SolidFilter = FilterBuilder.Include<Position>().Include<Rectangle>().Include<Solid>().Build();
+        AccelerateToPositionFilter = FilterBuilder.Include<Position>().Include<AccelerateToPosition>().Include<Velocity>().Build();
     }
 
     void ClearCanBeHeldSpatialHash()
@@ -248,8 +248,18 @@ public class Motion : MoonTools.ECS.System
                 Set(entity, new Velocity(vel + Vector2.UnitY * fallspeed));
             }
 
-            if (Has<DestroyAtScreenBottom>(entity) && pos.Y > 500)
+            if (Has<DestroyAtScreenBottom>(entity) && pos.Y > Dimensions.GAME_H - 32)
             {
+                if (HasOutRelation<UpdateDisplayScoreOnDestroy>(entity))
+                {
+                    var outEntity = OutRelationSingleton<UpdateDisplayScoreOnDestroy>(entity);
+                    var scoreEntity = OutRelationSingleton<HasScore>(outEntity);
+                    var score = Get<DisplayScore>(scoreEntity).Value + 1;
+                    Console.WriteLine(score.ToString());
+                    Set(scoreEntity, new Text(Content.Fonts.KosugiID, FontSizes.SCORE, score.ToString()));
+                    Set(scoreEntity, new DisplayScore(score));
+                    
+                }
                 Destroy(entity);
             }
         }
@@ -293,6 +303,17 @@ public class Motion : MoonTools.ECS.System
             {
                 Relate(entity, downOther, new TouchingSolid());
             }
+        }
+
+        foreach (var entity in AccelerateToPositionFilter.Entities)
+        {
+            var velocity = Get<Velocity>(entity).Value;
+            var position = Get<Position>(entity);
+            var accelTo = Get<AccelerateToPosition>(entity);
+            var difference = accelTo.Target - position;
+            velocity /= accelTo.MotionDampFactor * (1 + (float)delta.TotalSeconds); // TODO: IDK if this is deltatime friction but game is fixed fps rn anyway
+            velocity += Vector2.Normalize(difference) * accelTo.Acceleration * (float)delta.TotalSeconds;
+            Set(entity, new Velocity(velocity));
         }
     }
 }

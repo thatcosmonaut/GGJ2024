@@ -1,3 +1,5 @@
+using MoonTools.ECS;
+
 namespace RollAndCash.Relations;
 
 public readonly record struct Colliding();
@@ -11,6 +13,7 @@ public readonly record struct ShowingPopup();
 public readonly record struct DisplayingProductPrice();
 public readonly record struct DisplayingIngredientPrice();
 public readonly record struct HasScore();
+public readonly record struct UpdateDisplayScoreOnDestroy();
 public readonly record struct TimingFootstepAudio();
 public readonly record struct ProductSpawner();
 public readonly record struct BelongsToProductSpawner();
@@ -21,3 +24,4 @@ public readonly record struct OrderTimer();
 public readonly record struct OrderPriceText();
 public readonly record struct OrderIcon();
 public readonly record struct HoldingText();
+public readonly record struct TeleportToAtTimerEnd(Entity TeleportTo);

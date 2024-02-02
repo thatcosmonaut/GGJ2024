@@ -18,6 +18,7 @@ public readonly record struct TouchingSolid();
 public readonly record struct Name(int TextID);
 
 public readonly record struct Score(int Value);
+public readonly record struct DisplayScore(int Value);
 
 public readonly record struct Price(float Value);
 public readonly record struct TickerText(float Width);
@@ -64,3 +65,5 @@ public readonly record struct DirectionalSprites(
 public readonly record struct CanTalk();
 public readonly record struct DontSpawnNPCs();
 public readonly record struct StoreExit();
+public readonly record struct AccelerateToPosition(Position Target, float Acceleration, float MotionDampFactor);
+public readonly record struct DestroyAtGameEnd();
