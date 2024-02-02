@@ -42,6 +42,18 @@ public class NPCController : MoonTools.ECS.System
         -Vector2.UnitX - Vector2.UnitY
     };
 
+    StaticSoundID[] BizassSoundz =
+    [
+        StaticAudio.Bizass_NPC1,
+        StaticAudio.Bizass_NPC2,
+        StaticAudio.Bizass_NPC3,
+        StaticAudio.Bizass_NPC4,
+        StaticAudio.Bizass_NPC5,
+        StaticAudio.Bizass_NPC6,
+        StaticAudio.Bizass_NPC7,
+        StaticAudio.Bizass_NPC8
+    ];
+
     public NPCController(World world) : base(world)
     {
         NPCFilter =
@@ -103,7 +115,8 @@ public class NPCController : MoonTools.ECS.System
             return;
 
         var playerIndex = Get<Player>(player).Index;
-        Send(new PlayStaticSoundMessage(StaticAudio.BubbleOpen, 0.5f));
+        //Send(new PlayStaticSoundMessage(StaticAudio.BubbleOpen, 0.5f));
+        Send(new PlayStaticSoundMessage(Rando.GetRandomItem(BizassSoundz)));
 
         var index = 0;
         if (Some<IsPopupBox>())
