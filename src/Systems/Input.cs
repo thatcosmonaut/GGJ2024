@@ -79,7 +79,7 @@ public class Input : MoonTools.ECS.System
 				PlayerTwoGamepad.Interact.IsPressed
 			)
 			{
-				GameLoopManipulator.Restart();
+				GameLoopManipulator.AdvanceGameState();
 			}
 		}
 		else

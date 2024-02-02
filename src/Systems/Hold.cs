@@ -109,7 +109,7 @@ public class Hold : MoonTools.ECS.System
 			Set(txt, holderPos);
 			Set(txt, new Text(
 				Fonts.KosugiID,
-				Dimensions.HOLDING_FONT_SIZE,
+				FontSizes.HOLDING,
 				$"${Product.GetPrice(holding)}",
 				MoonWorks.Graphics.Font.HorizontalAlignment.Center,
 				MoonWorks.Graphics.Font.VerticalAlignment.Middle
@@ -170,7 +170,7 @@ public class Hold : MoonTools.ECS.System
 
 		var name = CreateEntity();
 		Set(name, holderPosition + new Position(xOffset, yOffset));
-		Set(name, new Text(Fonts.KosugiID, Dimensions.INSPECT_FONT_SIZE, Get<Name>(product).TextID, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
+		Set(name, new Text(Fonts.KosugiID, FontSizes.INSPECT, Get<Name>(product).TextID, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 		Set(name, new TextDropShadow(1, 1));
 		Set(name, new Depth(6 - index * 4));
 
@@ -190,7 +190,7 @@ public class Hold : MoonTools.ECS.System
 
 		var price = CreateEntity();
 		Set(price, holderPosition + new Position(xOffset, yOffset));
-		Set(price, new Text(Fonts.KosugiID, Dimensions.INSPECT_FONT_SIZE, "$" + Product.GetPrice(product).ToString("F2"), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
+		Set(price, new Text(Fonts.KosugiID, FontSizes.INSPECT, "$" + Product.GetPrice(product).ToString("F2"), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 		Set(price, new TextDropShadow(1, 1));
 		Set(price, new Depth(6 - index * 4));
 
@@ -206,7 +206,7 @@ public class Hold : MoonTools.ECS.System
 
 			var ingredientName = CreateEntity();
 			Set(ingredientName, holderPosition + new Position(xOffset, yOffset));
-			Set(ingredientName, new Text(Fonts.KosugiID, Dimensions.INGREDIENT_FONT_SIZE, ingredientString, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
+			Set(ingredientName, new Text(Fonts.KosugiID, FontSizes.INGREDIENT, ingredientString, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 			Set(ingredientName, new TextDropShadow(1, 1));
 			Set(ingredientName, new Depth(6 - index * 4));
 
@@ -229,7 +229,7 @@ public class Hold : MoonTools.ECS.System
 
 			var ingredientPrice = CreateEntity();
 			Set(ingredientPrice, holderPosition + new Position(xOffset + priceAdditionalOffset, yOffset));
-			Set(ingredientPrice, new Text(Fonts.KosugiID, Dimensions.INGREDIENT_FONT_SIZE, ingredientPriceString, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
+			Set(ingredientPrice, new Text(Fonts.KosugiID, FontSizes.INGREDIENT, ingredientPriceString, MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 			Set(ingredientPrice, new TextDropShadow(1, 1));
 			Set(ingredientPrice, new Depth(6 - index * 4));
 

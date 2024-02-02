@@ -115,7 +115,7 @@ public class Orders : MoonTools.ECS.System
                 Set(order, new Price(price));
 
                 var text = CategoriesAndIngredients.GetDisplayName(Get<Category>(category));
-                Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text, HorizontalAlignment.Center));
+                Set(order, new Text(Fonts.KosugiID, FontSizes.ORDER, text, HorizontalAlignment.Center));
 
                 var animation = CategoriesAndIngredients.GetIcon(Get<Category>(category));
 
@@ -151,7 +151,7 @@ public class Orders : MoonTools.ECS.System
                 var price = MathF.Round(Rando.Range(min, max), 2);
                 Set(order, new Price(price));
                 var text = CategoriesAndIngredients.GetDisplayName(Get<Ingredient>(ingredient));
-                Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+                Set(order, new Text(Fonts.KosugiID, FontSizes.ORDER, text, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
 
                 if (HasOutRelation<OrderIcon>(order))
                 {
@@ -164,7 +164,7 @@ public class Orders : MoonTools.ECS.System
         var orderText = Get<Text>(order);
         font.TextBounds(
             TextStorage.GetString(orderText.TextID),
-            Dimensions.ORDER_FONT_SIZE,
+            FontSizes.ORDER,
             HorizontalAlignment.Center,
             VerticalAlignment.Middle,
             out var textBounds
@@ -172,20 +172,20 @@ public class Orders : MoonTools.ECS.System
 
         if (textBounds.W > Dimensions.CARD_WIDTH)
         {
-            Set(order, new Text(Fonts.KosugiID, Dimensions.SMALL_ORDER_FONT_SIZE, orderText.TextID, HorizontalAlignment.Center));
+            Set(order, new Text(Fonts.KosugiID, FontSizes.SMALL_ORDER, orderText.TextID, HorizontalAlignment.Center));
         }
 
         if (!HasOutRelation<OrderPriceText>(order))
         {
             var position = Get<Position>(order);
             var priceTextEntity = CreateEntity();
-            Set(priceTextEntity, position + Vector2.UnitY * Dimensions.ORDER_FONT_SIZE * 2);
+            Set(priceTextEntity, position + Vector2.UnitY * FontSizes.ORDER * 2);
             Relate(order, priceTextEntity, new OrderPriceText());
         }
 
         var priceText = OutRelationSingleton<OrderPriceText>(order);
         var priceString = $"${Get<Price>(order).Value}";
-        Set(priceText, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, priceString, HorizontalAlignment.Center));
+        Set(priceText, new Text(Fonts.KosugiID, FontSizes.ORDER, priceString, HorizontalAlignment.Center));
 
         var timer = CreateEntity();
         Set(timer, new Timer(OrderTime));
@@ -213,7 +213,7 @@ public class Orders : MoonTools.ECS.System
             var score = Get<Score>(scoreEntity).Value + calculate;
 
             Set(scoreEntity, new Score(score));
-            Set(scoreEntity, new Text(Fonts.KosugiID, Dimensions.SCORE_FONT_SIZE, score.ToString()));
+            Set(scoreEntity, new Text(Fonts.KosugiID, FontSizes.SCORE, score.ToString()));
 
             if (calculate < 0)
             {

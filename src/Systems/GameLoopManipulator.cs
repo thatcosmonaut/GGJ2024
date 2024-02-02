@@ -34,14 +34,19 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		Send(new PlayStaticSoundMessage(StaticAudio.RollAndCash));
 	}
 
-	public void Restart()
+	public void ShowScoreScreen()
 	{
-		if (Some<IsTitleScreen>())
-		{
-			Destroy(GetSingletonEntity<IsTitleScreen>());
-		}
+		var scoreScreenEntity = CreateEntity();
+		Set(scoreScreenEntity, new Position(0, 0));
+		Set(scoreScreenEntity, new SpriteAnimation(SpriteAnimations.Score, 0));
+		Set(scoreScreenEntity, new Depth(0.02f));
+		Set(scoreScreenEntity, new IsScoreScreen());
+	}
 
-		Set(GameTimerFilter.NthEntity(0), new RollAndCash.Components.GameTimer(90));
+	void StartGame()
+	{
+		Destroy(GetSingletonEntity<IsTitleScreen>());
+		Set(GameTimerFilter.NthEntity(0), new RollAndCash.Components.GameTimer(5));
 
 		var playerOne = PlayerFilter.NthEntity(0);
 		var playerTwo = PlayerFilter.NthEntity(1);
@@ -52,7 +57,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		foreach (var entity in ScoreFilter.Entities)
 		{
 			Set(entity, new Score(0));
-			Set(entity, new Text(Fonts.KosugiID, Dimensions.SCORE_FONT_SIZE, "0"));
+			Set(entity, new Text(Fonts.KosugiID, FontSizes.SCORE, "0"));
 		}
 
 		World.Send(new PlaySongMessage());
@@ -63,5 +68,29 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		ProductSpawner.SpawnProducts();
 
 		// reset orders
+	}
+
+	void BackToTitle()
+	{
+		Destroy(GetSingletonEntity<IsScoreScreen>());
+		ShowTitleScreen();
+	}
+
+	public void AdvanceGameState()
+	{
+		if (Some<IsTitleScreen>())
+		{
+			StartGame();
+		}
+
+		else if (Some<IsScoreScreen>())
+		{
+			BackToTitle();
+		}
+
+		else
+		{
+			ShowScoreScreen();
+		}
 	}
 }
