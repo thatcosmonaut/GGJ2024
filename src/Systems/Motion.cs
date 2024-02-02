@@ -5,6 +5,8 @@ using RollAndCash.Utility;
 using System.Collections.Generic;
 using RollAndCash.Components;
 using RollAndCash.Relations;
+using RollAndCash.Messages;
+using RollAndCash.Content;
 
 namespace RollAndCash.Systems;
 
@@ -258,7 +260,18 @@ public class Motion : MoonTools.ECS.System
                     Set(scoreEntity, new Text(Content.Fonts.KosugiID, FontSizes.SCORE, score.ToString()));
                     Set(scoreEntity, new DisplayScore(score));
 
+                    // TODO: shouldn't tightly couple this exact money sound behavior to DestroyAtScreenBottom but hey it's a jam game
+                    var pan = (((float)pos.X / Dimensions.GAME_W * 2f) - 1f) / 1.5f;
+                    var pitch = .9f + (.1f * (float)score / 800);
+
+                    Send(new PlayStaticSoundMessage(
+                        Rando.GetRandomItem(AudioArrays.Coins),
+                        1f,
+                        pitch,
+                        pan
+                    ));
                 }
+
                 Destroy(entity);
             }
 
