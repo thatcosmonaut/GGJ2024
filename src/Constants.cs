@@ -11,5 +11,6 @@ public static class Dimensions
 	public const int DIALOGUE_FONT_SIZE = 10;
 	public const int INSPECT_FONT_SIZE = 10;
 	public const int INGREDIENT_FONT_SIZE = 8;
+	public const int HOLDING_FONT_SIZE = 10;
 	public const int CARD_WIDTH = 120;
 }

@@ -9,6 +9,8 @@ using RollAndCash.Content;
 using RollAndCash.Relations;
 using MoonWorks.Math;
 using RollAndCash.Messages;
+using RollAndCash.Content;
+
 
 namespace RollAndCash.Systems;
 
@@ -92,6 +94,27 @@ public class Hold : MoonTools.ECS.System
 		Set(holding, holderPos + holderDirection * 16 + new Position(0, -10));
 		var depth = MathHelper.Lerp(100, 10, Get<Position>(holding).Y / (float)Dimensions.GAME_H);
 		Set(holding, new Depth(depth));
+
+		if (Has<Player>(e))
+		{
+			if (!HasOutRelation<HoldingText>(e))
+			{
+				var textEntity = CreateEntity();
+				Set(textEntity, new Depth(6));
+				Set(textEntity, new TextDropShadow(1, 1));
+				Relate(e, textEntity, new HoldingText());
+			}
+
+			var txt = OutRelationSingleton<HoldingText>(e);
+			Set(txt, holderPos);
+			Set(txt, new Text(
+				Fonts.KosugiID,
+				Dimensions.HOLDING_FONT_SIZE,
+				$"${Product.GetPrice(holding)}",
+				MoonWorks.Graphics.Font.HorizontalAlignment.Center,
+				MoonWorks.Graphics.Font.VerticalAlignment.Middle
+			));
+		}
 	}
 
 	public void Inspect(Entity potentialHolder, Entity product)
@@ -279,6 +302,11 @@ public class Hold : MoonTools.ECS.System
 			if (HasOutRelation<Holding>(holder))
 			{
 				SetHoldParameters(holder, (float)delta.TotalSeconds);
+			}
+			else
+			{
+				if (HasOutRelation<HoldingText>(holder))
+					Destroy(OutRelationSingleton<HoldingText>(holder));
 			}
 		}
 
