@@ -140,7 +140,7 @@ public class NPCController : MoonTools.ECS.System
             builder.Append(" ");
             font.TextBounds(
                 builder.ToString(),
-                10,
+                Dimensions.DIALOGUE_FONT_SIZE,
                 MoonWorks.Graphics.Font.HorizontalAlignment.Left,
                 MoonWorks.Graphics.Font.VerticalAlignment.Top,
                 out var testBounds

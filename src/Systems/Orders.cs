@@ -8,6 +8,8 @@ using RollAndCash.Utility;
 using MoonTools.ECS;
 using MoonWorks.Math.Float;
 using System.Text;
+using MoonWorks.Graphics.Font;
+using RollAndCash.Data;
 
 namespace RollAndCash.Systems;
 
@@ -19,6 +21,8 @@ public class Orders : MoonTools.ECS.System
     Filter PlayerFilter;
     Filter NPCFilter;
     Product ProductManipulator;
+
+    const float OrderTime = 1.0f;
 
     public Orders(World world) : base(world)
     {
@@ -41,7 +45,6 @@ public class Orders : MoonTools.ECS.System
 
     (float min, float max) GetPriceRange(Entity e)
     {
-
         if (Has<Category>(e))
         {
             float min = float.PositiveInfinity;
@@ -90,29 +93,63 @@ public class Orders : MoonTools.ECS.System
             Unrelate<RequiresIngredient>(order, ingredientRequirement);
         }
 
-        if (Rando.Value <= 0.5f)
-        { // require category
-            var category = CategoryFilter.RandomEntity;
-            Relate(order, category, new RequiresCategory());
-            var (min, max) = GetPriceRange(category);
-            var price = MathF.Round(Rando.Range(min, max), 2);
-            Set(order, new Price(price));
+        bool suitableCandidate = false;
 
-            var text = CategoriesAndIngredients.GetDisplayName(Get<Category>(category));
-            Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+        while (!suitableCandidate)
+        {
+            if (Rando.Value <= 0.5f)
+            { // require category
+                var category = CategoryFilter.RandomEntity;
+                var (min, max) = GetPriceRange(category);
+
+                if (min == float.PositiveInfinity || max == float.NegativeInfinity)
+                    continue; //no item can fulfill this order, skip it
+
+                if (HasInRelation<RequiresCategory>(category))
+                    continue; //another order already wants this, skip it
+
+                suitableCandidate = true;
+
+                Relate(order, category, new RequiresCategory());
+                var price = MathF.Round(Rando.Range(min, max), 2);
+                Set(order, new Price(price));
+
+                var text = CategoriesAndIngredients.GetDisplayName(Get<Category>(category));
+                Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+            }
+            else
+            { // require ingredient
+                var ingredient = IngredientFilter.RandomEntity;
+                var (min, max) = GetPriceRange(ingredient);
+
+                if (min == float.PositiveInfinity || max == float.NegativeInfinity)
+                    continue;
+
+                if (HasInRelation<RequiresIngredient>(ingredient))
+                    continue;
+
+                Relate(order, ingredient, new RequiresIngredient());
+                var price = MathF.Round(Rando.Range(min, max), 2);
+                Set(order, new Price(price));
+                var text = CategoriesAndIngredients.GetDisplayName(Get<Ingredient>(ingredient));
+                Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+            }
         }
-        else
-        { // require ingredient
-            var ingredient = IngredientFilter.RandomEntity;
-            Relate(order, ingredient, new RequiresIngredient());
-            var (min, max) = GetPriceRange(ingredient);
-            var price = MathF.Round(Rando.Range(min, max), 2);
-            Set(order, new Price(price));
 
-            var text = CategoriesAndIngredients.GetDisplayName(Get<Ingredient>(ingredient));
-            Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+        var font = Fonts.FromID(Fonts.KosugiID);
+        var orderText = Get<Text>(order);
+        font.TextBounds(
+            TextStorage.GetString(orderText.TextID),
+            Dimensions.ORDER_FONT_SIZE,
+            HorizontalAlignment.Center,
+            VerticalAlignment.Middle,
+            out var textBounds
+        );
+
+        if (textBounds.W > Dimensions.CARD_WIDTH)
+        {
+            Set(order, new Text(Fonts.KosugiID, Dimensions.SMALL_ORDER_FONT_SIZE, orderText.TextID, HorizontalAlignment.Center));
         }
-
 
         if (!HasOutRelation<OrderPriceText>(order))
         {
@@ -127,7 +164,7 @@ public class Orders : MoonTools.ECS.System
         Set(priceText, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, priceString, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
 
         var timer = CreateEntity();
-        Set(timer, new Timer(30));
+        Set(timer, new Timer(OrderTime));
         Relate(order, timer, new OrderTimer());
     }
 
