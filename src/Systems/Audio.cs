@@ -4,6 +4,7 @@ using RollAndCash.Messages;
 using RollAndCash.Utility;
 using MoonTools.ECS;
 using MoonWorks.Audio;
+using GGJ2024.Data;
 
 namespace RollAndCash.Systems;
 
@@ -15,6 +16,8 @@ public class Audio : MoonTools.ECS.System
 	StreamingVoice TitleMusicVoice;
 
 	StreamingSoundID[] GameplaySongs;
+
+	PersistentVoice DroneVoice;
 
 	public Audio(World world, AudioDevice audioDevice) : base(world)
 	{
@@ -34,6 +37,8 @@ public class Audio : MoonTools.ECS.System
 		TitleMusicVoice = AudioDevice.Obtain<StreamingVoice>(streamingAudioData.Format);
 		TitleMusicVoice.SetVolume(0.5f);
 		TitleMusicVoice.Loop = true;
+
+		DroneVoice = AudioDevice.Obtain<PersistentVoice>(StaticAudio.Lookup(StaticAudio.Drone1).Format);
 	}
 
 	public override void Update(TimeSpan delta)
@@ -44,7 +49,8 @@ public class Audio : MoonTools.ECS.System
 				staticSoundMessage.Sound,
 				staticSoundMessage.Volume,
 				staticSoundMessage.Pitch,
-				staticSoundMessage.Pan
+				staticSoundMessage.Pan,
+				staticSoundMessage.Category
 			);
 		}
 
@@ -73,10 +79,20 @@ public class Audio : MoonTools.ECS.System
 		AudioBuffer sound,
 		float volume,
 		float pitch,
-		float pan
+		float pan,
+		SoundCategory soundCategory
 	)
 	{
-		var voice = AudioDevice.Obtain<TransientVoice>(sound.Format);
+		SourceVoice voice;
+		if (soundCategory == SoundCategory.Drone)
+		{
+			voice = DroneVoice;
+		}
+		else
+		{
+			voice = AudioDevice.Obtain<TransientVoice>(sound.Format);
+		}
+
 		voice.SetVolume(volume);
 		voice.SetPitch(pitch);
 		voice.SetPan(pan);

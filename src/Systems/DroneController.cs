@@ -14,12 +14,9 @@ namespace GGJ2024.Systems;
 
 public class DroneController : MoonTools.ECS.System
 {
-    float MinSpawnTime = 5f;
-    float MaxSpawnTime = 12f;
-
     float DroneSpeed = 80;
 
-    RollAndCash.Systems.ProductSpawner Product;
+    ProductSpawner Product;
 
     Filter TargeterFilter;
     Filter HoldableFilter;
@@ -56,24 +53,30 @@ public class DroneController : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
-        var gameTimer = GetSingleton<RollAndCash.Components.GameTimer>();
-
+        // set restock timer on empty product spawners
         foreach (var productSpawner in ProductSpawnerFilter.Entities)
         {
-            if (!HasInRelation<BelongsToProductSpawner>(productSpawner))
+            if (!HasInRelation<BelongsToProductSpawner>(productSpawner) && !Has<WaitingForProductRestock>(productSpawner))
             {
+                Set(productSpawner, new WaitingForProductRestock());
+
+                var restockTimerEntity = CreateEntity();
+                Set(restockTimerEntity, new Timer(Rando.Range(0.5f, 2.5f)));
+                Relate(productSpawner, restockTimerEntity, new RestockTimer());
+            }
+        }
+
+        // check restock timer
+        foreach (var productSpawner in ProductSpawnerFilter.Entities)
+        {
+            if (Has<WaitingForProductRestock>(productSpawner) && !HasOutRelation<RestockTimer>(productSpawner))
+            {
+                Remove<WaitingForProductRestock>(productSpawner);
                 SpawnDrone(productSpawner);
             }
         }
 
-        foreach (var targeter in TargeterFilter.Entities)
-        {
-            if (!HasOutRelation<Targeting>(targeter) && !HoldableFilter.Empty)
-            {
-                Relate(targeter, HoldableFilter.RandomEntity, new Targeting());
-            }
-        }
-
+        // drone target procedure
         foreach (var targeter in TargeterFilter.Entities)
         {
             if (HasOutRelation<Holding>(targeter) && HasOutRelation<Targeting>(targeter))
@@ -99,6 +102,7 @@ public class DroneController : MoonTools.ECS.System
                     Send(new PlayStaticSoundMessage(StaticAudio.PutDown));
                     Set(product, targetedPosition);
 
+                    // fly off in a random direction
                     var randomDirection = Vector2.Rotate(Vector2.UnitX, Rando.Range(0, 2 * MathF.PI));
                     Set(targeter, new Velocity(randomDirection * DroneSpeed));
                 }
@@ -108,7 +112,10 @@ public class DroneController : MoonTools.ECS.System
 
     public void SpawnDrone(Entity emptyProductSpawner)
     {
-        var position = new Position(0, 0);
+        // spawn in random border position
+        var xPosition = Rando.IntInclusive(0, 1) == 0 ? Rando.IntInclusive(-75, -25) : Rando.IntInclusive(Dimensions.GAME_W + 25, Dimensions.GAME_W + 75);
+        var yPosition = Rando.IntInclusive(-25, Dimensions.GAME_H - 50);
+        var position = new Position(xPosition, yPosition);
 
         var drone = World.CreateEntity();
         Set(drone, position);
@@ -146,6 +153,6 @@ public class DroneController : MoonTools.ECS.System
         Relate(drone, emptyProductSpawner, new Targeting());
         Relate(product, emptyProductSpawner, new BelongsToProductSpawner());
 
-        Send(new PlayStaticSoundMessage(Rando.GetRandomItem(DroneSounds)));
+        Send(new PlayStaticSoundMessage(Rando.GetRandomItem(DroneSounds), Data.SoundCategory.Drone));
     }
 }

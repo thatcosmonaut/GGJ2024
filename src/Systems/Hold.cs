@@ -110,7 +110,7 @@ public class Hold : MoonTools.ECS.System
 	public void Inspect(Entity potentialHolder, Entity product)
 	{
 		var playerIndex = Get<Player>(potentialHolder).Index;
-		Send(new PlayStaticSoundMessage(StaticAudio.BubbleOpen, 0.5f));
+		Send(new PlayStaticSoundMessage(StaticAudio.BubbleOpen, GGJ2024.Data.SoundCategory.Generic, 0.5f));
 
 		var index = 0;
 		if (Some<IsPopupBox>())

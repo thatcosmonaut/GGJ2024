@@ -71,3 +71,5 @@ public readonly record struct DestroyAtGameEnd();
 
 public readonly record struct CanTargetProductSpawner();
 public readonly record struct DestroyWhenOutOfBounds();
+
+public readonly record struct WaitingForProductRestock();

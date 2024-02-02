@@ -25,3 +25,4 @@ public readonly record struct OrderIcon();
 public readonly record struct HoldingText();
 public readonly record struct TeleportToAtTimerEnd(Entity TeleportTo);
 public readonly record struct Targeting();
+public readonly record struct RestockTimer();

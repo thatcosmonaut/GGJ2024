@@ -3,11 +3,13 @@ using RollAndCash.Systems;
 using MoonTools.ECS;
 using MoonWorks.Audio;
 using RollAndCash.Components;
+using GGJ2024.Data;
 
 namespace RollAndCash.Messages;
 
 public readonly record struct PlayStaticSoundMessage(
 	StaticSoundID StaticSoundID,
+	SoundCategory Category = SoundCategory.Generic,
 	float Volume = 1,
 	float Pitch = 0,
 	float Pan = 0

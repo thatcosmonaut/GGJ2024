@@ -188,6 +188,7 @@ public class PlayerController : MoonTools.ECS.System
 					StaticAudio.Footstep4,
 					StaticAudio.Footstep5,
 				}.GetRandomItem<StaticSoundID>(),
+			GGJ2024.Data.SoundCategory.Generic,
 			Rando.Range(0.66f, 0.88f),
 			Rando.Range(-.05f, .05f)
 			)
