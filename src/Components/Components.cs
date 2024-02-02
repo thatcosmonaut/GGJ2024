@@ -36,6 +36,7 @@ public readonly record struct TextDropShadow(int OffsetX, int OffsetY);
 public readonly record struct ForceIntegerMovement();
 public readonly record struct MaxSpeed(float Value);
 
+public readonly record struct AdjustFramerateToSpeed();
 public readonly record struct FunnyRunTimer(float Time); //Scooby doo style quick run when starting to move
 public readonly record struct CanFunnyRun();
 
@@ -67,3 +68,6 @@ public readonly record struct DontSpawnNPCs();
 public readonly record struct StoreExit();
 public readonly record struct AccelerateToPosition(Position Target, float Acceleration, float MotionDampFactor);
 public readonly record struct DestroyAtGameEnd();
+
+public readonly record struct CanTargetProductSpawner();
+public readonly record struct DestroyWhenOutOfBounds();

@@ -11,12 +11,10 @@ namespace RollAndCash.Systems;
 public class GameTimer : MoonTools.ECS.System
 {
 	GameLoopManipulator GameLoopManipulator;
-	ProductSpawner ProductSpawner;
 
 	public GameTimer(World world) : base(world)
 	{
 		GameLoopManipulator = new GameLoopManipulator(world);
-		ProductSpawner = new ProductSpawner(world);
 	}
 
 	public override void Update(TimeSpan delta)
@@ -57,12 +55,6 @@ public class GameTimer : MoonTools.ECS.System
 		if (time <= 0 && !Some<IsScoreScreen>() && !Some<IsTitleScreen>())
 		{
 			GameLoopManipulator.AdvanceGameState();
-		}
-
-		if (OnTime(time, 0, (float)delta.TotalSeconds, 5))
-		{
-			// respawn products
-			ProductSpawner.SpawnProducts();
 		}
 	}
 

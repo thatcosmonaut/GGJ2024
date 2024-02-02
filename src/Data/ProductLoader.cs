@@ -1,13 +1,6 @@
 using System;
-using MoonTools.ECS;
-using RollAndCash.Utility;
-using RollAndCash.Components;
-using MoonWorks.Math.Float;
 using System.IO;
-using System.Linq;
 using System.Collections.Generic;
-using RollAndCash.Data;
-using RollAndCash.Relations;
 
 namespace RollAndCash.Systems;
 
@@ -20,7 +13,6 @@ public static class ProductLoader
     {
         foreach (Category category in Enum.GetValues(typeof(Category)))
         {
-            Console.WriteLine("initialized " + Enum.GetName(category));
             CategoryToProductList[category] = new List<ProductData>();
         }
 

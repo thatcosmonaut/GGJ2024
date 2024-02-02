@@ -10,6 +10,7 @@ using RollAndCash.Data;
 using RollAndCash.Messages;
 using RollAndCash.Relations;
 using LD54.Systems;
+using GGJ2024.Systems;
 
 namespace RollAndCash
 {
@@ -21,8 +22,8 @@ namespace RollAndCash
 		Motion Motion;
 		Audio Audio;
 		Hold Hold;
-		RollAndCash.Systems.ProductSpawner ProductSpawner;
-		Product ProductManipulator;
+		ProductSpawner ProductSpawner;
+		ShelfSpawner ShelfSpawner;
 		Ticker Ticker;
 		Systems.GameTimer GameTimer;
 		Timing Timing;
@@ -32,7 +33,7 @@ namespace RollAndCash
 		UpdateSpriteAnimationSystem UpdateSpriteAnimationSystem;
 		ColorAnimation ColorAnimation;
 		NPCController NPCController;
-
+		DroneController DroneController;
 		PlayerController PlayerController;
 
 		GameLoopManipulator GameLoopManipulator;
@@ -66,13 +67,14 @@ namespace RollAndCash
 			PlayerController = new PlayerController(World);
 			Hold = new Hold(World);
 			Orders = new Orders(World);
-			ProductSpawner = new RollAndCash.Systems.ProductSpawner(World);
-			ProductManipulator = new Product(World);
+            ProductSpawner = new ProductSpawner(World);
+			ShelfSpawner = new ShelfSpawner(World);
 			SetSpriteAnimationSystem = new SetSpriteAnimationSystem(World);
 			UpdateSpriteAnimationSystem = new UpdateSpriteAnimationSystem(World);
 			ColorAnimation = new ColorAnimation(World);
 			DirectionalAnimation = new DirectionalAnimation(World);
 			NPCController = new NPCController(World);
+			DroneController = new DroneController(World);
 
 			CategoriesAndIngredients cats = new CategoriesAndIngredients(World);
 			cats.Initialize(World);
@@ -179,6 +181,9 @@ namespace RollAndCash
 			World.Relate(playerOne, scoreOne, new HasScore());
 			World.Relate(playerTwo, scoreTwo, new HasScore());
 
+			ShelfSpawner.SpawnShelves();
+			ProductSpawner.SpawnAllProducts();
+
 			GameLoopManipulator.ShowTitleScreen();
 
 			//GameLoopManipulator.Restart();
@@ -193,6 +198,7 @@ namespace RollAndCash
 			Input.Update(dt);
 			PlayerController.Update(dt);
 			NPCController.Update(dt);
+			DroneController.Update(dt);
 			Motion.Update(dt);
 			Hold.Update(dt);
 			Orders.Update(dt);

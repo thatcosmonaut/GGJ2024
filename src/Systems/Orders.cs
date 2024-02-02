@@ -20,7 +20,7 @@ public class Orders : MoonTools.ECS.System
     Filter OrderFilter;
     Filter PlayerFilter;
     Filter NPCFilter;
-    Product ProductManipulator;
+    ProductSpawner ProductManipulator;
 
     const float OrderTime = 20.0f;
 
@@ -30,7 +30,7 @@ public class Orders : MoonTools.ECS.System
         IngredientFilter = FilterBuilder.Include<Ingredient>().Build();
         OrderFilter = FilterBuilder.Include<IsOrder>().Build();
         PlayerFilter = FilterBuilder.Include<Player>().Include<CanHold>().Build();
-        ProductManipulator = new Product(world);
+        ProductManipulator = new ProductSpawner(world);
         NPCFilter =
             FilterBuilder
             .Include<Position>()
@@ -319,11 +319,12 @@ public class Orders : MoonTools.ECS.System
         {
             if (HasOutRelation<Holding>(npc))
             {
+                var product = OutRelationSingleton<Holding>(npc);
+
                 foreach (var colliding in OutRelations<Colliding>(npc))
                 {
                     if (colliding == cashRegister)
                     {
-                        var product = OutRelationSingleton<Holding>(npc);
                         Destroy(product);
                     }
                 }

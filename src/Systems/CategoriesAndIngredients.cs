@@ -79,7 +79,8 @@ public class CategoriesAndIngredients : Manipulator
             "shrimp" => Ingredient.Shrimp,
             "uranium" => Ingredient.Uranium,
             "gold" => Ingredient.Gold,
-            "oatmeal" => Ingredient.Oatmeal
+            "oatmeal" => Ingredient.Oatmeal,
+            _ => Ingredient.Ectoplasm
         };
     }
 
@@ -96,7 +97,8 @@ public class CategoriesAndIngredients : Manipulator
             "gasses" => Category.Gasses,
             "ip" => Category.IntellectualProperty,
             "pharmacy" => Category.Pharmacy,
-            "relics" => Category.Relics
+            "relics" => Category.Relics,
+            _ => Category.Animals
         };
     }
 
@@ -123,7 +125,8 @@ public class CategoriesAndIngredients : Manipulator
             Ingredient.Shrimp => "Brine Shrimp",
             Ingredient.Uranium => "Uranium",
             Ingredient.Gold => "Gold",
-            Ingredient.Oatmeal => "Oatmeal"
+            Ingredient.Oatmeal => "Oatmeal",
+            _ => "Invalid"
         };
     }
 
@@ -141,7 +144,8 @@ public class CategoriesAndIngredients : Manipulator
             Category.Gasses => "Gasses",
             Category.IntellectualProperty => "Intellectual Property",
             Category.Pharmacy => "Pharmacy",
-            Category.Relics => "Relics"
+            Category.Relics => "Relics",
+            _ => "Invalid"
         };
     }
 
@@ -168,6 +172,7 @@ public class CategoriesAndIngredients : Manipulator
             Category.Pharmacy => Content.SpriteAnimations.Item_Pharmacy,
 
             Category.Relics => Content.SpriteAnimations.Item_Relic,
+            _ => Content.SpriteAnimations.Item_Animal
         };
     }
 

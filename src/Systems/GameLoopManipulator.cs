@@ -17,7 +17,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 	Filter ScoreScreenFilter;
 	Filter DestroyAtGameEndFilter;
 
-	RollAndCash.Systems.ProductSpawner ProductSpawner;
+	ProductSpawner ProductSpawner;
 
 	string[] ScoreStrings;
 	public GameLoopManipulator(World world) : base(world)
@@ -28,7 +28,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		ScoreScreenFilter = FilterBuilder.Include<IsScoreScreen>().Build();
 		DestroyAtGameEndFilter = FilterBuilder.Include<DestroyAtGameEnd>().Build();
 
-		ProductSpawner = new RollAndCash.Systems.ProductSpawner(world);
+		ProductSpawner = new ProductSpawner(world);
 
 		var scoreStringsFilePath = Path.Combine(
 			System.AppContext.BaseDirectory,
@@ -55,7 +55,6 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 	public void ShowScoreScreen()
 	{
 		Send(new PlayStaticSoundMessage(StaticAudio.Score));
-
 
 		var scoreScreenEntity = CreateEntity();
 		Set(scoreScreenEntity, new Position(0, 0));
@@ -184,7 +183,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 
 		World.Send(new PlaySongMessage());
 
-		
+
 		foreach (var entity in DestroyAtGameEndFilter.Entities)
 		{
 			Destroy(entity);
@@ -193,7 +192,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		// respawn products
 
 		ProductSpawner.ClearProducts();
-		ProductSpawner.SpawnProducts();
+		ProductSpawner.SpawnAllProducts();
 
 		// reset orders
 	}

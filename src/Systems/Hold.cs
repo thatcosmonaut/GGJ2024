@@ -9,15 +9,13 @@ using RollAndCash.Content;
 using RollAndCash.Relations;
 using MoonWorks.Math;
 using RollAndCash.Messages;
-using RollAndCash.Content;
-
 
 namespace RollAndCash.Systems;
 
 public class Hold : MoonTools.ECS.System
 {
 	MoonTools.ECS.Filter CanHoldFilter;
-	Product Product;
+	ProductSpawner Product;
 
 	public Hold(World world) : base(world)
 	{
@@ -29,20 +27,18 @@ public class Hold : MoonTools.ECS.System
 			.Include<CanHold>()
 			.Build();
 
-		Product = new Product(world);
+		Product = new ProductSpawner(world);
 	}
 
 	void HoldOrDrop(Entity e)
 	{
 		if (!HasOutRelation<Holding>(e))
 		{
-			bool holding = false;
-
 			foreach (var o in OutRelations<Colliding>(e))
 			{
 				if (Has<CanBeHeld>(o))
 				{
-					holding = true;
+					UnrelateAll<Holding>(o); // steal
 					Relate(e, o, new Holding());
 					Send(new PlayStaticSoundMessage(StaticAudio.PickUp));
 
@@ -51,20 +47,8 @@ public class Hold : MoonTools.ECS.System
 						o,
 						new SpriteAnimation(spriteInfo, 90, true)
 					));
-				}
-			}
 
-			if (!holding)
-			{
-				foreach (var i in InRelations<Colliding>(e))
-				{
-					if (Has<CanBeHeld>(i))
-					{
-						Set(i, Color.Yellow);
-						Relate(e, i, new Holding());
-
-						StopInspect(e);
-					}
+					break;
 				}
 			}
 		}
@@ -94,6 +78,12 @@ public class Hold : MoonTools.ECS.System
 		Set(holding, holderPos + holderDirection * 16 + new Position(0, -10));
 		var depth = MathHelper.Lerp(100, 10, Get<Position>(holding).Y / (float)Dimensions.GAME_H);
 		Set(holding, new Depth(depth));
+
+		// this is drone jank -evan
+		if (Has<CanTargetProductSpawner>(e))
+		{
+			Set(holding, holderPos + new Position(0, 15));
+		}
 
 		if (Has<Player>(e))
 		{
@@ -286,6 +276,7 @@ public class Hold : MoonTools.ECS.System
 			if (Has<TryHold>(holder))
 			{
 				HoldOrDrop(holder);
+				Remove<TryHold>(holder);
 			}
 			else if (!HasOutRelation<Inspecting>(holder))
 			{

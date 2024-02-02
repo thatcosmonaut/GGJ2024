@@ -42,6 +42,7 @@ public class PlayerController : MoonTools.ECS.System
 		World.Set(player, new MaxSpeed(128));
 		World.Set(player, new Velocity(Vector2.Zero));
 		World.Set(player, new LastDirection(Vector2.Zero));
+		World.Set(player, new AdjustFramerateToSpeed());
 		World.Set(player, new InputState());
 		World.Set(player, new DirectionalSprites(
 			index == 0 ? Content.SpriteAnimations.Char_Walk_Up.ID : Content.SpriteAnimations.Char2_Walk_Up.ID,
@@ -65,8 +66,6 @@ public class PlayerController : MoonTools.ECS.System
 		{
 			var playerIndex = Get<Player>(entity).Index;
 			var direction = Vector2.Zero;
-			if (Has<TryHold>(entity))
-				Remove<TryHold>(entity);
 
 			#region Input
 			var inputState = Get<InputState>(entity);

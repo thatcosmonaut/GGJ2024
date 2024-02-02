@@ -23,9 +23,10 @@ public class DirectionalAnimation : MoonTools.ECS.System
     {
         foreach (var entity in DirectionFilter.Entities)
         {
-            SpriteAnimationInfo animation = Has<SpriteAnimation>(entity) ? Get<SpriteAnimation>(entity).SpriteAnimationInfo : null;
             var direction = Get<LastDirection>(entity).Direction;
             var animations = Get<DirectionalSprites>(entity);
+
+            SpriteAnimationInfo animation;
 
             if (direction.X > 0)
             {
@@ -75,10 +76,15 @@ public class DirectionalAnimation : MoonTools.ECS.System
 
             var velocity = Has<Velocity>(entity) ? (Vector2)Get<Velocity>(entity) : Vector2.Zero;
 
-            int framerate = (int)(velocity.Length() / 20f);
-            if (Has<FunnyRunTimer>(entity))
+            int framerate = Get<SpriteAnimation>(entity).FrameRate;
+
+            if (Has<AdjustFramerateToSpeed>(entity))
             {
-                framerate = 25;
+                framerate = (int)(velocity.Length() / 20f);
+                if (Has<FunnyRunTimer>(entity))
+                {
+                    framerate = 25;
+                }
             }
 
             if (direction.LengthSquared() > 0)

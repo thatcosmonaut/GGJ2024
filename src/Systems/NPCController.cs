@@ -88,6 +88,7 @@ public class NPCController : MoonTools.ECS.System
         Set(NPC, new Solid());
         Set(NPC, new Depth(5));
         Set(NPC, new MaxSpeed(128));
+        Set(NPC, new AdjustFramerateToSpeed());
         Set(NPC, new Velocity(Vector2.Zero));
         Set(NPC, new LastDirection(Vector2.UnitY));
         Set(NPC, new CanTalk());
@@ -115,7 +116,6 @@ public class NPCController : MoonTools.ECS.System
             return;
 
         var playerIndex = Get<Player>(player).Index;
-        //Send(new PlayStaticSoundMessage(StaticAudio.BubbleOpen, 0.5f));
         Send(new PlayStaticSoundMessage(Rando.GetRandomItem(BizassSoundz)));
 
         var index = 0;
@@ -230,9 +230,6 @@ public class NPCController : MoonTools.ECS.System
             var direction = Get<LastDirection>(entity).Direction;
             var position = Get<Position>(entity);
 
-            if (Has<TryHold>(entity))
-                Remove<TryHold>(entity);
-
             if (HasOutRelation<TouchingSolid>(entity) || HasInRelation<TouchingSolid>(entity))
             {
                 direction = Vector2.Normalize(Directions.GetRandomItem());
@@ -297,11 +294,6 @@ public class NPCController : MoonTools.ECS.System
 
             if (!destroyed)
             {
-                if (HasOutRelation<Holding>(entity))
-                {
-                    UnrelateAll<BelongsToProductSpawner>(OutRelationSingleton<Holding>(entity));
-                }
-
                 Set(entity, new Velocity(direction * NPCSpeed));
                 Set(entity, new LastDirection(direction));
 

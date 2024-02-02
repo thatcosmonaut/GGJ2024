@@ -183,9 +183,6 @@ public class Motion : MoonTools.ECS.System
 
         foreach (var entity in InteractFilter.Entities)
         {
-            if (HasInRelation<Holding>(entity))
-                continue;
-
             AddToHash(InteractSpatialHash, entity);
         }
 
@@ -195,7 +192,10 @@ public class Motion : MoonTools.ECS.System
             {
                 Unrelate<Colliding>(entity, other);
             }
+        }
 
+        foreach (var entity in InteractFilter.Entities)
+        {
             var position = Get<Position>(entity);
             var rect = GetWorldRect(position, Get<Rectangle>(entity));
 
@@ -227,7 +227,7 @@ public class Motion : MoonTools.ECS.System
             var pos = Get<Position>(entity);
             var vel = (Vector2)Get<Velocity>(entity);
 
-            if (Has<Rectangle>(entity))
+            if (Has<Rectangle>(entity) && Has<Solid>(entity))
             {
                 var result = SweepTest(entity, (float)delta.TotalSeconds);
                 Set(entity, result);
@@ -255,12 +255,19 @@ public class Motion : MoonTools.ECS.System
                     var outEntity = OutRelationSingleton<UpdateDisplayScoreOnDestroy>(entity);
                     var scoreEntity = OutRelationSingleton<HasScore>(outEntity);
                     var score = Get<DisplayScore>(scoreEntity).Value + 1;
-                    Console.WriteLine(score.ToString());
                     Set(scoreEntity, new Text(Content.Fonts.KosugiID, FontSizes.SCORE, score.ToString()));
                     Set(scoreEntity, new DisplayScore(score));
-                    
+
                 }
                 Destroy(entity);
+            }
+
+            if (Has<DestroyWhenOutOfBounds>(entity))
+            {
+                if (pos.X < -100 || pos.X > Dimensions.GAME_W + 100 || pos.Y < -100 || pos.Y > Dimensions.GAME_H + 100)
+                {
+                    Destroy(entity);
+                }
             }
         }
 
