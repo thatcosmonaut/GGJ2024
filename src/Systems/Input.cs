@@ -70,7 +70,7 @@ public class Input : MoonTools.ECS.System
 
 	public override void Update(TimeSpan timeSpan)
 	{
-		if (Some<IsTitleScreen>())
+		if (Some<IsTitleScreen>() || Some<IsScoreScreen>())
 		{
 			if (
 				PlayerOneKeyboard.Interact.IsPressed ||

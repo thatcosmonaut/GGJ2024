@@ -22,5 +22,5 @@ public static class FontSizes
 
 public static class Time
 {
-	public const float RoundTime = 90.0f;
+	public const float RoundTime = 30.0f;
 }
