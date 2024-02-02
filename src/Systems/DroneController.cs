@@ -19,7 +19,6 @@ public class DroneController : MoonTools.ECS.System
     ProductSpawner Product;
 
     Filter TargeterFilter;
-    Filter HoldableFilter;
     Filter ProductSpawnerFilter;
 
     StaticSoundID[] DroneSounds =
@@ -45,7 +44,6 @@ public class DroneController : MoonTools.ECS.System
     public DroneController(World world) : base(world)
     {
         TargeterFilter = FilterBuilder.Include<CanTargetProductSpawner>().Build();
-        HoldableFilter = FilterBuilder.Include<CanBeHeld>().Build();
         ProductSpawnerFilter = FilterBuilder.Include<Position>().Include<CanSpawn>().Build();
 
         Product = new ProductSpawner(world);

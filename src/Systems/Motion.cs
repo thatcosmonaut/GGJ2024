@@ -267,7 +267,7 @@ public class Motion : MoonTools.ECS.System
                     Send(new PlayStaticSoundMessage(
                         Rando.GetRandomItem(AudioArrays.Coins),
                         GGJ2024.Data.SoundCategory.Generic,
-                        1f,
+                        2f,
                         pitch,
                         pan
                     ));
