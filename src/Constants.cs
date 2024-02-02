@@ -18,9 +18,10 @@ public static class FontSizes
 	public const int INSPECT = 10;
 	public const int INGREDIENT = 8;
 	public const int HOLDING = 10;
+	public const int SCORE_STRING = 20;
 }
 
 public static class Time
 {
-	public const float RoundTime = 30.0f;
+	public const float RoundTime = 90.0f;
 }

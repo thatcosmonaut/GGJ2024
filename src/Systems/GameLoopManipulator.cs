@@ -9,6 +9,8 @@ using Microsoft.VisualBasic;
 using System.Numerics;
 using MoonWorks.Graphics.Font;
 using RollAndCash.Relations;
+using System.IO;
+using RollAndCash.Utility;
 
 public class GameLoopManipulator : MoonTools.ECS.Manipulator
 {
@@ -19,6 +21,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 
 	RollAndCash.Systems.ProductSpawner ProductSpawner;
 
+	string[] ScoreStrings;
 	public GameLoopManipulator(World world) : base(world)
 	{
 		PlayerFilter = FilterBuilder.Include<Player>().Build();
@@ -27,6 +30,15 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		ScoreScreenFilter = FilterBuilder.Include<IsScoreScreen>().Build();
 
 		ProductSpawner = new RollAndCash.Systems.ProductSpawner(world);
+
+		var scoreStringsFilePath = Path.Combine(
+			System.AppContext.BaseDirectory,
+			"Content",
+			"Data",
+			"score"
+		);
+
+		ScoreStrings = File.ReadAllLines(scoreStringsFilePath);
 	}
 
 	public void ShowTitleScreen()
@@ -43,6 +55,9 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 
 	public void ShowScoreScreen()
 	{
+		Send(new PlayStaticSoundMessage(StaticAudio.Score));
+
+
 		var scoreScreenEntity = CreateEntity();
 		Set(scoreScreenEntity, new Position(0, 0));
 		Set(scoreScreenEntity, new SpriteAnimation(SpriteAnimations.Score, 0));
@@ -79,7 +94,6 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 			HorizontalAlignment.Center,
 			VerticalAlignment.Middle
 		));
-		Set(p1ScoreEntity, new TextDropShadow(1, 1));
 		Set(p1ScoreEntity, new Depth(0.1f));
 		Set(p1ScoreEntity, new IsScoreScreen());
 
@@ -98,9 +112,20 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 			HorizontalAlignment.Center,
 			VerticalAlignment.Middle
 		));
-		Set(p2ScoreEntity, new TextDropShadow(1, 1));
 		Set(p2ScoreEntity, new Depth(0.1f));
 		Set(p2ScoreEntity, new IsScoreScreen());
+
+		var scoreStringEntity = CreateEntity();
+		Set(scoreStringEntity, new Position(Dimensions.GAME_W * 0.5f, 32.0f));
+		Set(scoreStringEntity, new Text(
+			Fonts.KosugiID,
+			FontSizes.SCORE_STRING,
+			$"{ScoreStrings.GetRandomItem()}",
+			HorizontalAlignment.Center,
+			VerticalAlignment.Middle
+		));
+		Set(scoreStringEntity, new Depth(0.1f));
+		Set(scoreStringEntity, new IsScoreScreen());
 
 	}
 
