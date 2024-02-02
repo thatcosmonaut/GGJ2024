@@ -98,13 +98,8 @@ public class Orders : MoonTools.ECS.System
             var price = MathF.Round(Rando.Range(min, max), 2);
             Set(order, new Price(price));
 
-            var text = new StringBuilder();
-            text.Append(CategoriesAndIngredients.GetDisplayName(Get<Category>(category)));
-            text.Append(" ($");
-            text.Append(price);
-            text.Append(")");
-            Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text.ToString(), MoonWorks.Graphics.Font.HorizontalAlignment.Center));
-
+            var text = CategoriesAndIngredients.GetDisplayName(Get<Category>(category));
+            Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
         }
         else
         { // require ingredient
@@ -114,14 +109,22 @@ public class Orders : MoonTools.ECS.System
             var price = MathF.Round(Rando.Range(min, max), 2);
             Set(order, new Price(price));
 
-            var text = new StringBuilder();
-            text.Append(CategoriesAndIngredients.GetDisplayName(Get<Ingredient>(ingredient)));
-            text.Append(" ($");
-            text.Append(price);
-            text.Append(")");
-            Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text.ToString(), MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+            var text = CategoriesAndIngredients.GetDisplayName(Get<Ingredient>(ingredient));
+            Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, text, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
         }
 
+
+        if (!HasOutRelation<OrderPriceText>(order))
+        {
+            var position = Get<Position>(order);
+            var priceTextEntity = CreateEntity();
+            Set(priceTextEntity, position + Vector2.UnitY * Dimensions.ORDER_FONT_SIZE * 2);
+            Relate(order, priceTextEntity, new OrderPriceText());
+        }
+
+        var priceText = OutRelationSingleton<OrderPriceText>(order);
+        var priceString = $"(${Get<Price>(order).Value})";
+        Set(priceText, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, priceString, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
 
         var timer = CreateEntity();
         Set(timer, new Timer(30));

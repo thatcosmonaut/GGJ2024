@@ -84,15 +84,15 @@ namespace RollAndCash
 			NPCController.SpawnNPC();
 
 			var orderOne = World.CreateEntity();
-			World.Set(orderOne, new Position(195, 345));
+			World.Set(orderOne, new Position(195, 340));
 			World.Set(orderOne, new IsOrder());
 
 			var orderTwo = World.CreateEntity();
-			World.Set(orderTwo, new Position(320, 345));
+			World.Set(orderTwo, new Position(320, 340));
 			World.Set(orderTwo, new IsOrder());
 
 			var orderThree = World.CreateEntity();
-			World.Set(orderThree, new Position(440, 345));
+			World.Set(orderThree, new Position(440, 340));
 			World.Set(orderThree, new IsOrder());
 
 			var topBorder = World.CreateEntity();
