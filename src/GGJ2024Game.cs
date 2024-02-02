@@ -134,6 +134,21 @@ namespace RollAndCash
 			World.Set(uiBottomBackground, new Depth(9));
 			World.Set(uiBottomBackground, new SpriteAnimation(Content.SpriteAnimations.HUD_Bottom, 0));
 
+			var uiBottomCard1 = World.CreateEntity();
+			World.Set(uiBottomCard1, new Position(Dimensions.GAME_W * 0.5f - 130 - 62, Dimensions.GAME_H - 40));
+			World.Set(uiBottomCard1, new Depth(9));
+			World.Set(uiBottomCard1, new SpriteAnimation(Content.SpriteAnimations.HUD_Card, 0));
+
+			var uiBottomCard2 = World.CreateEntity();
+			World.Set(uiBottomCard2, new Position(Dimensions.GAME_W * 0.5f - 62, Dimensions.GAME_H - 40));
+			World.Set(uiBottomCard2, new Depth(9));
+			World.Set(uiBottomCard2, new SpriteAnimation(Content.SpriteAnimations.HUD_Card, 0));
+
+			var uiBottomCard3 = World.CreateEntity();
+			World.Set(uiBottomCard3, new Position(Dimensions.GAME_W * 0.5f + 130 - 62, Dimensions.GAME_H - 40));
+			World.Set(uiBottomCard3, new Depth(9));
+			World.Set(uiBottomCard3, new SpriteAnimation(Content.SpriteAnimations.HUD_Card, 0));
+
 			var cashRegister = World.CreateEntity();
 			World.Set(cashRegister, new Position(8, 77));
 			World.Set(cashRegister, new Rectangle(0, 0, 80, 90));
