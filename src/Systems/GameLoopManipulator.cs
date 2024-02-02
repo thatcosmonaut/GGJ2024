@@ -125,14 +125,41 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		Set(p2ScoreEntity, new IsScoreScreen());
 
 		var scoreStringEntity = CreateEntity();
+		var str = ScoreStrings.GetRandomItem();
+		var fontSize = FontSizes.SCORE_STRING;
+
 		Set(scoreStringEntity, new Position(Dimensions.GAME_W * 0.5f, 32.0f));
+
+		var font = Fonts.FromID(Fonts.KosugiID);
+
+		font.TextBounds(
+			str,
+			fontSize,
+			MoonWorks.Graphics.Font.HorizontalAlignment.Center,
+			MoonWorks.Graphics.Font.VerticalAlignment.Middle,
+			out var textBounds
+		);
+
+		while (textBounds.W > 640)
+		{
+			fontSize--;
+			font.TextBounds(
+				str,
+				fontSize,
+				MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+				MoonWorks.Graphics.Font.VerticalAlignment.Top,
+				out textBounds
+			);
+		}
+
 		Set(scoreStringEntity, new Text(
 			Fonts.KosugiID,
-			FontSizes.SCORE_STRING,
-			$"{ScoreStrings.GetRandomItem()}",
+			fontSize,
+			$"{str}",
 			HorizontalAlignment.Center,
 			VerticalAlignment.Middle
 		));
+
 		Set(scoreStringEntity, new Depth(0.1f));
 		Set(scoreStringEntity, new IsScoreScreen());
 
