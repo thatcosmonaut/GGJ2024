@@ -152,7 +152,7 @@ public class NPCController : MoonTools.ECS.System
 
                 var text = CreateEntity();
                 Set(text, position + new Position(xOffset, yOffset));
-                Set(text, new Text(Fonts.KosugiID, 10, TextStorage.GetID(builder.ToString()), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
+                Set(text, new Text(Fonts.KosugiID, Dimensions.DIALOGUE_FONT_SIZE, TextStorage.GetID(builder.ToString()), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
                 Set(text, new TextDropShadow(1, 1));
                 Set(text, new Depth(6 - index * 4));
                 Set(text, new Timer(TalkTime));
@@ -168,7 +168,7 @@ public class NPCController : MoonTools.ECS.System
         {
             var text = CreateEntity();
             Set(text, position + new Position(xOffset, yOffset));
-            Set(text, new Text(Fonts.KosugiID, 10, TextStorage.GetID(builder.ToString()), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
+            Set(text, new Text(Fonts.KosugiID, Dimensions.DIALOGUE_FONT_SIZE, TextStorage.GetID(builder.ToString()), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
             Set(text, new TextDropShadow(1, 1));
             Set(text, new Depth(6 - index * 4));
             Set(text, new Timer(TalkTime));
