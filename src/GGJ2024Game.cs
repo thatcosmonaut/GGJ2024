@@ -160,7 +160,8 @@ namespace RollAndCash
 
 			var timer = World.CreateEntity();
 			World.Set(timer, new Components.GameTimer(90));
-			World.Set(timer, new Position(Dimensions.GAME_W - 40, 38));
+			World.Set(timer, new Position(Dimensions.GAME_W * 0.5f, 38));
+			World.Set(timer, new TextDropShadow(1, 1));
 
 			var scoreOne = World.CreateEntity();
 			World.Set(scoreOne, new Position(80, 345));
