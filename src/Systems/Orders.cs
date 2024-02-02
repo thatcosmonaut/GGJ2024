@@ -22,7 +22,7 @@ public class Orders : MoonTools.ECS.System
     Filter NPCFilter;
     Product ProductManipulator;
 
-    const float OrderTime = 1.0f;
+    const float OrderTime = 20.0f;
 
     public Orders(World world) : base(world)
     {
