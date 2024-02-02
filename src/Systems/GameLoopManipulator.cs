@@ -85,6 +85,15 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 
 		}
 
+		var trophy = CreateEntity();
+		Set(trophy, new SpriteAnimation(SpriteAnimations.UI_Trophy, 10, true));
+		Set(trophy, p1Score >= p2Score ?
+			new Position(Dimensions.GAME_W * 0.5f - 64.0f, Dimensions.GAME_H * 0.5f - 64.0f) :
+			new Position(Dimensions.GAME_W * 0.5f + 64.0f, Dimensions.GAME_H * 0.5f - 64.0f)
+		);
+		Set(trophy, new Depth(0.1f));
+		Set(trophy, new IsScoreScreen());
+
 		var p1ScoreEntity = CreateEntity();
 		Set(p1ScoreEntity, new Position(Dimensions.GAME_W * 0.5f - 64.0f, Dimensions.GAME_H * 0.5f + 32.0f));
 		Set(p1ScoreEntity, new Text(
