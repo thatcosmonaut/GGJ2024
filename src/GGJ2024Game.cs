@@ -154,12 +154,12 @@ namespace RollAndCash
 			var scoreOne = World.CreateEntity();
 			World.Set(scoreOne, new Position(80, 345));
 			World.Set(scoreOne, new Score(0));
-			World.Set(scoreOne, new Text(Fonts.KosugiID, 8, "0"));
+			World.Set(scoreOne, new Text(Fonts.KosugiID, Dimensions.SCORE_FONT_SIZE, "0"));
 
 			var scoreTwo = World.CreateEntity();
 			World.Set(scoreTwo, new Position(560, 345));
 			World.Set(scoreTwo, new Score(0));
-			World.Set(scoreTwo, new Text(Fonts.KosugiID, 8, "0"));
+			World.Set(scoreTwo, new Text(Fonts.KosugiID, Dimensions.SCORE_FONT_SIZE, "0"));
 
 			var playerOne = PlayerController.SpawnPlayer(0);
 			var playerTwo = PlayerController.SpawnPlayer(1);

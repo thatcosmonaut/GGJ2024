@@ -52,7 +52,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		foreach (var entity in ScoreFilter.Entities)
 		{
 			Set(entity, new Score(0));
-			Set(entity, new Text(Fonts.KosugiID, 8, "0"));
+			Set(entity, new Text(Fonts.KosugiID, Dimensions.SCORE_FONT_SIZE, "0"));
 		}
 
 		World.Send(new PlaySongMessage());

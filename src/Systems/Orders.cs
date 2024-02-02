@@ -54,13 +54,13 @@ public class Orders : MoonTools.ECS.System
         { // require category
             var category = CategoryFilter.RandomEntity;
             Relate(order, category, new RequiresCategory());
-            Set(order, new Text(Fonts.KosugiID, 10, Get<Category>(category).ToString(), MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+            Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, Get<Category>(category).ToString(), MoonWorks.Graphics.Font.HorizontalAlignment.Center));
         }
         else
         { // require ingredient
             var ingredient = IngredientFilter.RandomEntity;
             Relate(order, ingredient, new RequiresIngredient());
-            Set(order, new Text(Fonts.KosugiID, 10, Get<Ingredient>(ingredient).ToString(), MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+            Set(order, new Text(Fonts.KosugiID, Dimensions.ORDER_FONT_SIZE, Get<Ingredient>(ingredient).ToString(), MoonWorks.Graphics.Font.HorizontalAlignment.Center));
         }
     }
 
@@ -91,7 +91,7 @@ public class Orders : MoonTools.ECS.System
             var score = Get<Score>(scoreEntity).Value + calculate;
 
             Set(scoreEntity, new Score(score));
-            Set(scoreEntity, new Text(Fonts.KosugiID, 8, score.ToString()));
+            Set(scoreEntity, new Text(Fonts.KosugiID, Dimensions.SCORE_FONT_SIZE, score.ToString()));
 
             if (calculate < 0)
             {
