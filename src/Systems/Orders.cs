@@ -22,7 +22,6 @@ public class Orders : MoonTools.ECS.System
     Filter NPCFilter;
     ProductSpawner ProductManipulator;
     Filter DestroyForDebugTestReasonsFilter;
-    Product ProductManipulator;
 
     const float OrderTime = 20.0f;
 
@@ -34,7 +33,6 @@ public class Orders : MoonTools.ECS.System
         PlayerFilter = FilterBuilder.Include<Player>().Include<CanHold>().Build();
         ProductManipulator = new ProductSpawner(world);
         DestroyForDebugTestReasonsFilter = FilterBuilder.Include<DestroyForDebugTestReasons>().Build();
-        ProductManipulator = new Product(world);
         NPCFilter =
             FilterBuilder
             .Include<Position>()
@@ -88,9 +86,8 @@ public class Orders : MoonTools.ECS.System
             World.Set(orderCardCategoryIcon, new DestroyForDebugTestReasons());
             World.Set(orderCardCategoryIcon, new Position(spawnX + 100, spawnY + 32));
             World.Set(orderCardCategoryIcon, new Depth(8));
-            World.Set(orderCardCategoryIcon, new ColorBlend(MoonWorks.Graphics.Color.Red));
             World.Set(orderCardCategoryIcon, new SpriteAnimation(SpriteAnimations.HUD_Card, 0));
-            World.Set(orderCardCategoryIcon, new ColorFlicker(0, MoonWorks.Graphics.Color.DarkRed));
+            World.Set(orderCardCategoryIcon, new ColorFlicker(0, Colors.OrderCategory));
             World.Relate(orderData, orderCardCategoryIcon, new OrderIcon());
 
             var orderCardTimerRectangle = World.CreateEntity();
