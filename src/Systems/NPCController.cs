@@ -223,6 +223,8 @@ public class NPCController : MoonTools.ECS.System
             Set(timer, new Timer(time));
         }
 
+        if (!Some<GameInProgress>()) { return; }
+
         float deltaTime = (float)delta.TotalSeconds;
 
         foreach (var entity in NPCFilter.Entities)

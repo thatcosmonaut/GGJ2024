@@ -73,6 +73,11 @@ public class Audio : MoonTools.ECS.System
 			TitleMusicVoice.Load(streamingAudioData);
 			TitleMusicVoice.Play();
 		}
+
+		if (SomeMessage<StopDroneSounds>())
+		{
+			DroneVoice.Stop();
+		}
 	}
 
 	private void PlayStaticSound(

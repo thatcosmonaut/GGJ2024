@@ -50,6 +50,8 @@ public class Ticker : MoonTools.ECS.System
 
 	public override void Update(TimeSpan delta)
 	{
+		if (!Some<GameInProgress>()) { return; }
+
 		var farthestRight = 0;
 
 		foreach (var tickerTextEntity in TickerTextFilter.Entities)

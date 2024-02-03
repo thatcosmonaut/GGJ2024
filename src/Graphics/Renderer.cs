@@ -25,6 +25,7 @@ public class Renderer : MoonTools.ECS.Renderer
 	Texture SpriteAtlasTexture;
 
 	Sampler PointSampler;
+
 	MoonTools.ECS.Filter RectangleFilter;
 	MoonTools.ECS.Filter TextFilter;
 	MoonTools.ECS.Filter SpriteAnimationFilter;
@@ -75,7 +76,7 @@ public class Renderer : MoonTools.ECS.Renderer
 					RasterizerState = RasterizerState.CCW_CullNone,
 					VertexInputState = new VertexInputState([
 						VertexBindingAndAttributes.Create<PositionVertex>(0),
-					VertexBindingAndAttributes.Create<SpriteInstanceData>(1, 1, VertexInputRate.Instance)
+						VertexBindingAndAttributes.Create<SpriteInstanceData>(1, 1, VertexInputRate.Instance)
 					]),
 					VertexShaderInfo = GraphicsShaderInfo.Create<ViewProjectionMatrices>(vertShaderModule, "main", 0),
 					FragmentShaderInfo = GraphicsShaderInfo.Create(fragShaderModule, "main", 1)
@@ -154,7 +155,7 @@ public class Renderer : MoonTools.ECS.Renderer
 				{
 					color = Get<ColorBlend>(entity).Color;
 				}
-				
+
 				if (Has<ColorFlicker>(entity))
 				{
 					var colorFlicker = Get<ColorFlicker>(entity);
@@ -163,7 +164,7 @@ public class Renderer : MoonTools.ECS.Renderer
 						color = colorFlicker.Color;
 					}
 				}
-				
+
 				if (Has<Depth>(entity))
 				{
 					depth = -Get<Depth>(entity).Value;

@@ -8,7 +8,7 @@ using RollAndCash.Relations;
 using RollAndCash.Systems;
 using RollAndCash.Utility;
 
-namespace GGJ2024.Systems;
+namespace RollAndCash.Systems;
 
 public class DroneController : MoonTools.ECS.System
 {
@@ -32,6 +32,8 @@ public class DroneController : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        if (!Some<GameInProgress>()) { return; }
+
         // set restock timer on empty product spawners
         foreach (var productSpawner in ProductSpawnerFilter.Entities)
         {
