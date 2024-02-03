@@ -38,7 +38,11 @@ namespace RollAndCash
 			CreditsState = new CreditsState(this, GameplayState);
 			LogoState = new LogoState(this, CreditsState);
 
+#if DEBUG
+			SetState(GameplayState);
+#else
 			SetState(LogoState);
+#endif
 		}
 
 		protected override void Update(System.TimeSpan dt)
