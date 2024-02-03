@@ -54,6 +54,9 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 
 	public void ShowScoreScreen()
 	{
+		Destroy(GetSingletonEntity<GameInProgress>());
+
+		Send(new StopDroneSounds());
 		Send(new PlayStaticSoundMessage(StaticAudio.Score));
 
 		var scoreScreenEntity = CreateEntity();
@@ -166,6 +169,10 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 	void StartGame()
 	{
 		Destroy(GetSingletonEntity<IsTitleScreen>());
+
+		var gameInProgressEntity = CreateEntity();
+		Set(gameInProgressEntity, new GameInProgress());
+
 		Set(GameTimerFilter.NthEntity(0), new RollAndCash.Components.GameTimer(Time.ROUND_TIME));
 
 		var playerOne = PlayerFilter.NthEntity(0);
@@ -200,7 +207,10 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 	void BackToTitle()
 	{
 		foreach (var entity in ScoreScreenFilter.Entities)
+		{
 			Destroy(entity);
+		}
+
 		ShowTitleScreen();
 	}
 

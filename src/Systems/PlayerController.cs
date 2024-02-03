@@ -61,6 +61,8 @@ public class PlayerController : MoonTools.ECS.System
 
 	public override void Update(System.TimeSpan delta)
 	{
+		if (!Some<GameInProgress>()) { return; }
+
 		var deltaTime = (float)delta.TotalSeconds;
 
 		foreach (var entity in PlayerFilter.Entities)

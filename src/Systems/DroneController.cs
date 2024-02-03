@@ -32,6 +32,8 @@ public class DroneController : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        if (!Some<GameInProgress>()) { return; }
+
         // set restock timer on empty product spawners
         foreach (var productSpawner in ProductSpawnerFilter.Entities)
         {

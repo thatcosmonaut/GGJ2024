@@ -64,6 +64,7 @@ public class DroneSpawner : Manipulator
         Set(drone, new CanTargetProductSpawner());
         Set(drone, new Velocity(Vector2.Zero));
         Set(drone, new DestroyWhenOutOfBounds());
+        Set(drone, new DestroyAtGameEnd());
 
         // spawn product related to spawner
         Entity product;
@@ -111,6 +112,7 @@ public class DroneSpawner : Manipulator
         ));
         Set(drone, new CanStealProducts());
         Set(drone, new DestroyWhenOutOfBounds());
+        Set(drone, new DestroyAtGameEnd());
 
         Relate(drone, productToSteal, new Targeting());
 

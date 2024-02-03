@@ -51,6 +51,7 @@ public readonly record struct DestroyAtScreenBottom();
 
 public readonly record struct IsTitleScreen(); // bleeeh
 public readonly record struct IsScoreScreen(); // sorry
+public readonly record struct GameInProgress(); // yaaargh
 
 public readonly record struct DirectionalSprites(
     SpriteAnimationInfoID Up,

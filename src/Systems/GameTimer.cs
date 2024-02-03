@@ -56,7 +56,7 @@ public class GameTimer : MoonTools.ECS.System
             return;
         }
 
-        if (time <= 0 && !Some<IsScoreScreen>() && !Some<IsTitleScreen>())
+        if (time <= 0 && Some<GameInProgress>())
         {
             GameLoopManipulator.AdvanceGameState();
         }
