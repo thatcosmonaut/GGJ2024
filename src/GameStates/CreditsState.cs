@@ -18,10 +18,10 @@ public class CreditsState : GameState
     GraphicsDevice GraphicsDevice;
     AudioDevice AudioDevice;
 
-	GraphicsPipeline TextPipeline;
+    GraphicsPipeline TextPipeline;
 
-	Queue<TextBatch> BatchPool = new Queue<TextBatch>();
-	List<(TextBatch, Matrix4x4)> ActiveBatchTransforms = new List<(TextBatch, Matrix4x4)>();
+    Queue<TextBatch> BatchPool = new Queue<TextBatch>();
+    List<(TextBatch, Matrix4x4)> ActiveBatchTransforms = new List<(TextBatch, Matrix4x4)>();
 
     private string[] Names = [
         "BEAU BLYTH",
@@ -43,24 +43,24 @@ public class CreditsState : GameState
         AudioDevice = Game.AudioDevice;
 
         TextPipeline = new GraphicsPipeline(
-			Game.GraphicsDevice,
-			new GraphicsPipelineCreateInfo
-			{
-				AttachmentInfo = new GraphicsPipelineAttachmentInfo(
-					new ColorAttachmentDescription(
-						Game.MainWindow.SwapchainFormat,
-						ColorAttachmentBlendState.AlphaBlend
-					)
-				),
-				DepthStencilState = DepthStencilState.DepthReadWrite,
-				VertexShaderInfo = GraphicsDevice.TextVertexShaderInfo,
-				FragmentShaderInfo = GraphicsDevice.TextFragmentShaderInfo,
-				VertexInputState = GraphicsDevice.TextVertexInputState,
-				RasterizerState = RasterizerState.CCW_CullNone,
-				PrimitiveType = PrimitiveType.TriangleList,
-				MultisampleState = MultisampleState.None
-			}
-		);
+            Game.GraphicsDevice,
+            new GraphicsPipelineCreateInfo
+            {
+                AttachmentInfo = new GraphicsPipelineAttachmentInfo(
+                    new ColorAttachmentDescription(
+                        Game.MainWindow.SwapchainFormat,
+                        ColorAttachmentBlendState.AlphaBlend
+                    )
+                ),
+                DepthStencilState = DepthStencilState.DepthReadWrite,
+                VertexShaderInfo = GraphicsDevice.TextVertexShaderInfo,
+                FragmentShaderInfo = GraphicsDevice.TextFragmentShaderInfo,
+                VertexInputState = GraphicsDevice.TextVertexInputState,
+                RasterizerState = RasterizerState.CCW_CullNone,
+                PrimitiveType = PrimitiveType.TriangleList,
+                MultisampleState = MultisampleState.None
+            }
+        );
 
         Rando.Shuffle(Names);
     }
@@ -75,7 +75,7 @@ public class CreditsState : GameState
 
     public override void Update(TimeSpan delta)
     {
-        CreditsTime += (float) delta.TotalSeconds;
+        CreditsTime += (float)delta.TotalSeconds;
 
         if (CreditsTime >= CreditsDuration)
         {
@@ -91,10 +91,10 @@ public class CreditsState : GameState
         if (swapchainTexture != null)
         {
             foreach (var (batch, _) in ActiveBatchTransforms)
-			{
-				FreeTextBatch(batch);
-			}
-			ActiveBatchTransforms.Clear();
+            {
+                FreeTextBatch(batch);
+            }
+            ActiveBatchTransforms.Clear();
 
             AddString("JERRY CREW", 100, Color.White, new Position(960, 180));
             AddString("is", 50, Color.White, new Position(960, 300));
@@ -106,14 +106,14 @@ public class CreditsState : GameState
                 y += 100;
             }
 
-			foreach (var (batch, _) in ActiveBatchTransforms)
-			{
-				batch.UploadBufferData(commandBuffer);
-			}
+            foreach (var (batch, _) in ActiveBatchTransforms)
+            {
+                batch.UploadBufferData(commandBuffer);
+            }
 
-			commandBuffer.BeginRenderPass(
-				new ColorAttachmentInfo(swapchainTexture, Color.Black)
-			);
+            commandBuffer.BeginRenderPass(
+                new ColorAttachmentInfo(swapchainTexture, Color.Black)
+            );
 
             if (ActiveBatchTransforms.Count > 0)
             {
@@ -137,17 +137,17 @@ public class CreditsState : GameState
 
     }
 
-	private Matrix4x4 GetHiResProjectionMatrix()
-	{
-		return Matrix4x4.CreateOrthographicOffCenter(
-			0,
-			1920,
-			1080,
-			0,
-			0.01f,
-			1000
-		);
-	}
+    private Matrix4x4 GetHiResProjectionMatrix()
+    {
+        return Matrix4x4.CreateOrthographicOffCenter(
+            0,
+            1920,
+            1080,
+            0,
+            0.01f,
+            1000
+        );
+    }
 
     private void AddString(string text, int pixelSize, Color color, Position position)
     {
@@ -166,19 +166,19 @@ public class CreditsState : GameState
     }
 
     private TextBatch AcquireTextBatch()
-	{
-		if (BatchPool.Count > 0)
-		{
-			return BatchPool.Dequeue();
-		}
-		else
-		{
-			return new TextBatch(GraphicsDevice);
-		}
-	}
+    {
+        if (BatchPool.Count > 0)
+        {
+            return BatchPool.Dequeue();
+        }
+        else
+        {
+            return new TextBatch(GraphicsDevice);
+        }
+    }
 
-	private void FreeTextBatch(TextBatch batch)
-	{
-		BatchPool.Enqueue(batch);
-	}
+    private void FreeTextBatch(TextBatch batch)
+    {
+        BatchPool.Enqueue(batch);
+    }
 }
