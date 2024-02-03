@@ -21,6 +21,7 @@ public class Orders : MoonTools.ECS.System
     Filter PlayerFilter;
     Filter NPCFilter;
     ProductSpawner ProductManipulator;
+    Filter DestroyForDebugTestReasonsFilter;
 
     const float OrderTime = 20.0f;
 
@@ -31,6 +32,7 @@ public class Orders : MoonTools.ECS.System
         OrderFilter = FilterBuilder.Include<IsOrder>().Build();
         PlayerFilter = FilterBuilder.Include<Player>().Include<CanHold>().Build();
         ProductManipulator = new ProductSpawner(world);
+        DestroyForDebugTestReasonsFilter = FilterBuilder.Include<DestroyForDebugTestReasons>().Build();
         NPCFilter =
             FilterBuilder
             .Include<Position>()
@@ -41,6 +43,62 @@ public class Orders : MoonTools.ECS.System
             .Exclude<Player>()
             .Include<DirectionalSprites>()
             .Build();
+    }
+
+    public void InitializeOrders()
+    {
+        foreach(var entity in DestroyForDebugTestReasonsFilter.Entities)
+        {
+            Destroy(entity);
+        }
+
+        // Spawn Orders and cards
+        var horizontalCardSpacing = 126;
+        int spawnX = (int)System.MathF.Floor(Dimensions.GAME_W * .5f - (horizontalCardSpacing * 3f / 2f));
+        var spawnY = Dimensions.GAME_H - 40;
+
+        for (var i = 0; i < 3; i++)
+        {
+            var orderData = World.CreateEntity();
+            World.Set(orderData, new IsOrder());
+            World.Set(orderData, new DestroyForDebugTestReasons());
+
+            var orderCardText = World.CreateEntity();
+            World.Set(orderCardText, new DestroyForDebugTestReasons());
+            World.Set(orderCardText, new Position(spawnX + 5, spawnY + 5));
+            World.Set(orderCardText, new Text(Fonts.KosugiID, FontSizes.ORDER, "ORDER TITLE", HorizontalAlignment.Left, VerticalAlignment.Top));
+            World.Relate(orderData, orderCardText, new OrderTitleText());
+
+            var orderCardPrice = World.CreateEntity();
+            World.Set(orderCardPrice, new DestroyForDebugTestReasons());
+            World.Set(orderCardPrice, new Position(spawnX + 5, spawnY + FontSizes.ORDER * 2f + 2));
+            World.Set(orderCardPrice, new Text(Fonts.KosugiID, FontSizes.ORDER, "$$$", HorizontalAlignment.Left, VerticalAlignment.Top));
+            World.Relate(orderData, orderCardPrice, new OrderPriceText());
+
+            var orderCardBG = World.CreateEntity();
+            World.Set(orderCardBG, new DestroyForDebugTestReasons());
+            World.Set(orderCardBG, new Position(spawnX, spawnY));
+            World.Set(orderCardBG, new Depth(9));
+            World.Set(orderCardBG, new SpriteAnimation(SpriteAnimations.HUD_Card, 0));
+            World.Relate(orderData, orderCardBG, new OrderBG());
+
+            var orderCardCategoryIcon = World.CreateEntity();
+            World.Set(orderCardCategoryIcon, new DestroyForDebugTestReasons());
+            World.Set(orderCardCategoryIcon, new Position(spawnX + 100, spawnY + 32));
+            World.Set(orderCardCategoryIcon, new Depth(8));
+            World.Set(orderCardCategoryIcon, new SpriteAnimation(SpriteAnimations.HUD_Card, 0));
+            World.Set(orderCardCategoryIcon, new ColorFlicker(0, Colors.OrderCategory));
+            World.Relate(orderData, orderCardCategoryIcon, new OrderIcon());
+
+            var orderCardTimerRectangle = World.CreateEntity();
+            World.Set(orderCardTimerRectangle, new DestroyForDebugTestReasons());
+            World.Set(orderCardTimerRectangle, new Position(spawnX, spawnY + 1));
+            World.Set(orderCardTimerRectangle, new DrawAsRectangle());
+            World.Set(orderCardTimerRectangle, new Depth(7));
+            World.Relate(orderData, orderCardTimerRectangle, new OrderTimerRectangle());
+
+            spawnX += horizontalCardSpacing;
+        }
     }
 
     (float min, float max) GetPriceRange(Entity e)
@@ -93,12 +151,19 @@ public class Orders : MoonTools.ECS.System
             Unrelate<RequiresIngredient>(order, ingredientRequirement);
         }
 
+        var orderCardTitleText = OutRelationSingleton<OrderTitleText>(order);
+        var orderCardPriceText = OutRelationSingleton<OrderPriceText>(order);
+        var titleText = Get<Text>(orderCardTitleText);
+
         bool suitableCandidate = false;
+
+        int titleFontSize = FontSizes.ORDER;
 
         while (!suitableCandidate)
         {
             if (Rando.Value <= 0.5f)
-            { // require category
+            {
+                // CATEGORY Order
                 var category = CategoryFilter.RandomEntity;
                 var (min, max) = GetPriceRange(category);
 
@@ -110,22 +175,22 @@ public class Orders : MoonTools.ECS.System
 
                 suitableCandidate = true;
 
+                // Update Order Data
                 Relate(order, category, new RequiresCategory());
                 var price = MathF.Round(Rando.Range(min, max), 2);
                 Set(order, new Price(price));
 
+                var color = Colors.OrderCategory;
+                Set(order, new ColorBlend(color));
+                Set(orderCardTitleText, new ColorBlend(color));
+                Set(orderCardPriceText, new ColorBlend(color));
+
+                // Update Order Title
                 var text = CategoriesAndIngredients.GetDisplayName(Get<Category>(category));
-                Set(order, new Text(Fonts.KosugiID, FontSizes.ORDER, text, HorizontalAlignment.Center));
+                Set(orderCardTitleText, new Text(Fonts.KosugiID, titleFontSize, text, titleText.HorizontalAlignment, titleText.VerticalAlignment));
 
+                // Update Order Icon
                 var animation = CategoriesAndIngredients.GetIcon(Get<Category>(category));
-
-                if (!HasOutRelation<OrderIcon>(order))
-                {
-                    var iconEntity = CreateEntity();
-                    Set(iconEntity, Get<Position>(order) + Vector2.UnitY * 16.0f);
-                    Set(iconEntity, new Depth(8));
-                    Relate(order, iconEntity, new OrderIcon());
-                }
 
                 Set(OutRelationSingleton<OrderIcon>(order), new SpriteAnimation(
                     animation,
@@ -135,7 +200,9 @@ public class Orders : MoonTools.ECS.System
                 ));
             }
             else
-            { // require ingredient
+            {
+                // INGREDIENT Order
+                titleFontSize = FontSizes.INGREDIENT;
                 var ingredient = IngredientFilter.RandomEntity;
                 var (min, max) = GetPriceRange(ingredient);
 
@@ -150,42 +217,42 @@ public class Orders : MoonTools.ECS.System
                 Relate(order, ingredient, new RequiresIngredient());
                 var price = MathF.Round(Rando.Range(min, max), 2);
                 Set(order, new Price(price));
+
                 var text = CategoriesAndIngredients.GetDisplayName(Get<Ingredient>(ingredient));
-                Set(order, new Text(Fonts.KosugiID, FontSizes.ORDER, text, MoonWorks.Graphics.Font.HorizontalAlignment.Center));
+                Set(orderCardTitleText, new Text(Fonts.KosugiID, titleFontSize, text, titleText.HorizontalAlignment, titleText.VerticalAlignment));
+
+                var color = Colors.OrderIngredient;
+                Set(order, new ColorBlend(color));
+                Set(orderCardTitleText, new ColorBlend(color));
+                Set(orderCardPriceText, new ColorBlend(color));
 
                 if (HasOutRelation<OrderIcon>(order))
                 {
-                    Destroy(OutRelationSingleton<OrderIcon>(order));
+                    Remove<SpriteAnimation>(OutRelationSingleton<OrderIcon>(order));
                 }
             }
         }
 
+        // Shrink font if text too wide
         var font = Fonts.FromID(Fonts.KosugiID);
-        var orderText = Get<Text>(order);
+        var orderText = Get<Text>(orderCardTitleText);
         font.TextBounds(
             TextStorage.GetString(orderText.TextID),
-            FontSizes.ORDER,
-            HorizontalAlignment.Center,
-            VerticalAlignment.Middle,
+            titleFontSize,
+            titleText.HorizontalAlignment,
+            titleText.VerticalAlignment,
             out var textBounds
         );
 
         if (textBounds.W > Dimensions.CARD_WIDTH)
         {
-            Set(order, new Text(Fonts.KosugiID, FontSizes.SMALL_ORDER, orderText.TextID, HorizontalAlignment.Center));
+            titleFontSize = FontSizes.SMALL_ORDER;
+            Set(orderCardTitleText, new Text(Fonts.KosugiID, titleFontSize, orderText.TextID, titleText.HorizontalAlignment, titleText.VerticalAlignment));
         }
 
-        if (!HasOutRelation<OrderPriceText>(order))
-        {
-            var position = Get<Position>(order);
-            var priceTextEntity = CreateEntity();
-            Set(priceTextEntity, position + Vector2.UnitY * FontSizes.ORDER * 2);
-            Relate(order, priceTextEntity, new OrderPriceText());
-        }
-
-        var priceText = OutRelationSingleton<OrderPriceText>(order);
+        // Set Price
         var priceString = $"${Get<Price>(order).Value}";
-        Set(priceText, new Text(Fonts.KosugiID, FontSizes.ORDER, priceString, HorizontalAlignment.Center));
+        Set(orderCardPriceText, new Text(Fonts.KosugiID, FontSizes.ORDER, priceString, HorizontalAlignment.Left, VerticalAlignment.Top));
 
         var timer = CreateEntity();
         Set(timer, new Timer(OrderTime));
@@ -221,7 +288,7 @@ public class Orders : MoonTools.ECS.System
             }
             else
             {
-                var x = playerIndex == 1? Dimensions.GAME_W - 100 : 100;
+                var x = playerIndex == 1 ? Dimensions.GAME_W - 100 : 100;
                 ProductManipulator.SpawnScoreEffect(
                     player,
                     new Position(x, Dimensions.GAME_H),
@@ -327,6 +394,25 @@ public class Orders : MoonTools.ECS.System
                     {
                         Destroy(product);
                     }
+                }
+            }
+        }
+
+        // Udate Order Card Timer Visual
+        foreach (var orderEntity in OrderFilter.Entities)
+        {
+            if (HasOutRelation<OrderTimer>(orderEntity) && HasOutRelation<OrderTimerRectangle>(orderEntity))
+            {
+                var timerEntity = OutRelationSingleton<OrderTimer>(orderEntity);
+                float timeFactor = Get<Timer>(timerEntity).Remaining;
+                var hudRectangleEntity = OutRelationSingleton<OrderTimerRectangle>(orderEntity);
+                Set(hudRectangleEntity, new Rectangle(0, 0, (int)(timeFactor * 120f), 2));
+
+                Set(hudRectangleEntity, Get<ColorBlend>(orderEntity));
+                // Flicker Effect
+                if (timeFactor < .25f && Math.Floor(Get<Timer>(timerEntity).Time * 10) % 2 == 0)
+                {
+                    Set(hudRectangleEntity, new ColorBlend(MoonWorks.Graphics.Color.Black));
                 }
             }
         }

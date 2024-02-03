@@ -10,10 +10,12 @@ public class SetSpriteAnimationSystem : MoonTools.ECS.System
 {
 
 	MoonTools.ECS.Filter SlowDownAnimationFilter;
+	MoonTools.ECS.Filter FlickerFilter;
 
 	public SetSpriteAnimationSystem(World world) : base(world)
 	{
 		SlowDownAnimationFilter = FilterBuilder.Include<SlowDownAnimation>().Include<Position>().Build();
+		FlickerFilter = FilterBuilder.Include<ColorFlicker>().Build();
 	}
 
 	public override void Update(TimeSpan delta)
@@ -57,6 +59,14 @@ public class SetSpriteAnimationSystem : MoonTools.ECS.System
 			var frameRate = currentAnimation.FrameRate;
 			frameRate = Math.Max(frameRate - step, goal);
 			Set(entity, currentAnimation.ChangeFramerate(frameRate));
+		}
+
+		// Flicker
+		foreach (var entity in FlickerFilter.Entities)
+		{
+			var flicker = Get<ColorFlicker>(entity);
+			var frames = flicker.ElapsedFrames + 1;
+			Set(entity, new ColorFlicker(frames, flicker.Color));
 		}
 	}
 }
