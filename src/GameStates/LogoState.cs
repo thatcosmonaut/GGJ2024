@@ -116,7 +116,7 @@ public class LogoState : GameState
 
     public override void Draw(Window window, double alpha)
     {
-        var logoPosition = new Position(window.Width / 2 + 20, window.Height / 2 - 100);
+        var logoPosition = new Position(680, 250);
 
         var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
 
