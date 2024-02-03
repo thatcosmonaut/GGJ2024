@@ -38,6 +38,7 @@ public class ShelfSpawner : MoonTools.ECS.Manipulator
 		Set(collision, new Rectangle(-12, 8, 4 * spawnStepDistance, 8));
 
 		SpawnShelf(640 - spawnStepDistance + 10, 160, 1, 4, Categories[9]);
+		SpawnShelf(spawnStepDistance - 10, 160, 1, 4, Categories[9]);
 	}
 
 	private void SpawnVerticalDoubleShelf(int x, int y, int categoryInt)

@@ -122,12 +122,19 @@ namespace RollAndCash
 
 			Orders.InitializeOrders();
 
-			var cashRegister = World.CreateEntity();
-			World.Set(cashRegister, new Position(8, 77));
-			World.Set(cashRegister, new Rectangle(0, 0, 80, 90));
-			World.Set(cashRegister, new CanInteract());
-			World.Set(cashRegister, new CanFillOrders());
-			World.Set(cashRegister, Color.ForestGreen);
+			var cashRegisterLeft = World.CreateEntity();
+			World.Set(cashRegisterLeft, new Position(8, 77));
+			World.Set(cashRegisterLeft, new Rectangle(0, 0, 80, 90));
+			World.Set(cashRegisterLeft, new CanInteract());
+			World.Set(cashRegisterLeft, new CanFillOrders());
+			World.Set(cashRegisterLeft, Color.ForestGreen);
+
+			var cashRegisterRight = World.CreateEntity();
+			World.Set(cashRegisterRight, new Position(Dimensions.GAME_W - 88, 77));
+			World.Set(cashRegisterRight, new Rectangle(0, 0, 80, 90));
+			World.Set(cashRegisterRight, new CanInteract());
+			World.Set(cashRegisterRight, new CanFillOrders());
+			World.Set(cashRegisterRight, Color.ForestGreen);
 
 			var exit = World.CreateEntity();
 			World.Set(exit, new Position(Dimensions.GAME_W * 0.5f - 44, 0));

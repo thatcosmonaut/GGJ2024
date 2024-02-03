@@ -353,8 +353,6 @@ public class Orders : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
-        var cashRegister = GetSingletonEntity<CanFillOrders>();
-
         if (!Some<IsTitleScreen>() && Some<Price>())
         {
             foreach (var order in OrderFilter.Entities)
@@ -372,7 +370,7 @@ public class Orders : MoonTools.ECS.System
             {
                 foreach (var colliding in OutRelations<Colliding>(player))
                 {
-                    if (colliding == cashRegister)
+                    if (Has<CanFillOrders>(colliding))
                     {
                         TryFillOrder(player);
                     }
@@ -388,7 +386,7 @@ public class Orders : MoonTools.ECS.System
 
                 foreach (var colliding in OutRelations<Colliding>(npc))
                 {
-                    if (colliding == cashRegister)
+                    if (Has<CanFillOrders>(colliding))
                     {
                         Destroy(product);
                     }
