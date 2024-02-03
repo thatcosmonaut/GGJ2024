@@ -93,21 +93,21 @@ public class DroneSpawner : Manipulator
         var drone = World.CreateEntity();
         Set(drone, position);
         Set(drone, new Velocity(Vector2.Zero));
-        Set(drone, new SpriteAnimation(SpriteAnimations.NPC_Drone_Fly_Down, 60));
+        Set(drone, new SpriteAnimation(SpriteAnimations.NPC_DroneEvil_Fly_Down, 60));
         Set(drone, new Rectangle(-8, -8, 16, 16));
         Set(drone, new CanInteract());
         Set(drone, new CanHold());
         Set(drone, new Depth(5));
         // TODO: evil drone sprites
         Set(drone, new DirectionalSprites(
-            SpriteAnimations.NPC_Drone_Fly_Up.ID,
-            SpriteAnimations.NPC_Drone_Fly_UpRight.ID,
-            SpriteAnimations.NPC_Drone_Fly_Right.ID,
-            SpriteAnimations.NPC_Drone_Fly_DownRight.ID,
-            SpriteAnimations.NPC_Drone_Fly_Down.ID,
-            SpriteAnimations.NPC_Drone_Fly_DownLeft.ID,
-            SpriteAnimations.NPC_Drone_Fly_Left.ID,
-            SpriteAnimations.NPC_Drone_Fly_UpLeft.ID
+            SpriteAnimations.NPC_DroneEvil_Fly_Up.ID,
+            SpriteAnimations.NPC_DroneEvil_Fly_UpRight.ID,
+            SpriteAnimations.NPC_DroneEvil_Fly_Right.ID,
+            SpriteAnimations.NPC_DroneEvil_Fly_DownRight.ID,
+            SpriteAnimations.NPC_DroneEvil_Fly_Down.ID,
+            SpriteAnimations.NPC_DroneEvil_Fly_DownLeft.ID,
+            SpriteAnimations.NPC_DroneEvil_Fly_Left.ID,
+            SpriteAnimations.NPC_DroneEvil_Fly_UpLeft.ID
         ));
         Set(drone, new CanStealProducts());
         Set(drone, new DestroyWhenOutOfBounds());
