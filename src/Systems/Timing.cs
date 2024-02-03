@@ -3,7 +3,7 @@ using MoonTools.ECS;
 using RollAndCash.Relations;
 using Timer = RollAndCash.Components.Timer;
 
-namespace LD54.Systems;
+namespace RollAndCash.Systems;
 
 public class Timing : MoonTools.ECS.System
 {

@@ -8,7 +8,7 @@ using RollAndCash.Relations;
 using RollAndCash.Systems;
 using RollAndCash.Utility;
 
-namespace GGJ2024.Systems;
+namespace RollAndCash.Systems;
 
 public class DroneController : MoonTools.ECS.System
 {
