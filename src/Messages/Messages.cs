@@ -26,3 +26,5 @@ public readonly record struct SetAnimationMessage(
 
 public readonly record struct PlaySongMessage();
 public readonly record struct PlayTitleMusic();
+
+public readonly record struct Startup();

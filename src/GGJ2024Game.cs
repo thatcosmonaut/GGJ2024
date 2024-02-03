@@ -38,6 +38,8 @@ namespace RollAndCash
 
 		GameLoopManipulator GameLoopManipulator;
 
+		SplashScreenSystem SplashScreenSystem;
+
 		public RollAndCashGame(
 			WindowCreateInfo windowCreateInfo,
 			FrameLimiterSettings frameLimiterSettings,
@@ -50,6 +52,7 @@ namespace RollAndCash
 
 			var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
 			TextureAtlases.TP_Sprites.Load(GraphicsDevice, commandBuffer);
+			TextureAtlases.TP_HiRes.Load(GraphicsDevice, commandBuffer);
 			GraphicsDevice.Submit(commandBuffer);
 
 			StaticAudioPacks.LoadAll(AudioDevice);
@@ -76,6 +79,8 @@ namespace RollAndCash
 			NPCController = new NPCController(World);
 			DroneController = new DroneController(World);
 
+			SplashScreenSystem = new SplashScreenSystem(World);
+
 			CategoriesAndIngredients cats = new CategoriesAndIngredients(World);
 			cats.Initialize(World);
 
@@ -83,6 +88,7 @@ namespace RollAndCash
 
 			Renderer = new Renderer(World, GraphicsDevice, MainWindow.SwapchainFormat);
 
+			/*
 			NPCController.SpawnNPC();
 
 			var topBorder = World.CreateEntity();
@@ -165,14 +171,17 @@ namespace RollAndCash
 
 			ShelfSpawner.SpawnShelves();
 			ProductSpawner.SpawnAllProducts();
+			*/
+			var gameState = World.CreateEntity();
+			World.Set(gameState, GameState.Splash);
 
-			GameLoopManipulator.ShowTitleScreen();
-
-			//GameLoopManipulator.Restart();
+			World.Send(new Startup());
 		}
 
 		protected override void Update(System.TimeSpan dt)
 		{
+			SplashScreenSystem.Update(dt);
+
 			Timing.Update(dt);
 			UpdateSpriteAnimationSystem.Update(dt);
 			GameTimer.Update(dt);
