@@ -46,7 +46,8 @@ public class DroneSpawner : Manipulator
         StaticAudio.Evil10,
         StaticAudio.Evil11,
         StaticAudio.Evil12,
-        StaticAudio.Evil13
+        StaticAudio.Evil13,
+        StaticAudio.EvilDrone
     ];
 
     public DroneSpawner(World world) : base(world)
