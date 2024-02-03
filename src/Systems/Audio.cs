@@ -4,7 +4,7 @@ using RollAndCash.Messages;
 using RollAndCash.Utility;
 using MoonTools.ECS;
 using MoonWorks.Audio;
-using GGJ2024.Data;
+using RollAndCash.Data;
 
 namespace RollAndCash.Systems;
 

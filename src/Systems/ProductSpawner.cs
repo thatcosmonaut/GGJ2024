@@ -52,6 +52,7 @@ public class ProductSpawner : MoonTools.ECS.Manipulator
         Set(entity, new SlowDownAnimation(15, 1));
         var depth = MathHelper.Lerp(100, 10, position.Y / (float)Dimensions.GAME_H);
         Set(entity, new Depth(depth));
+        Set(entity, new DestroyWhenOutOfBounds());
 
         var product = ProductLoader.CategoryToProductList[category].GetRandomItem();
 

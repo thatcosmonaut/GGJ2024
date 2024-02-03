@@ -1,8 +1,6 @@
 using System;
 using MoonTools.ECS;
-using MoonWorks.Math;
 using MoonWorks.Math.Float;
-using RollAndCash;
 using RollAndCash.Components;
 using RollAndCash.Content;
 using RollAndCash.Messages;
@@ -14,39 +12,22 @@ namespace GGJ2024.Systems;
 
 public class DroneController : MoonTools.ECS.System
 {
-    float DroneSpeed = 80;
-
-    ProductSpawner Product;
+    float RestockDroneSpeed = 80;
+    float EvilDroneSpeed = 200;
 
     Filter TargeterFilter;
     Filter ProductSpawnerFilter;
+    Filter StealerFilter;
 
-    StaticSoundID[] DroneSounds =
-    [
-        StaticAudio.Drone1,
-        StaticAudio.Drone2,
-        StaticAudio.Drone3,
-        StaticAudio.Drone4,
-        StaticAudio.Drone5,
-        StaticAudio.Drone6,
-        StaticAudio.Drone7,
-        StaticAudio.Drone8,
-        StaticAudio.Drone9,
-        StaticAudio.Drone10,
-        StaticAudio.Drone11,
-        StaticAudio.Drone12,
-        StaticAudio.Drone13,
-        StaticAudio.Drone14,
-        StaticAudio.Drone15,
-        StaticAudio.Drone16
-    ];
+    DroneSpawner DroneSpawner;
 
     public DroneController(World world) : base(world)
     {
         TargeterFilter = FilterBuilder.Include<CanTargetProductSpawner>().Build();
         ProductSpawnerFilter = FilterBuilder.Include<Position>().Include<CanSpawn>().Build();
+        StealerFilter = FilterBuilder.Include<CanStealProducts>().Build();
 
-        Product = new ProductSpawner(world);
+        DroneSpawner = new DroneSpawner(world);
     }
 
     public override void Update(TimeSpan delta)
@@ -70,11 +51,11 @@ public class DroneController : MoonTools.ECS.System
             if (Has<WaitingForProductRestock>(productSpawner) && !HasOutRelation<RestockTimer>(productSpawner))
             {
                 Remove<WaitingForProductRestock>(productSpawner);
-                SpawnDrone(productSpawner);
+                DroneSpawner.SpawnRestockDrone(productSpawner);
             }
         }
 
-        // drone target procedure
+        // restock drone target procedure
         foreach (var targeter in TargeterFilter.Entities)
         {
             if (HasOutRelation<Holding>(targeter) && HasOutRelation<Targeting>(targeter))
@@ -87,7 +68,7 @@ public class DroneController : MoonTools.ECS.System
 
                 var vectorToTarget = targetedPosition + new Vector2(0, -15) - targeterPosition;
                 var direction = Vector2.Normalize(vectorToTarget);
-                var distance = MathF.Min(vectorToTarget.Length(), DroneSpeed);
+                var distance = MathF.Min(vectorToTarget.Length(), RestockDroneSpeed);
 
                 Set(targeter, new Velocity(direction * distance));
                 Set(targeter, new LastDirection(direction));
@@ -102,55 +83,38 @@ public class DroneController : MoonTools.ECS.System
 
                     // fly off in a random direction
                     var randomDirection = Vector2.Rotate(Vector2.UnitX, Rando.Range(0, 2 * MathF.PI));
-                    Set(targeter, new Velocity(randomDirection * DroneSpeed));
+                    Set(targeter, new Velocity(randomDirection * RestockDroneSpeed));
                 }
             }
         }
-    }
 
-    public void SpawnDrone(Entity emptyProductSpawner)
-    {
-        // spawn in random border position
-        var xPosition = Rando.IntInclusive(0, 1) == 0 ? Rando.IntInclusive(-75, -25) : Rando.IntInclusive(Dimensions.GAME_W + 25, Dimensions.GAME_W + 75);
-        var yPosition = Rando.IntInclusive(-25, Dimensions.GAME_H - 50);
-        var position = new Position(xPosition, yPosition);
-
-        var drone = World.CreateEntity();
-        Set(drone, position);
-        Set(drone, new SpriteAnimation(SpriteAnimations.NPC_Drone_Fly_Down, 60));
-        Set(drone, new Rectangle(-8, -8, 16, 16));
-        Set(drone, new CanInteract());
-        Set(drone, new CanHold());
-        Set(drone, new Depth(5));
-        Set(drone, new DirectionalSprites(
-            SpriteAnimations.NPC_Drone_Fly_Up.ID,
-            SpriteAnimations.NPC_Drone_Fly_UpRight.ID,
-            SpriteAnimations.NPC_Drone_Fly_Right.ID,
-            SpriteAnimations.NPC_Drone_Fly_DownRight.ID,
-            SpriteAnimations.NPC_Drone_Fly_Down.ID,
-            SpriteAnimations.NPC_Drone_Fly_DownLeft.ID,
-            SpriteAnimations.NPC_Drone_Fly_Left.ID,
-            SpriteAnimations.NPC_Drone_Fly_UpLeft.ID
-        ));
-        Set(drone, new CanTargetProductSpawner());
-        Set(drone, new Velocity(Vector2.Zero));
-        Set(drone, new DestroyWhenOutOfBounds());
-
-        // spawn product related to spawner
-        Entity product;
-        if (Has<SpawnCategory>(emptyProductSpawner))
+        foreach (var stealer in StealerFilter.Entities)
         {
-            product = Product.SpawnProduct(position, Get<SpawnCategory>(emptyProductSpawner).Category);
-        }
-        else
-        {
-            product = Product.SpawnRandomProduct(position);
-        }
+            if (HasOutRelation<Targeting>(stealer))
+            {
+                if (!HasOutRelation<Holding>(stealer))
+                {
+                    // approach target
+                    var target = OutRelationSingleton<Targeting>(stealer);
 
-        Relate(drone, product, new Holding());
-        Relate(drone, emptyProductSpawner, new Targeting());
-        Relate(product, emptyProductSpawner, new BelongsToProductSpawner());
+                    var stealerPosition = Get<Position>(stealer);
+                    var targetPosition = Get<Position>(target);
 
-        Send(new PlayStaticSoundMessage(Rando.GetRandomItem(DroneSounds), Data.SoundCategory.Drone));
+                    var vectorToTarget = targetPosition + new Vector2(0, -15) - stealerPosition;
+                    var distanceSquared = vectorToTarget.LengthSquared();
+
+                    var direction = Vector2.Normalize(vectorToTarget);
+                    Set(stealer, new Velocity(direction * EvilDroneSpeed));
+                    Set(stealer, new LastDirection(direction));
+
+                    // try to steal
+                    if (distanceSquared < 9)
+                    {
+                        Set(stealer, new TryHold());
+                        Send(new PlayStaticSoundMessage(StaticAudio.EvilDroneLaugh));
+                    }
+                }
+            }
+        }
     }
 }

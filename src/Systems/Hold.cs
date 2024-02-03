@@ -9,13 +9,15 @@ using RollAndCash.Content;
 using RollAndCash.Relations;
 using MoonWorks.Math;
 using RollAndCash.Messages;
+using RollAndCash.Utility;
 
 namespace RollAndCash.Systems;
 
 public class Hold : MoonTools.ECS.System
 {
 	MoonTools.ECS.Filter CanHoldFilter;
-	ProductSpawner Product;
+	ProductSpawner ProductSpawner;
+	DroneSpawner DroneSpawner;
 
 	public Hold(World world) : base(world)
 	{
@@ -27,7 +29,8 @@ public class Hold : MoonTools.ECS.System
 			.Include<CanHold>()
 			.Build();
 
-		Product = new ProductSpawner(world);
+		ProductSpawner = new ProductSpawner(world);
+		DroneSpawner = new DroneSpawner(world);
 	}
 
 	void HoldOrDrop(Entity e)
@@ -47,6 +50,15 @@ public class Hold : MoonTools.ECS.System
 						o,
 						new SpriteAnimation(spriteInfo, 90, true)
 					));
+
+					if (Has<CanBeStolenFrom>(e))
+					{
+						// chance to spawn evil drone
+						if (Rando.Int(0, 10) == 0)
+						{
+							DroneSpawner.SpawnEvilDrone(o);
+						}
+					}
 
 					break;
 				}
@@ -80,7 +92,7 @@ public class Hold : MoonTools.ECS.System
 		Set(holding, new Depth(depth));
 
 		// this is drone jank -evan
-		if (Has<CanTargetProductSpawner>(e))
+		if (Has<CanTargetProductSpawner>(e) || Has<CanStealProducts>(e))
 		{
 			Set(holding, holderPos + new Position(0, 15));
 		}
@@ -100,7 +112,7 @@ public class Hold : MoonTools.ECS.System
 			Set(txt, new Text(
 				Fonts.KosugiID,
 				FontSizes.HOLDING,
-				$"${Product.GetPrice(holding)}",
+				$"${ProductSpawner.GetPrice(holding)}",
 				MoonWorks.Graphics.Font.HorizontalAlignment.Center,
 				MoonWorks.Graphics.Font.VerticalAlignment.Middle
 			));
@@ -110,7 +122,7 @@ public class Hold : MoonTools.ECS.System
 	public void Inspect(Entity potentialHolder, Entity product)
 	{
 		var playerIndex = Get<Player>(potentialHolder).Index;
-		Send(new PlayStaticSoundMessage(StaticAudio.BubbleOpen, GGJ2024.Data.SoundCategory.Generic, 0.5f));
+		Send(new PlayStaticSoundMessage(StaticAudio.BubbleOpen, Data.SoundCategory.Generic, 0.5f));
 
 		var index = 0;
 		if (Some<IsPopupBox>())
@@ -180,7 +192,7 @@ public class Hold : MoonTools.ECS.System
 
 		var price = CreateEntity();
 		Set(price, holderPosition + new Position(xOffset, yOffset));
-		Set(price, new Text(Fonts.KosugiID, FontSizes.INSPECT, "$" + Product.GetPrice(product).ToString("F2"), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
+		Set(price, new Text(Fonts.KosugiID, FontSizes.INSPECT, "$" + ProductSpawner.GetPrice(product).ToString("F2"), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 		Set(price, new TextDropShadow(1, 1));
 		Set(price, new Depth(6 - index * 4));
 
@@ -278,7 +290,7 @@ public class Hold : MoonTools.ECS.System
 				HoldOrDrop(holder);
 				Remove<TryHold>(holder);
 			}
-			else if (!HasOutRelation<Inspecting>(holder))
+			else if (!HasOutRelation<Inspecting>(holder) && !HasOutRelation<Holding>(holder))
 			{
 				foreach (var other in OutRelations<Colliding>(holder))
 				{
@@ -304,7 +316,7 @@ public class Hold : MoonTools.ECS.System
 		// real-time price updates
 		foreach (var (uiText, product) in Relations<DisplayingProductPrice>())
 		{
-			Set(uiText, new Text(Fonts.KosugiID, 10, "$" + Product.GetPrice(product).ToString("F2"), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
+			Set(uiText, new Text(Fonts.KosugiID, 10, "$" + ProductSpawner.GetPrice(product).ToString("F2"), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Top));
 		}
 
 		foreach (var (uiText, ingredient) in Relations<DisplayingIngredientPrice>())

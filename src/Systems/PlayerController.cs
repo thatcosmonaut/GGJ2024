@@ -36,6 +36,7 @@ public class PlayerController : MoonTools.ECS.System
 		World.Set(player, new CanInteract());
 		World.Set(player, new CanInspect());
 		World.Set(player, new CanHold());
+		World.Set(player, new CanBeStolenFrom());
 		World.Set(player, new Solid());
 		World.Set(player, index == 0 ? Color.Green : Color.Blue);
 		World.Set(player, new Depth(5));
@@ -188,7 +189,7 @@ public class PlayerController : MoonTools.ECS.System
 					StaticAudio.Footstep4,
 					StaticAudio.Footstep5,
 				}.GetRandomItem<StaticSoundID>(),
-			GGJ2024.Data.SoundCategory.Generic,
+			SoundCategory.Generic,
 			Rando.Range(0.66f, 0.88f),
 			Rando.Range(-.05f, .05f)
 			)

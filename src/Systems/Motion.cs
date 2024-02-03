@@ -266,7 +266,7 @@ public class Motion : MoonTools.ECS.System
 
                     Send(new PlayStaticSoundMessage(
                         Rando.GetRandomItem(AudioArrays.Coins),
-                        GGJ2024.Data.SoundCategory.Generic,
+                        Data.SoundCategory.Generic,
                         2f,
                         pitch,
                         pan
@@ -280,6 +280,11 @@ public class Motion : MoonTools.ECS.System
             {
                 if (pos.X < -100 || pos.X > Dimensions.GAME_W + 100 || pos.Y < -100 || pos.Y > Dimensions.GAME_H + 100)
                 {
+                    foreach (var heldEntity in OutRelations<Holding>(entity))
+                    {
+                        Destroy(heldEntity);
+                    }
+
                     Destroy(entity);
                 }
             }

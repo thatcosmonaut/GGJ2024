@@ -69,6 +69,8 @@ public readonly record struct StoreExit();
 public readonly record struct AccelerateToPosition(Position Target, float Acceleration, float MotionDampFactor);
 public readonly record struct DestroyAtGameEnd();
 
+public readonly record struct CanBeStolenFrom();
+public readonly record struct CanStealProducts();
 public readonly record struct CanTargetProductSpawner();
 public readonly record struct DestroyWhenOutOfBounds();
 
