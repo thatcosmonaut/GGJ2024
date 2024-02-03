@@ -32,6 +32,23 @@ public class DroneSpawner : Manipulator
         StaticAudio.Drone16
     ];
 
+    StaticSoundID[] EvilDroneSounds =
+    [
+        StaticAudio.Evil1,
+        StaticAudio.Evil2,
+        StaticAudio.Evil3,
+        StaticAudio.Evil4,
+        StaticAudio.Evil5,
+        StaticAudio.Evil6,
+        StaticAudio.Evil7,
+        StaticAudio.Evil8,
+        StaticAudio.Evil9,
+        StaticAudio.Evil10,
+        StaticAudio.Evil11,
+        StaticAudio.Evil12,
+        StaticAudio.Evil13
+    ];
+
     public DroneSpawner(World world) : base(world)
     {
         Product = new ProductSpawner(world);
@@ -116,6 +133,6 @@ public class DroneSpawner : Manipulator
 
         Relate(drone, productToSteal, new Targeting());
 
-        Send(new PlayStaticSoundMessage(StaticAudio.EvilDrone));
+        Send(new PlayStaticSoundMessage(Rando.GetRandomItem(EvilDroneSounds)));
     }
 }

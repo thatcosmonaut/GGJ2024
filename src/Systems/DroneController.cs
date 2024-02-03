@@ -113,7 +113,12 @@ public class DroneController : MoonTools.ECS.System
                     if (distanceSquared < 9)
                     {
                         Set(stealer, new TryHold());
-                        Send(new PlayStaticSoundMessage(StaticAudio.EvilDroneLaugh));
+
+                        // 33% chance to laugh
+                        if (Rando.IntInclusive(0, 2) == 0)
+                        {
+                            Send(new PlayStaticSoundMessage(StaticAudio.EvilDroneLaugh));
+                        }
                     }
                 }
             }
