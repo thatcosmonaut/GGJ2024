@@ -166,7 +166,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 	void StartGame()
 	{
 		Destroy(GetSingletonEntity<IsTitleScreen>());
-		Set(GameTimerFilter.NthEntity(0), new RollAndCash.Components.GameTimer(Time.RoundTime));
+		Set(GameTimerFilter.NthEntity(0), new RollAndCash.Components.GameTimer(Time.ROUND_TIME));
 
 		var playerOne = PlayerFilter.NthEntity(0);
 		var playerTwo = PlayerFilter.NthEntity(1);

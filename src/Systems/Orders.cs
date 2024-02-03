@@ -23,8 +23,6 @@ public class Orders : MoonTools.ECS.System
     ProductSpawner ProductManipulator;
     Filter DestroyForDebugTestReasonsFilter;
 
-    const float OrderTime = 20.0f;
-
     public Orders(World world) : base(world)
     {
         CategoryFilter = FilterBuilder.Include<Category>().Build();
@@ -47,7 +45,7 @@ public class Orders : MoonTools.ECS.System
 
     public void InitializeOrders()
     {
-        foreach(var entity in DestroyForDebugTestReasonsFilter.Entities)
+        foreach (var entity in DestroyForDebugTestReasonsFilter.Entities)
         {
             Destroy(entity);
         }
@@ -255,7 +253,7 @@ public class Orders : MoonTools.ECS.System
         Set(orderCardPriceText, new Text(Fonts.KosugiID, FontSizes.ORDER, priceString, HorizontalAlignment.Left, VerticalAlignment.Top));
 
         var timer = CreateEntity();
-        Set(timer, new Timer(OrderTime));
+        Set(timer, new Timer(HasOutRelation<RequiresCategory>(order) ? Time.CATEGORY_ORDER_TIME : Time.INGREDIENT_ORDER_TIME));
         Relate(order, timer, new OrderTimer());
     }
 
