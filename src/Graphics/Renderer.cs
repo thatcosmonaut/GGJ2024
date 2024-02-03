@@ -15,25 +15,20 @@ public class Renderer : MoonTools.ECS.Renderer
 {
 	GraphicsDevice GraphicsDevice;
 	GraphicsPipeline SpriteBatchPipeline;
-	GraphicsPipeline HiResPipeline;
 	GraphicsPipeline TextPipeline;
 
-	SpriteBatch HiResSpriteBatch;
 	SpriteBatch ArtSpriteBatch;
 
 	Texture RenderTexture;
 	Texture DepthTexture;
 
 	Texture SpriteAtlasTexture;
-	Texture HiResTexture;
 
 	Sampler PointSampler;
-	Sampler LinearSampler;
 
 	MoonTools.ECS.Filter RectangleFilter;
 	MoonTools.ECS.Filter TextFilter;
 	MoonTools.ECS.Filter SpriteAnimationFilter;
-	MoonTools.ECS.Filter HiResFilter;
 
 	Queue<TextBatch> BatchPool = new Queue<TextBatch>();
 	List<(TextBatch, Matrix4x4)> ActiveBatchTransforms = new List<(TextBatch, Matrix4x4)>();
@@ -44,8 +39,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
 		RectangleFilter = FilterBuilder.Include<Rectangle>().Include<Position>().Include<DrawAsRectangle>().Build();
 		TextFilter = FilterBuilder.Include<Text>().Include<Position>().Build();
-		SpriteAnimationFilter = FilterBuilder.Include<SpriteAnimation>().Include<Position>().Exclude<HiResArt>().Build();
-		HiResFilter = FilterBuilder.Include<SpriteAnimation>().Include<HiResArt>().Include<Position>().Build();
+		SpriteAnimationFilter = FilterBuilder.Include<SpriteAnimation>().Include<Position>().Build();
 
 		var baseContentPath = Path.Combine(
 			System.AppContext.BaseDirectory,
@@ -61,7 +55,6 @@ public class Renderer : MoonTools.ECS.Renderer
 		DepthTexture = Texture.CreateTexture2D(GraphicsDevice, Dimensions.GAME_W, Dimensions.GAME_H, TextureFormat.D16, TextureUsageFlags.DepthStencilTarget);
 
 		SpriteAtlasTexture = TextureAtlases.TP_Sprites.Texture;
-		HiResTexture = TextureAtlases.TP_HiRes.Texture;
 
 		var vertShaderModule = new ShaderModule(GraphicsDevice, Path.Combine(shaderContentPath, "InstancedSpriteBatch.vert.refresh"));
 		var fragShaderModule = new ShaderModule(GraphicsDevice, Path.Combine(shaderContentPath, "InstancedSpriteBatch.frag.refresh"));
@@ -78,29 +71,6 @@ public class Renderer : MoonTools.ECS.Renderer
 						)
 					),
 					DepthStencilState = DepthStencilState.DepthReadWrite,
-					MultisampleState = MultisampleState.None,
-					PrimitiveType = PrimitiveType.TriangleList,
-					RasterizerState = RasterizerState.CCW_CullNone,
-					VertexInputState = new VertexInputState([
-						VertexBindingAndAttributes.Create<PositionVertex>(0),
-						VertexBindingAndAttributes.Create<SpriteInstanceData>(1, 1, VertexInputRate.Instance)
-					]),
-					VertexShaderInfo = GraphicsShaderInfo.Create<ViewProjectionMatrices>(vertShaderModule, "main", 0),
-					FragmentShaderInfo = GraphicsShaderInfo.Create(fragShaderModule, "main", 1)
-				}
-			);
-
-		HiResPipeline = new GraphicsPipeline(
-			GraphicsDevice,
-				new GraphicsPipelineCreateInfo
-				{
-					AttachmentInfo = new GraphicsPipelineAttachmentInfo(
-						new ColorAttachmentDescription(
-							swapchainFormat,
-							ColorAttachmentBlendState.NonPremultiplied
-						)
-					),
-					DepthStencilState = DepthStencilState.Disable,
 					MultisampleState = MultisampleState.None,
 					PrimitiveType = PrimitiveType.TriangleList,
 					RasterizerState = RasterizerState.CCW_CullNone,
@@ -135,9 +105,7 @@ public class Renderer : MoonTools.ECS.Renderer
 		);
 
 		PointSampler = new Sampler(GraphicsDevice, SamplerCreateInfo.PointClamp);
-		LinearSampler = new Sampler(GraphicsDevice, SamplerCreateInfo.LinearClamp);
 
-		HiResSpriteBatch = new SpriteBatch(GraphicsDevice);
 		ArtSpriteBatch = new SpriteBatch(GraphicsDevice);
 	}
 
@@ -149,7 +117,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
 		if (swapchainTexture != null)
 		{
-			HiResSpriteBatch.Reset();
 			ArtSpriteBatch.Reset();
 
 			foreach (var (batch, _) in ActiveBatchTransforms)
@@ -188,7 +155,7 @@ public class Renderer : MoonTools.ECS.Renderer
 				{
 					color = Get<ColorBlend>(entity).Color;
 				}
-				
+
 				if (Has<ColorFlicker>(entity))
 				{
 					var colorFlicker = Get<ColorFlicker>(entity);
@@ -197,30 +164,13 @@ public class Renderer : MoonTools.ECS.Renderer
 						color = colorFlicker.Color;
 					}
 				}
-				
+
 				if (Has<Depth>(entity))
 				{
 					depth = -Get<Depth>(entity).Value;
 				}
 
 				ArtSpriteBatch.Add(new Vector3(position.X + offset.X, position.Y + offset.Y, depth), 0, new Vector2(sprite.SliceRect.W, sprite.SliceRect.H), color, sprite.UV.LeftTop, sprite.UV.Dimensions);
-			}
-
-			foreach (var entity in HiResFilter.Entities)
-			{
-				var position = Get<Position>(entity);
-				var animation = Get<SpriteAnimation>(entity);
-				var sprite = animation.CurrentSprite;
-				var origin = animation.Origin;
-				var offset = -origin - new Vector2(sprite.FrameRect.X, sprite.FrameRect.Y);
-				var depth = -1f;
-
-				if (Has<Depth>(entity))
-				{
-					depth = -Get<Depth>(entity).Value;
-				}
-
-				HiResSpriteBatch.Add(new Vector3(position.X + offset.X, position.Y + offset.Y, depth), 0, new Vector2(sprite.SliceRect.W, sprite.SliceRect.H), Color.White, sprite.UV.LeftTop, sprite.UV.Dimensions);
 			}
 
 			foreach (var entity in TextFilter.Entities)
@@ -281,11 +231,6 @@ public class Renderer : MoonTools.ECS.Renderer
 				ArtSpriteBatch.Upload(commandBuffer);
 			}
 
-			if (HiResSpriteBatch.InstanceCount > 0)
-			{
-				HiResSpriteBatch.Upload(commandBuffer);
-			}
-
 			foreach (var (batch, _) in ActiveBatchTransforms)
 			{
 				batch.UploadBufferData(commandBuffer);
@@ -303,12 +248,6 @@ public class Renderer : MoonTools.ECS.Renderer
 				ArtSpriteBatch.Render(commandBuffer, SpriteBatchPipeline, SpriteAtlasTexture, PointSampler, viewProjectionMatrices);
 			}
 
-			// if (HiResSpriteBatch.InstanceCount > 0)
-			// {
-			// 	var hiResViewProjectionMatrices = new ViewProjectionMatrices(GetCameraMatrix(), GetHiResProjectionMatrix());
-			// 	HiResSpriteBatch.Render(commandBuffer, SpriteBatchPipeline, HiResTexture, LinearSampler, hiResViewProjectionMatrices);
-			// }
-
 			if (ActiveBatchTransforms.Count > 0)
 			{
 				commandBuffer.BindGraphicsPipeline(TextPipeline);
@@ -321,18 +260,6 @@ public class Renderer : MoonTools.ECS.Renderer
 			commandBuffer.EndRenderPass();
 
 			commandBuffer.CopyTextureToTexture(RenderTexture, swapchainTexture, MoonWorks.Graphics.Filter.Nearest);
-
-			if (HiResSpriteBatch.InstanceCount > 0)
-			{
-				commandBuffer.BeginRenderPass(
-					new ColorAttachmentInfo(swapchainTexture, LoadOp.Load)
-				);
-
-				var hiResViewProjectionMatrices = new ViewProjectionMatrices(GetCameraMatrix(), GetHiResProjectionMatrix());
-				HiResSpriteBatch.Render(commandBuffer, HiResPipeline, HiResTexture, LinearSampler, hiResViewProjectionMatrices);
-
-				commandBuffer.EndRenderPass();
-			}
 		}
 
 		GraphicsDevice.Submit(commandBuffer);
@@ -349,18 +276,6 @@ public class Renderer : MoonTools.ECS.Renderer
 			0,
 			Dimensions.GAME_W,
 			Dimensions.GAME_H,
-			0,
-			0.01f,
-			1000
-		);
-	}
-
-	public Matrix4x4 GetHiResProjectionMatrix()
-	{
-		return Matrix4x4.CreateOrthographicOffCenter(
-			0,
-			1920,
-			1080,
 			0,
 			0.01f,
 			1000

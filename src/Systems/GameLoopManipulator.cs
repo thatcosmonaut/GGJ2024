@@ -49,7 +49,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		Set(titleScreenEntity, new IsTitleScreen());
 
 		Send(new PlayTitleMusic());
-		Send(new PlayStaticSoundMessage(StaticAudio.RollAndCash));
+		Send(new PlayStaticSoundMessage(StaticAudio.RollAndCash, RollAndCash.Data.SoundCategory.Generic, 1.5f));
 	}
 
 	public void ShowScoreScreen()

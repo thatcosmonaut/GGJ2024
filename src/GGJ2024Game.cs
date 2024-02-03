@@ -9,6 +9,7 @@ namespace RollAndCash
 	public class RollAndCashGame : Game
 	{
 		LogoState LogoState;
+		CreditsState CreditsState;
 		GameplayState GameplayState;
 
 		GameState CurrentState;
@@ -34,7 +35,8 @@ namespace RollAndCash
 			Fonts.LoadAll(GraphicsDevice);
 
 			GameplayState = new GameplayState(this);
-			LogoState = new LogoState(this, GameplayState);
+			CreditsState = new CreditsState(this, GameplayState);
+			LogoState = new LogoState(this, CreditsState);
 
 			SetState(LogoState);
 		}

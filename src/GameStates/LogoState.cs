@@ -14,7 +14,7 @@ public class LogoState : GameState
     RollAndCashGame Game;
     GraphicsDevice GraphicsDevice;
     AudioDevice AudioDevice;
-    GameplayState GameplayState;
+    GameState TransitionState;
 
 	GraphicsPipeline HiResPipeline;
 
@@ -30,12 +30,12 @@ public class LogoState : GameState
 
     bool SoundPlayed = false;
 
-    public LogoState(RollAndCashGame game, GameplayState gameplayState)
+    public LogoState(RollAndCashGame game, GameState transitionState)
     {
         Game = game;
         GraphicsDevice = game.GraphicsDevice;
         AudioDevice = game.AudioDevice;
-        GameplayState = gameplayState;
+        TransitionState = transitionState;
 
 		var baseContentPath = Path.Combine(
 			System.AppContext.BaseDirectory,
@@ -110,7 +110,7 @@ public class LogoState : GameState
 
         if (FadeTimer > FadeInDuration + FadeHoldDuration + FadeOutDuration)
         {
-            Game.SetState(GameplayState);
+            Game.SetState(TransitionState);
         }
     }
 
