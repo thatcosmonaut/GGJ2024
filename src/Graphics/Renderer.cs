@@ -148,13 +148,28 @@ public class Renderer : MoonTools.ECS.Renderer
 				var origin = animation.Origin;
 				var offset = -origin - new Vector2(sprite.FrameRect.X, sprite.FrameRect.Y);
 				var depth = -1f;
+				var color = Color.White;
 
+				if (Has<ColorBlend>(entity))
+				{
+					color = Get<ColorBlend>(entity).Color;
+				}
+				
+				if (Has<ColorFlicker>(entity))
+				{
+					var colorFlicker = Get<ColorFlicker>(entity);
+					if (colorFlicker.ElapsedFrames % 2 == 0)
+					{
+						color = colorFlicker.Color;
+					}
+				}
+				
 				if (Has<Depth>(entity))
 				{
 					depth = -Get<Depth>(entity).Value;
 				}
 
-				ArtSpriteBatch.Add(new Vector3(position.X + offset.X, position.Y + offset.Y, depth), 0, new Vector2(sprite.SliceRect.W, sprite.SliceRect.H), Color.White, sprite.UV.LeftTop, sprite.UV.Dimensions);
+				ArtSpriteBatch.Add(new Vector3(position.X + offset.X, position.Y + offset.Y, depth), 0, new Vector2(sprite.SliceRect.W, sprite.SliceRect.H), color, sprite.UV.LeftTop, sprite.UV.Dimensions);
 			}
 
 			foreach (var entity in TextFilter.Entities)

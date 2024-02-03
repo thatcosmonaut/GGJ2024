@@ -75,3 +75,5 @@ public readonly record struct CanTargetProductSpawner();
 public readonly record struct DestroyWhenOutOfBounds();
 
 public readonly record struct WaitingForProductRestock();
+public readonly record struct DestroyForDebugTestReasons();
+public readonly record struct ColorFlicker(int ElapsedFrames, Color Color);
