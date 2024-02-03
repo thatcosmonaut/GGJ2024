@@ -92,6 +92,7 @@ public class Audio : MoonTools.ECS.System
 		if (soundCategory == SoundCategory.Drone)
 		{
 			voice = DroneVoice;
+			voice.Stop(); // drones should interrupt their own lines
 		}
 		else
 		{
