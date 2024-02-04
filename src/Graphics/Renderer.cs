@@ -7,7 +7,7 @@ using MoonWorks;
 using MoonWorks.Graphics;
 using MoonWorks.Graphics.Font;
 using MoonWorks.Math.Float;
-using System;
+using RollAndCash.Relations;
 
 namespace RollAndCash;
 
@@ -143,13 +143,24 @@ public class Renderer : MoonTools.ECS.Renderer
 
 			foreach (var entity in SpriteAnimationFilter.Entities)
 			{
+				if (HasOutRelation<DontDraw>(entity))
+					continue;
+
 				var position = Get<Position>(entity);
 				var animation = Get<SpriteAnimation>(entity);
 				var sprite = animation.CurrentSprite;
 				var origin = animation.Origin;
-				var offset = -origin - new Vector2(sprite.FrameRect.X, sprite.FrameRect.Y);
 				var depth = -1f;
 				var color = Color.White;
+
+				Vector2 scale = Vector2.One;
+				if (Has<SpriteScale>(entity))
+				{
+					scale *= Get<SpriteScale>(entity).Scale;
+					origin *= scale;
+				}
+
+				var offset = -origin - new Vector2(sprite.FrameRect.X, sprite.FrameRect.Y) * scale;
 
 				if (Has<ColorBlend>(entity))
 				{
@@ -170,11 +181,14 @@ public class Renderer : MoonTools.ECS.Renderer
 					depth = -Get<Depth>(entity).Value;
 				}
 
-				ArtSpriteBatch.Add(new Vector3(position.X + offset.X, position.Y + offset.Y, depth), 0, new Vector2(sprite.SliceRect.W, sprite.SliceRect.H), color, sprite.UV.LeftTop, sprite.UV.Dimensions);
+				ArtSpriteBatch.Add(new Vector3(position.X + offset.X, position.Y + offset.Y, depth), 0, new Vector2(sprite.SliceRect.W, sprite.SliceRect.H) * scale, color, sprite.UV.LeftTop, sprite.UV.Dimensions);
 			}
 
 			foreach (var entity in TextFilter.Entities)
 			{
+				if (HasOutRelation<DontDraw>(entity))
+					continue;
+
 				var text = Get<Text>(entity);
 				var position = Get<Position>(entity);
 

@@ -226,6 +226,9 @@ public class Motion : MoonTools.ECS.System
 
         foreach (var entity in VelocityFilter.Entities)
         {
+            if (HasOutRelation<DontMove>(entity))
+                continue;
+
             var pos = Get<Position>(entity);
             var vel = (Vector2)Get<Velocity>(entity);
 
@@ -248,6 +251,14 @@ public class Motion : MoonTools.ECS.System
             {
                 var fallspeed = Get<FallSpeed>(entity).Speed;
                 Set(entity, new Velocity(vel + Vector2.UnitY * fallspeed));
+            }
+
+            if (Has<MotionDamp>(entity))
+            {
+                var speed = Vector2.Distance(Vector2.Zero, vel) - Get<MotionDamp>(entity).Damping;
+                speed = MathF.Max(speed, 0);
+                vel = speed * Vector2.Normalize(vel);
+                Set(entity, new Velocity(vel));
             }
 
             if (Has<DestroyAtScreenBottom>(entity) && pos.Y > Dimensions.GAME_H - 32)
