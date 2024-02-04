@@ -38,8 +38,9 @@ public class GameTimer : MoonTools.ECS.System
 
         Set(timerEntity, new Text(Fonts.KosugiID, 16, timeString, MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
-        if (time <= 0 && Some<GameInProgress>())
+        if (time <= 0)
         {
+			Set(timerEntity, new Components.GameTimer(5));
             GameLoopManipulator.AdvanceGameState();
         }
     }

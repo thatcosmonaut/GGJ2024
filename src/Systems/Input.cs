@@ -71,30 +71,15 @@ public class Input : MoonTools.ECS.System
 
 	public override void Update(TimeSpan timeSpan)
 	{
-		if (!Some<GameInProgress>())
+		foreach (var playerEntity in PlayerFilter.Entities)
 		{
-			if (
-				PlayerOneKeyboard.Interact.IsPressed ||
-				PlayerTwoKeyboard.Interact.IsPressed ||
-				PlayerOneGamepad.Interact.IsPressed ||
-				PlayerTwoGamepad.Interact.IsPressed
-			)
-			{
-				GameLoopManipulator.AdvanceGameState();
-			}
-		}
-		else
-		{
-			foreach (var playerEntity in PlayerFilter.Entities)
-			{
-				var index = Get<Player>(playerEntity).Index;
-				var controlSet = index == 0 ? PlayerOneKeyboard : PlayerTwoKeyboard;
-				var altControlSet = index == 0 ? PlayerOneGamepad : PlayerTwoGamepad;
+			var index = Get<Player>(playerEntity).Index;
+			var controlSet = index == 0 ? PlayerOneKeyboard : PlayerTwoKeyboard;
+			var altControlSet = index == 0 ? PlayerOneGamepad : PlayerTwoGamepad;
 
-				InputState inputState = InputState(controlSet, altControlSet);
+			InputState inputState = InputState(controlSet, altControlSet);
 
-				Set(playerEntity, inputState);
-			}
+			Set(playerEntity, inputState);
 		}
 	}
 
