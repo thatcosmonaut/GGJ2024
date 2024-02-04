@@ -249,7 +249,7 @@ public class Orders : MoonTools.ECS.System
         }
 
         // Set Price
-        var priceString = $"${Get<Price>(order).Value}";
+        var priceString = "$" + Get<Price>(order).Value.ToString("F2");
         Set(orderCardPriceText, new Text(Fonts.KosugiID, FontSizes.ORDER, priceString, HorizontalAlignment.Left, VerticalAlignment.Top));
 
         var timer = CreateEntity();
