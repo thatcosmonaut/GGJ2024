@@ -88,6 +88,8 @@ public class LogoState : GameState
 
     public override void Start()
     {
+		Fade = 0;
+    	FadeTimer = 0;
         SoundPlayed = false;
     }
 

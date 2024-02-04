@@ -71,6 +71,8 @@ public class CreditsState : GameState
 
     public override void Start()
     {
+		CreditsTime = 0;
+
 		var sound = StaticAudio.Lookup(StaticAudio.CreditsLaugh);
         Voice.Submit(sound);
         Voice.Play();

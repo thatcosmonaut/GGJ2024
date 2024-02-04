@@ -43,18 +43,6 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		ScoreStrings = File.ReadAllLines(scoreStringsFilePath);
 	}
 
-	public void ShowTitleScreen()
-	{
-		var titleScreenEntity = CreateEntity();
-		Set(titleScreenEntity, new Position(0, 0));
-		Set(titleScreenEntity, new SpriteAnimation(SpriteAnimations.Title, 0));
-		Set(titleScreenEntity, new Depth(0.02f));
-		Set(titleScreenEntity, new IsTitleScreen());
-
-		Send(new PlayTitleMusic());
-		Send(new PlayStaticSoundMessage(StaticAudio.RollAndCash, RollAndCash.Data.SoundCategory.Generic, 1.5f));
-	}
-
 	public void ShowScoreScreen()
 	{
 		Destroy(GetSingletonEntity<GameInProgress>());

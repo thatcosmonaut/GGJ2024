@@ -267,6 +267,8 @@ public class Orders : MoonTools.ECS.System
 
     public bool TryFillOrder(Entity player)
     {
+		if (!HasOutRelation<Holding>(player)) { return false; }
+
         var product = OutRelationSingleton<Holding>(player);
 
         var (order, filled) = CheckOrders(product);
