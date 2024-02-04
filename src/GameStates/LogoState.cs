@@ -107,6 +107,8 @@ public class LogoState : GameState
 
         if (!SoundPlayed && Fade == 1)
         {
+			var sound = StaticAudio.Lookup(StaticAudio.MoonWorksChime);
+        	Voice.Submit(sound);
             Voice.Play();
 
             SoundPlayed = true;

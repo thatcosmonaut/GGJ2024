@@ -38,7 +38,6 @@ public class TitleState : GameState
 
         var sound = StreamingAudio.Lookup(StreamingAudio.roll_n_cash_grocery_lords);
         Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
-        Voice.Load(sound);
 
         var baseContentPath = Path.Combine(
             System.AppContext.BaseDirectory,
@@ -84,6 +83,8 @@ public class TitleState : GameState
 
     public override void Start()
     {
+		var sound = StreamingAudio.Lookup(StreamingAudio.roll_n_cash_grocery_lords);
+        Voice.Load(sound);
         Voice.Play();
     }
 

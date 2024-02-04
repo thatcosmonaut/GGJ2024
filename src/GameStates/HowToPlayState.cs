@@ -34,7 +34,6 @@ public class HowToPlayState : GameState
 
         var sound = StreamingAudio.Lookup(StreamingAudio.tutorial_type_beat);
         Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
-        Voice.Load(sound);
 
         var baseContentPath = Path.Combine(
             System.AppContext.BaseDirectory,
@@ -80,6 +79,8 @@ public class HowToPlayState : GameState
 
     public override void Start()
     {
+		var sound = StreamingAudio.Lookup(StreamingAudio.tutorial_type_beat);
+		Voice.Load(sound);
         Voice.Play();
     }
 

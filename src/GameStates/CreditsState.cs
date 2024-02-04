@@ -39,9 +39,9 @@ public class CreditsState : GameState
     {
         Game = game;
         TransitionState = transitionStateA;
-        var sound = StaticAudio.Lookup(StaticAudio.CreditsLaugh);
+
+		var sound = StaticAudio.Lookup(StaticAudio.CreditsLaugh);
         Voice = game.AudioDevice.Obtain<PersistentVoice>(sound.Format);
-        Voice.Submit(sound);
 
         GraphicsDevice = Game.GraphicsDevice;
         AudioDevice = Game.AudioDevice;
@@ -71,6 +71,8 @@ public class CreditsState : GameState
 
     public override void Start()
     {
+		var sound = StaticAudio.Lookup(StaticAudio.CreditsLaugh);
+        Voice.Submit(sound);
         Voice.Play();
     }
 
