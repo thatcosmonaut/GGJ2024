@@ -20,11 +20,14 @@ public class HowToPlayState : GameState
     SpriteBatch HiResSpriteBatch;
     Sampler LinearSampler;
 
+    StreamingVoice Voice;
     Texture RenderTexture;
+    AudioDevice AudioDevice;
 
 
     public HowToPlayState(RollAndCashGame game, GameState transitionState)
     {
+        AudioDevice = game.AudioDevice;
         Game = game;
         GraphicsDevice = game.GraphicsDevice;
         TransitionState = transitionState;
@@ -73,7 +76,10 @@ public class HowToPlayState : GameState
 
     public override void Start()
     {
-
+        var sound = StreamingAudio.Lookup(StreamingAudio.tutorial_type_beat);
+        Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
+        Voice.Load(sound);
+        Voice.Play();
     }
 
     public override void Update(TimeSpan delta)
@@ -129,7 +135,9 @@ public class HowToPlayState : GameState
 
     public override void End()
     {
-
+        Voice.Stop();
+        Voice.Unload();
+        Voice.Dispose();
     }
 
     private Matrix4x4 GetHiResProjectionMatrix()
