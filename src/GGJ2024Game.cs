@@ -22,6 +22,8 @@ namespace RollAndCash
 			bool debugMode
 		) : base(windowCreateInfo, frameLimiterSettings, 60, debugMode)
 		{
+			Inputs.Mouse.Hidden = true;
+
 			TextureAtlases.LoadAll();
 			SpriteAnimations.LoadAll();
 			ProductLoader.Load();
