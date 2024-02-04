@@ -23,6 +23,7 @@ public class LogoState : GameState
 
     SpriteBatch HiResSpriteBatch;
     Sampler LinearSampler;
+    TransientVoice Voice;
 
     float Fade = 0;
     float FadeTimer = 0;
@@ -83,7 +84,7 @@ public class LogoState : GameState
 
     public override void Start()
     {
-
+        SoundPlayed = false;
     }
 
     public override void Update(TimeSpan delta)
@@ -103,9 +104,9 @@ public class LogoState : GameState
         if (!SoundPlayed && Fade == 1)
         {
             var sound = StaticAudio.Lookup(StaticAudio.MoonWorksChime);
-            var voice = AudioDevice.Obtain<TransientVoice>(sound.Format);
-            voice.Submit(sound);
-            voice.Play();
+            Voice = AudioDevice.Obtain<TransientVoice>(sound.Format);
+            Voice.Submit(sound);
+            Voice.Play();
 
             SoundPlayed = true;
         }
@@ -166,7 +167,8 @@ public class LogoState : GameState
 
     public override void End()
     {
-
+        if (Voice != null)
+            Voice.Stop();
     }
 
     private Matrix4x4 GetHiResProjectionMatrix()

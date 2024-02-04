@@ -34,7 +34,6 @@ public class GameplayState : GameState
     NPCController NPCController;
     DroneController DroneController;
     PlayerController PlayerController;
-    GameLoopManipulator GameLoopManipulator;
     GameState TransitionState;
 
     public GameplayState(RollAndCashGame game, GameState transitionState)
@@ -46,8 +45,6 @@ public class GameplayState : GameState
     public override void Start()
     {
         World = new World();
-
-        GameLoopManipulator = new GameLoopManipulator(World);
 
         GameTimer = new(World);
         Timing = new(World);
