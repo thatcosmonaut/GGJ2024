@@ -28,8 +28,6 @@ public class TitleState : GameState
     float Time = 30.0f;
     private float Timer = 0.0f;
 
-    bool SoundPlayed = false;
-
     public TitleState(RollAndCashGame game, GameState transitionStateA, GameState transitionStateB)
     {
         Game = game;
@@ -37,6 +35,10 @@ public class TitleState : GameState
         AudioDevice = game.AudioDevice;
         TransitionStateA = transitionStateA;
         TransitionStateB = transitionStateB;
+
+        var sound = StreamingAudio.Lookup(StreamingAudio.roll_n_cash_grocery_lords);
+        Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
+        Voice.Load(sound);
 
         var baseContentPath = Path.Combine(
             System.AppContext.BaseDirectory,
@@ -82,9 +84,6 @@ public class TitleState : GameState
 
     public override void Start()
     {
-        var sound = StreamingAudio.Lookup(StreamingAudio.roll_n_cash_grocery_lords);
-        Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
-        Voice.Load(sound);
         Voice.Play();
     }
 
@@ -157,8 +156,6 @@ public class TitleState : GameState
     public override void End()
     {
         Voice.Stop();
-        Voice.Unload();
-        Voice.Dispose();
     }
 
     private Matrix4x4 GetHiResProjectionMatrix()

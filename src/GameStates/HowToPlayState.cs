@@ -32,6 +32,10 @@ public class HowToPlayState : GameState
         GraphicsDevice = game.GraphicsDevice;
         TransitionState = transitionState;
 
+        var sound = StreamingAudio.Lookup(StreamingAudio.tutorial_type_beat);
+        Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
+        Voice.Load(sound);
+
         var baseContentPath = Path.Combine(
             System.AppContext.BaseDirectory,
             "Content"
@@ -76,9 +80,6 @@ public class HowToPlayState : GameState
 
     public override void Start()
     {
-        var sound = StreamingAudio.Lookup(StreamingAudio.tutorial_type_beat);
-        Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
-        Voice.Load(sound);
         Voice.Play();
     }
 
@@ -136,8 +137,6 @@ public class HowToPlayState : GameState
     public override void End()
     {
         Voice.Stop();
-        Voice.Unload();
-        Voice.Dispose();
     }
 
     private Matrix4x4 GetHiResProjectionMatrix()

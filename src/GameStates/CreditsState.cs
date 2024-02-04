@@ -19,7 +19,7 @@ public class CreditsState : GameState
     AudioDevice AudioDevice;
 
     GraphicsPipeline TextPipeline;
-    TransientVoice Voice;
+    PersistentVoice Voice;
 
     Queue<TextBatch> BatchPool = new Queue<TextBatch>();
     List<(TextBatch, Matrix4x4)> ActiveBatchTransforms = new List<(TextBatch, Matrix4x4)>();
@@ -39,6 +39,9 @@ public class CreditsState : GameState
     {
         Game = game;
         TransitionState = transitionStateA;
+        var sound = StaticAudio.Lookup(StaticAudio.CreditsLaugh);
+        Voice = game.AudioDevice.Obtain<PersistentVoice>(sound.Format);
+        Voice.Submit(sound);
 
         GraphicsDevice = Game.GraphicsDevice;
         AudioDevice = Game.AudioDevice;
@@ -68,9 +71,6 @@ public class CreditsState : GameState
 
     public override void Start()
     {
-        var sound = StaticAudio.Lookup(StaticAudio.CreditsLaugh);
-        Voice = AudioDevice.Obtain<TransientVoice>(sound.Format);
-        Voice.Submit(sound);
         Voice.Play();
     }
 
@@ -141,8 +141,7 @@ public class CreditsState : GameState
 
     public override void End()
     {
-        if (Voice != null)
-            Voice.Stop();
+        Voice.Stop();
     }
 
     private Matrix4x4 GetHiResProjectionMatrix()

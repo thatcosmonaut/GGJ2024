@@ -23,7 +23,7 @@ public class LogoState : GameState
 
     SpriteBatch HiResSpriteBatch;
     Sampler LinearSampler;
-    TransientVoice Voice;
+    PersistentVoice Voice;
 
     float Fade = 0;
     float FadeTimer = 0;
@@ -41,6 +41,10 @@ public class LogoState : GameState
         AudioDevice = game.AudioDevice;
         TransitionStateA = transitionStateA;
         TransitionStateB = transitionStateA;
+
+        var sound = StaticAudio.Lookup(StaticAudio.MoonWorksChime);
+        Voice = AudioDevice.Obtain<PersistentVoice>(sound.Format);
+        Voice.Submit(sound);
 
         var baseContentPath = Path.Combine(
             System.AppContext.BaseDirectory,
@@ -103,9 +107,6 @@ public class LogoState : GameState
 
         if (!SoundPlayed && Fade == 1)
         {
-            var sound = StaticAudio.Lookup(StaticAudio.MoonWorksChime);
-            Voice = AudioDevice.Obtain<TransientVoice>(sound.Format);
-            Voice.Submit(sound);
             Voice.Play();
 
             SoundPlayed = true;
