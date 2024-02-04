@@ -32,7 +32,7 @@ public class DroneSpawner : Manipulator
         StaticAudio.Drone16
     ];
 
-    StaticSoundID[] EvilDroneSounds =
+    public StaticSoundID[] EvilDroneSounds =
     [
         StaticAudio.Evil1,
         StaticAudio.Evil2,

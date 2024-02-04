@@ -1,6 +1,7 @@
 using System;
 using MoonTools.ECS;
 using RollAndCash.Relations;
+using RollAndCash.Components;
 using Timer = RollAndCash.Components.Timer;
 
 namespace RollAndCash.Systems;
@@ -20,6 +21,8 @@ public class Timing : MoonTools.ECS.System
     {
         foreach (var entity in TimerFilter.Entities)
         {
+            if (HasOutRelation<DontTime>(entity)) continue;
+
             var timer = Get<Timer>(entity);
             var time = timer.Time - (float)delta.TotalSeconds;
 
@@ -32,6 +35,12 @@ public class Timing : MoonTools.ECS.System
                     var entityToTeleportTo = data.TeleportTo;
                     var position = Get<Position>(entityToTeleportTo);
                     Set(outEntity, position);
+                }
+
+                if (Has<PlaySoundOnTimerEnd>(entity))
+                {
+                    var soundMessage = Get<PlaySoundOnTimerEnd>(entity).PlayStaticSoundMessage;
+                    Send(soundMessage);
                 }
 
                 Destroy(entity);

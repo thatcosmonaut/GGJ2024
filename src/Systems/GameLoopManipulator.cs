@@ -18,6 +18,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 	Filter ScoreScreenFilter;
 	Filter DestroyAtGameEndFilter;
 
+	DroneSpawner DroneSpawner;
 	ProductSpawner ProductSpawner;
 
 	string[] ScoreStrings;
@@ -30,6 +31,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		DestroyAtGameEndFilter = FilterBuilder.Include<DestroyAtGameEnd>().Build();
 
 		ProductSpawner = new ProductSpawner(world);
+		DroneSpawner = new DroneSpawner(world);
 
 		var scoreStringsFilePath = Path.Combine(
 			System.AppContext.BaseDirectory,
@@ -41,6 +43,17 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		ScoreStrings = File.ReadAllLines(scoreStringsFilePath);
 	}
 
+	public void ShowTitleScreen()
+	{
+		var titleScreenEntity = CreateEntity();
+		Set(titleScreenEntity, new Position(0, 0));
+		Set(titleScreenEntity, new SpriteAnimation(SpriteAnimations.Title, 0));
+		Set(titleScreenEntity, new Depth(0.02f));
+		Set(titleScreenEntity, new IsTitleScreen());
+
+		Send(new PlayTitleMusic());
+		Send(new PlayStaticSoundMessage(StaticAudio.RollAndCash, RollAndCash.Data.SoundCategory.Generic, 1.5f));
+	}
 
 	public void ShowScoreScreen()
 	{
@@ -55,71 +68,86 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		Set(scoreScreenEntity, new Depth(0.5f));
 		Set(scoreScreenEntity, new IsScoreScreen());
 
-		var p1Entity = CreateEntity();
-		Set(p1Entity, new Position(Dimensions.GAME_W * 0.5f - 64.0f, Dimensions.GAME_H * 0.5f));
-		Set(p1Entity, new SpriteAnimation(SpriteAnimations.Char_Walk_Down, 0));
-		Set(p1Entity, new Depth(0.1f));
-		Set(p1Entity, new IsScoreScreen());
-
-		var p1Score = 0;
-		var p2Score = 0;
-
-		foreach (var player in PlayerFilter.Entities)
+		// Find Highest Score
+		var highestScore = -999f;
+		var tie = false;
+		foreach (var score in ScoreFilter.Entities)
 		{
-			var p = Get<Player>(player);
-			var score = Get<Score>(OutRelationSingleton<HasScore>(player));
+			var value = Get<Score>(score).Value;
 
-			if (p.Index == 0)
-				p1Score = score.Value;
-			else
-				p2Score = score.Value;
-
+			if (value >= highestScore)
+			{
+				if (value == highestScore)
+				{
+					tie = true;
+				}
+				highestScore = value;
+			}
 		}
 
-		var trophy = CreateEntity();
-		Set(trophy, new SpriteAnimation(SpriteAnimations.UI_Trophy, 10, true));
-		Set(trophy, p1Score >= p2Score ?
-			new Position(Dimensions.GAME_W * 0.5f - 64.0f, Dimensions.GAME_H * 0.5f - 64.0f) :
-			new Position(Dimensions.GAME_W * 0.5f + 64.0f, Dimensions.GAME_H * 0.5f - 64.0f)
-		);
-		Set(trophy, new Depth(0.1f));
-		Set(trophy, new IsScoreScreen());
+		// Spawn Players + HUD entities
+		foreach (var player in PlayerFilter.Entities)
+		{
+			var playerIndex = Get<Player>(player).Index;
+			var score = Get<Score>(OutRelationSingleton<HasScore>(player)).Value;
+			var x = Dimensions.GAME_W * 0.5f - 64.0f + 128.0f * playerIndex;
+			var y = Dimensions.GAME_H * .7f;
+			var sprite = playerIndex == 0 ? SpriteAnimations.Char_Walk_Down : SpriteAnimations.Char2_Walk_Down;
 
-		var p1ScoreEntity = CreateEntity();
-		Set(p1ScoreEntity, new Position(Dimensions.GAME_W * 0.5f - 64.0f, Dimensions.GAME_H * 0.5f + 32.0f));
-		Set(p1ScoreEntity, new Text(
-			Fonts.KosugiID,
-			FontSizes.SCORE,
-			$"{p1Score}",
-			HorizontalAlignment.Center,
-			VerticalAlignment.Middle
-		));
-		Set(p1ScoreEntity, new Depth(0.1f));
-		Set(p1ScoreEntity, new IsScoreScreen());
+			var playerEntity = CreateEntity();
+			Set(playerEntity, new Position(x, y));
+			Set(playerEntity, new SpriteAnimation(sprite, 0));
+			Set(playerEntity, new Depth(0.1f));
+			Set(playerEntity, new IsScoreScreen());
+			Set(playerEntity, new SpriteScale(new MoonWorks.Math.Float.Vector2(2, 2)));
 
-		var p2Entity = CreateEntity();
-		Set(p2Entity, new Position(Dimensions.GAME_W * 0.5f + 64.0f, Dimensions.GAME_H * 0.5f));
-		Set(p2Entity, new SpriteAnimation(SpriteAnimations.Char2_Walk_Down, 0));
-		Set(p2Entity, new Depth(0.1f));
-		Set(p2Entity, new IsScoreScreen());
+			// Spawn trophy for winning player
+			var countUpTime = 1.4f;
+			if (score == highestScore)
+			{
 
-		var p2ScoreEntity = CreateEntity();
-		Set(p2ScoreEntity, new Position(Dimensions.GAME_W * 0.5f + 64.0f, Dimensions.GAME_H * 0.5f + 32.0f));
-		Set(p2ScoreEntity, new Text(
-			Fonts.KosugiID,
-			FontSizes.SCORE,
-			$"{p2Score}",
-			HorizontalAlignment.Center,
-			VerticalAlignment.Middle
-		));
-		Set(p2ScoreEntity, new Depth(0.1f));
-		Set(p2ScoreEntity, new IsScoreScreen());
+				var trophySprite = tie ? SpriteAnimations.NPC_DroneEvil_Fly_Down : SpriteAnimations.UI_Trophy;
+				countUpTime = 1.8f + score / 3000;
+				var trophy = CreateEntity();
+				Set(trophy, new SpriteAnimation(trophySprite, 140, true));
+				Set(trophy, new SlowDownAnimation(15, 1));
+				Set(trophy, new Position(x, y - 32));
+				Set(trophy, new Velocity(new MoonWorks.Math.Float.Vector2(0, -330)));
+				Set(trophy, new MotionDamp(10));
+				Set(trophy, new Depth(0.1f));
+				Set(trophy, new IsScoreScreen());
+				Set(trophy, new SpriteScale(new MoonWorks.Math.Float.Vector2(2, 2)));
 
-		var scoreStringEntity = CreateEntity();
+				var timer = CreateEntity();
+				Set(timer, new Timer(countUpTime + 1f));
+				Set(timer, new PlaySoundOnTimerEnd(new PlayStaticSoundMessage(
+					tie ? Rando.GetRandomItem(DroneSpawner.EvilDroneSounds) : StaticAudio.OrderComplete
+				)));
+				Relate(trophy, timer, new DontMove());
+				Relate(trophy, timer, new DontDraw());
+			}
+
+			// Score below
+			var scoreEntity = CreateEntity();
+			Set(scoreEntity, new Position(x, y + 38));
+			Set(scoreEntity, new Depth(0.1f));
+			Set(scoreEntity, new IsScoreScreen());
+			Set(scoreEntity, new Text());
+			Set(scoreEntity, new LastValue(0));
+			var scoreTimer = CreateEntity();
+			Set(scoreTimer, new Timer(countUpTime));
+			Relate(scoreEntity, scoreTimer, new CountUpScore(0, score));
+			var dontDrawTextTimer = CreateEntity();
+			Set(dontDrawTextTimer, new Timer(.4f));
+			Relate(scoreTimer, dontDrawTextTimer, new DontTime());
+			Relate(scoreEntity, dontDrawTextTimer, new DontDraw());
+		}
+
+		var scoreTitleEntity = CreateEntity();
 		var str = ScoreStrings.GetRandomItem();
 		var fontSize = FontSizes.SCORE_STRING;
 
-		Set(scoreStringEntity, new Position(Dimensions.GAME_W * 0.5f, 32.0f));
+		Set(scoreTitleEntity, new Position(Dimensions.GAME_W * 0.5f, 32.0f));
 
 		var font = Fonts.FromID(Fonts.KosugiID);
 
@@ -143,7 +171,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 			);
 		}
 
-		Set(scoreStringEntity, new Text(
+		Set(scoreTitleEntity, new Text(
 			Fonts.KosugiID,
 			fontSize,
 			$"{str}",
@@ -151,8 +179,8 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 			VerticalAlignment.Middle
 		));
 
-		Set(scoreStringEntity, new Depth(0.1f));
-		Set(scoreStringEntity, new IsScoreScreen());
+		Set(scoreTitleEntity, new Depth(0.1f));
+		Set(scoreTitleEntity, new IsScoreScreen());
 
 	}
 

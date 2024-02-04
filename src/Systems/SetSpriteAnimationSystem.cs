@@ -1,5 +1,4 @@
 using System;
-using System.Security.Cryptography.X509Certificates;
 using RollAndCash.Components;
 using RollAndCash.Messages;
 using MoonTools.ECS;
@@ -9,13 +8,8 @@ namespace RollAndCash.Systems;
 public class SetSpriteAnimationSystem : MoonTools.ECS.System
 {
 
-	MoonTools.ECS.Filter SlowDownAnimationFilter;
-	MoonTools.ECS.Filter FlickerFilter;
-
 	public SetSpriteAnimationSystem(World world) : base(world)
 	{
-		SlowDownAnimationFilter = FilterBuilder.Include<SlowDownAnimation>().Include<Position>().Build();
-		FlickerFilter = FilterBuilder.Include<ColorFlicker>().Build();
 	}
 
 	public override void Update(TimeSpan delta)
@@ -47,26 +41,6 @@ public class SetSpriteAnimationSystem : MoonTools.ECS.System
 			{
 				Set(message.Entity, message.Animation);
 			}
-		}
-
-		// Slows down item animation
-		foreach (var entity in SlowDownAnimationFilter.Entities)
-		{
-			var c = Get<SlowDownAnimation>(entity);
-			var goal = c.BaseSpeed;
-			var step = c.step;
-			var currentAnimation = Get<SpriteAnimation>(entity);
-			var frameRate = currentAnimation.FrameRate;
-			frameRate = Math.Max(frameRate - step, goal);
-			Set(entity, currentAnimation.ChangeFramerate(frameRate));
-		}
-
-		// Flicker
-		foreach (var entity in FlickerFilter.Entities)
-		{
-			var flicker = Get<ColorFlicker>(entity);
-			var frames = flicker.ElapsedFrames + 1;
-			Set(entity, new ColorFlicker(frames, flicker.Color));
 		}
 	}
 }

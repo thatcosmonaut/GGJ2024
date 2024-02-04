@@ -29,3 +29,7 @@ public readonly record struct OrderTitleText();
 public readonly record struct OrderBG();
 public readonly record struct OrderPriceText();
 public readonly record struct OrderIcon();
+public readonly record struct DontMove();
+public readonly record struct DontDraw();
+public readonly record struct CountUpScore(int Start, int End);
+public readonly record struct DontTime();

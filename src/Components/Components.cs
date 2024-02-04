@@ -1,7 +1,7 @@
-using MoonWorks.Math.Float;
 using MoonWorks.Graphics;
 using RollAndCash.Systems;
 using RollAndCash.Data;
+using RollAndCash.Messages;
 
 namespace RollAndCash.Components;
 
@@ -77,3 +77,7 @@ public readonly record struct DestroyWhenOutOfBounds();
 public readonly record struct WaitingForProductRestock();
 public readonly record struct DestroyForDebugTestReasons();
 public readonly record struct ColorFlicker(int ElapsedFrames, Color Color);
+public readonly record struct MotionDamp(float Damping);
+public readonly record struct SpriteScale(MoonWorks.Math.Float.Vector2 Scale);
+public readonly record struct LastValue(int value);
+public readonly record struct PlaySoundOnTimerEnd(PlayStaticSoundMessage PlayStaticSoundMessage);
