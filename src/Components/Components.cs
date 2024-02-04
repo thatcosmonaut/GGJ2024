@@ -49,7 +49,6 @@ public readonly record struct CanSpawn(int Width, int Height);
 public readonly record struct FallSpeed(float Speed);
 public readonly record struct DestroyAtScreenBottom();
 
-public readonly record struct IsTitleScreen(); // bleeeh
 public readonly record struct IsScoreScreen(); // sorry
 public readonly record struct GameInProgress(); // yaaargh
 

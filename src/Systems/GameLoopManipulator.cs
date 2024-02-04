@@ -8,6 +8,7 @@ using MoonWorks.Graphics.Font;
 using RollAndCash.Relations;
 using System.IO;
 using RollAndCash.Utility;
+using MoonWorks;
 
 public class GameLoopManipulator : MoonTools.ECS.Manipulator
 {
@@ -40,17 +41,6 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 		ScoreStrings = File.ReadAllLines(scoreStringsFilePath);
 	}
 
-	public void ShowTitleScreen()
-	{
-		var titleScreenEntity = CreateEntity();
-		Set(titleScreenEntity, new Position(0, 0));
-		Set(titleScreenEntity, new SpriteAnimation(SpriteAnimations.Title, 0));
-		Set(titleScreenEntity, new Depth(0.02f));
-		Set(titleScreenEntity, new IsTitleScreen());
-
-		Send(new PlayTitleMusic());
-		Send(new PlayStaticSoundMessage(StaticAudio.RollAndCash, RollAndCash.Data.SoundCategory.Generic, 1.5f));
-	}
 
 	public void ShowScoreScreen()
 	{
@@ -166,43 +156,6 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 
 	}
 
-	void StartGame()
-	{
-		Destroy(GetSingletonEntity<IsTitleScreen>());
-
-		var gameInProgressEntity = CreateEntity();
-		Set(gameInProgressEntity, new GameInProgress());
-
-		Set(GameTimerFilter.NthEntity(0), new RollAndCash.Components.GameTimer(Time.ROUND_TIME));
-
-		var playerOne = PlayerFilter.NthEntity(0);
-		var playerTwo = PlayerFilter.NthEntity(1);
-
-		Set(playerOne, new Position(Dimensions.GAME_W * 0.47f + 0 * 48.0f, Dimensions.GAME_H * 0.25f));
-		Set(playerTwo, new Position(Dimensions.GAME_W * 0.47f + 1 * 48.0f, Dimensions.GAME_H * 0.25f));
-
-		foreach (var entity in ScoreFilter.Entities)
-		{
-			Set(entity, new Score(0));
-			Set(entity, new DisplayScore(0));
-			Set(entity, new Text(Fonts.KosugiID, FontSizes.SCORE, "0"));
-		}
-
-		World.Send(new PlaySongMessage());
-
-
-		foreach (var entity in DestroyAtGameEndFilter.Entities)
-		{
-			Destroy(entity);
-		}
-
-		// respawn products
-
-		ProductSpawner.ClearProducts();
-		ProductSpawner.SpawnAllProducts();
-
-		// reset orders
-	}
 
 	void BackToTitle()
 	{
@@ -211,16 +164,12 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 			Destroy(entity);
 		}
 
-		ShowTitleScreen();
+		Send(new EndGame());
 	}
 
 	public void AdvanceGameState()
 	{
-		if (Some<IsTitleScreen>())
-		{
-			StartGame();
-		}
-		else if (Some<IsScoreScreen>())
+		if (Some<IsScoreScreen>())
 		{
 			BackToTitle();
 		}

@@ -10,14 +10,14 @@ namespace RollAndCash.Systems;
 
 public class GameTimer : MoonTools.ECS.System
 {
-	GameLoopManipulator GameLoopManipulator;
+    GameLoopManipulator GameLoopManipulator;
 
-	public GameTimer(World world) : base(world)
-	{
-		GameLoopManipulator = new GameLoopManipulator(world);
-	}
+    public GameTimer(World world) : base(world)
+    {
+        GameLoopManipulator = new GameLoopManipulator(world);
+    }
 
-	public override void Update(TimeSpan delta)
+    public override void Update(TimeSpan delta)
     {
         if (!Some<Components.GameTimer>())
         {
@@ -38,24 +38,6 @@ public class GameTimer : MoonTools.ECS.System
 
         Set(timerEntity, new Text(Fonts.KosugiID, 16, timeString, MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
-        // title shake
-        if (Some<IsTitleScreen>())
-        {
-            var titleScreenEntity = GetSingletonEntity<IsTitleScreen>();
-            var pos = Get<Position>(titleScreenEntity);
-
-            if (OnTime(time, 0, (float)delta.TotalSeconds, (float)delta.TotalSeconds * 2))
-            {
-                Set(titleScreenEntity, new Position(pos.X + 1, pos.Y + 1));
-            }
-            else
-            {
-                Set(titleScreenEntity, new Position(pos.X - 1, pos.Y - 1));
-            }
-
-            return;
-        }
-
         if (time <= 0 && Some<GameInProgress>())
         {
             GameLoopManipulator.AdvanceGameState();
@@ -63,16 +45,16 @@ public class GameTimer : MoonTools.ECS.System
     }
 
     public static bool OnTime(float time, float triggerTime, float dt, float loopTime)
-	{
-		if (loopTime == 0)
-		{
-			return false;
-		}
+    {
+        if (loopTime == 0)
+        {
+            return false;
+        }
 
-		var t = time % loopTime;
-		return (
-			(t <= triggerTime && t + dt >= triggerTime) ||
-			(t <= triggerTime + loopTime && t + dt >= triggerTime + loopTime)
-			);
-	}
+        var t = time % loopTime;
+        return (
+            (t <= triggerTime && t + dt >= triggerTime) ||
+            (t <= triggerTime + loopTime && t + dt >= triggerTime + loopTime)
+            );
+    }
 }

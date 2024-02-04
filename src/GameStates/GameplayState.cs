@@ -5,6 +5,7 @@ using MoonWorks.Graphics;
 using MoonWorks.Math.Float;
 using RollAndCash.Components;
 using RollAndCash.Content;
+using RollAndCash.Messages;
 using RollAndCash.Relations;
 using RollAndCash.Systems;
 
@@ -15,7 +16,7 @@ public class GameplayState : GameState
     RollAndCashGame Game;
 
     Renderer Renderer;
-    World World = new World();
+    World World;
     Input Input;
     Motion Motion;
     Audio Audio;
@@ -33,12 +34,18 @@ public class GameplayState : GameState
     NPCController NPCController;
     DroneController DroneController;
     PlayerController PlayerController;
-
     GameLoopManipulator GameLoopManipulator;
+    GameState TransitionState;
 
-    public GameplayState(RollAndCashGame game)
+    public GameplayState(RollAndCashGame game, GameState transitionState)
     {
         Game = game;
+        TransitionState = transitionState;
+    }
+
+    public override void Start()
+    {
+        World = new World();
 
         GameLoopManipulator = new GameLoopManipulator(World);
 
@@ -65,11 +72,6 @@ public class GameplayState : GameState
         Ticker = new Ticker(World, cats);
 
         Renderer = new Renderer(World, Game.GraphicsDevice, Game.MainWindow.SwapchainFormat);
-    }
-
-    public override void Start()
-    {
-        NPCController.SpawnNPC();
 
         var topBorder = World.CreateEntity();
         World.Set(topBorder, new Position(0, 65));
@@ -108,7 +110,7 @@ public class GameplayState : GameState
 
         Orders.InitializeOrders();
 
-		var cashRegisterLeft = World.CreateEntity();
+        var cashRegisterLeft = World.CreateEntity();
         World.Set(cashRegisterLeft, new Position(8, 77));
         World.Set(cashRegisterLeft, new Rectangle(0, 0, 80, 90));
         World.Set(cashRegisterLeft, new CanInteract());
@@ -136,11 +138,14 @@ public class GameplayState : GameState
         var scoreOne = World.CreateEntity();
         World.Set(scoreOne, new Position(80, 345));
         World.Set(scoreOne, new Score(0));
+        World.Set(scoreOne, new DisplayScore(0));
         World.Set(scoreOne, new Text(Fonts.KosugiID, FontSizes.SCORE, "0"));
 
         var scoreTwo = World.CreateEntity();
         World.Set(scoreTwo, new Position(560, 345));
         World.Set(scoreTwo, new Score(0));
+        World.Set(scoreTwo, new DisplayScore(0));
+
         World.Set(scoreTwo, new Text(Fonts.KosugiID, FontSizes.SCORE, "0"));
 
         var playerOne = PlayerController.SpawnPlayer(0);
@@ -149,10 +154,13 @@ public class GameplayState : GameState
         World.Relate(playerOne, scoreOne, new HasScore());
         World.Relate(playerTwo, scoreTwo, new HasScore());
 
+        var gameInProgressEntity = World.CreateEntity();
+        World.Set(gameInProgressEntity, new GameInProgress());
+
         ShelfSpawner.SpawnShelves();
         ProductSpawner.SpawnAllProducts();
+        World.Send(new PlaySongMessage());
 
-        GameLoopManipulator.ShowTitleScreen();
     }
 
     public override void Update(TimeSpan dt)
@@ -173,12 +181,20 @@ public class GameplayState : GameState
         ColorAnimation.Update(dt);
         Audio.Update(dt);
 
+        if (World.SomeMessage<EndGame>())
+        {
+            World.FinishUpdate();
+            World.Dispose();
+            Game.SetState(TransitionState);
+            return;
+        }
+
         World.FinishUpdate();
     }
 
     public override void Draw(Window window, double alpha)
     {
-		Renderer.Render(Game.MainWindow);
+        Renderer.Render(Game.MainWindow);
     }
 
     public override void End()

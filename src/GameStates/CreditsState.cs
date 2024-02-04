@@ -34,10 +34,10 @@ public class CreditsState : GameState
     float CreditsTime = 0;
     float CreditsDuration = 4;
 
-    public CreditsState(RollAndCashGame game, GameState transitionState)
+    public CreditsState(RollAndCashGame game, GameState transitionStateA)
     {
         Game = game;
-        TransitionState = transitionState;
+        TransitionState = transitionStateA;
 
         GraphicsDevice = Game.GraphicsDevice;
         AudioDevice = Game.AudioDevice;
@@ -77,11 +77,17 @@ public class CreditsState : GameState
     {
         CreditsTime += (float)delta.TotalSeconds;
 
-        if (CreditsTime >= CreditsDuration)
+        if (Game.Inputs.AnyPressed || CreditsTime >= CreditsDuration)
         {
             Game.SetState(TransitionState);
         }
     }
+
+    public void SetTransitionState(GameState state)
+    {
+        TransitionState = state;
+    }
+
 
     public override void Draw(Window window, double alpha)
     {

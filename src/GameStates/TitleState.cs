@@ -3,15 +3,14 @@ using System.IO;
 using MoonWorks;
 using MoonWorks.Audio;
 using MoonWorks.Graphics;
-using MoonWorks.Input;
 using MoonWorks.Math;
 using MoonWorks.Math.Float;
 using RollAndCash.Content;
-using RollAndCash.Systems;
+using RollAndCash.Utility;
 
 namespace RollAndCash.GameStates;
 
-public class LogoState : GameState
+public class TitleState : GameState
 {
     RollAndCashGame Game;
     GraphicsDevice GraphicsDevice;
@@ -22,24 +21,22 @@ public class LogoState : GameState
     GraphicsPipeline HiResPipeline;
 
     SpriteBatch HiResSpriteBatch;
+    Texture RenderTexture;
+
     Sampler LinearSampler;
-
-    float Fade = 0;
-    float FadeTimer = 0;
-
-    float FadeInDuration = 2f;
-    float FadeHoldDuration = 1f;
-    float FadeOutDuration = 2f;
+    StreamingVoice Voice;
+    float Time = 30.0f;
+    private float Timer = 0.0f;
 
     bool SoundPlayed = false;
 
-    public LogoState(RollAndCashGame game, GameState transitionStateA, GameState transitionStateB)
+    public TitleState(RollAndCashGame game, GameState transitionStateA, GameState transitionStateB)
     {
         Game = game;
         GraphicsDevice = game.GraphicsDevice;
         AudioDevice = game.AudioDevice;
         TransitionStateA = transitionStateA;
-        TransitionStateB = transitionStateA;
+        TransitionStateB = transitionStateB;
 
         var baseContentPath = Path.Combine(
             System.AppContext.BaseDirectory,
@@ -79,52 +76,43 @@ public class LogoState : GameState
 
         LinearSampler = new Sampler(GraphicsDevice, SamplerCreateInfo.LinearClamp);
         HiResSpriteBatch = new SpriteBatch(GraphicsDevice);
+
+        RenderTexture = Texture.CreateTexture2D(GraphicsDevice, Dimensions.GAME_W, Dimensions.GAME_H, game.MainWindow.SwapchainFormat, TextureUsageFlags.ColorTarget);
     }
 
     public override void Start()
     {
-
+        var sound = StreamingAudio.Lookup(StreamingAudio.roll_n_cash_grocery_lords);
+        Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
+        Voice.Load(sound);
+        Voice.Play();
     }
 
     public override void Update(TimeSpan delta)
     {
-        Fade = Easing.AttackHoldRelease(
-            0,
-            1,
-            0,
-            FadeTimer,
-            FadeInDuration,
-            Easing.Function.Float.InQuart,
-            FadeHoldDuration,
-            FadeOutDuration,
-            Easing.Function.Float.OutQuart
-        );
+        Timer += (float)delta.TotalSeconds;
 
-        if (!SoundPlayed && Fade == 1)
-        {
-            var sound = StaticAudio.Lookup(StaticAudio.MoonWorksChime);
-            var voice = AudioDevice.Obtain<TransientVoice>(sound.Format);
-            voice.Submit(sound);
-            voice.Play();
+        Voice.Update();
 
-            SoundPlayed = true;
-        }
-
-        FadeTimer += (float)delta.TotalSeconds;
         if (Game.Inputs.AnyPressed)
         {
             Game.SetState(TransitionStateB);
         }
-        else if (FadeTimer > FadeInDuration + FadeHoldDuration + FadeOutDuration)
+        else if (Timer >= Time)
         {
+            Timer = 0.0f;
             Game.SetState(TransitionStateA);
         }
+    }
 
+    public void SetTransitionStateB(GameState state)
+    {
+        TransitionStateB = state;
     }
 
     public override void Draw(Window window, double alpha)
     {
-        var logoPosition = new Position(680, 250);
+        var logoPosition = new Position(Rando.Range(-1, 1), Rando.Range(-1, 1));
 
         var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
 
@@ -134,19 +122,19 @@ public class LogoState : GameState
         {
             HiResSpriteBatch.Reset();
 
-            var logoAnimation = SpriteAnimations.Logo_MoonWorks;
+            var logoAnimation = SpriteAnimations.Screen_Title;
             var sprite = logoAnimation.Frames[0];
             HiResSpriteBatch.Add(
                 new Vector3(logoPosition.X, logoPosition.Y, -1f),
                 0,
                 new Vector2(sprite.SliceRect.W, sprite.SliceRect.H),
-                Color.Lerp(Color.White, Color.Black, 1 - Fade),
+                Color.White,
                 sprite.UV.LeftTop, sprite.UV.Dimensions
             );
 
             HiResSpriteBatch.Upload(commandBuffer);
 
-            commandBuffer.BeginRenderPass(new ColorAttachmentInfo(swapchainTexture, Color.Black));
+            commandBuffer.BeginRenderPass(new ColorAttachmentInfo(RenderTexture, Color.Black));
 
             var hiResViewProjectionMatrices = new ViewProjectionMatrices(Matrix4x4.Identity, GetHiResProjectionMatrix());
 
@@ -159,6 +147,8 @@ public class LogoState : GameState
             );
 
             commandBuffer.EndRenderPass();
+
+            commandBuffer.CopyTextureToTexture(RenderTexture, swapchainTexture, MoonWorks.Graphics.Filter.Nearest);
         }
 
         GraphicsDevice.Submit(commandBuffer);
@@ -166,15 +156,17 @@ public class LogoState : GameState
 
     public override void End()
     {
-
+        Voice.Stop();
+        Voice.Unload();
+        Voice.Dispose();
     }
 
     private Matrix4x4 GetHiResProjectionMatrix()
     {
         return Matrix4x4.CreateOrthographicOffCenter(
             0,
-            1920,
-            1080,
+            Dimensions.GAME_W,
+            Dimensions.GAME_H,
             0,
             0.01f,
             1000

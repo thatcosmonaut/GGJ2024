@@ -16,7 +16,7 @@ namespace RollAndCash.Systems;
 
 public class NPCController : MoonTools.ECS.System
 {
-    MoonTools.ECS.Filter NPCFilter;
+    public MoonTools.ECS.Filter NPCFilter;
     const float NPCSpeed = 64.0f;
     const float PickUpChance = 0.5f;
     const float MinSpawnTime = 3.0f;
@@ -204,14 +204,6 @@ public class NPCController : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
-        if (Some<IsTitleScreen>())
-        {
-            foreach (var npc in NPCFilter.Entities)
-            {
-                Destroy(npc);
-            }
-            return;
-        }
 
         if (!Some<DontSpawnNPCs>() && NPCFilter.Count < MaxNPCs)
         {

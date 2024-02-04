@@ -11,6 +11,8 @@ namespace RollAndCash
 		LogoState LogoState;
 		CreditsState CreditsState;
 		GameplayState GameplayState;
+		TitleState TitleState;
+		HowToPlayState HowToPlayState;
 
 		GameState CurrentState;
 
@@ -34,15 +36,18 @@ namespace RollAndCash
 			StreamingAudio.InitAll(AudioDevice);
 			Fonts.LoadAll(GraphicsDevice);
 
-			GameplayState = new GameplayState(this);
-			CreditsState = new CreditsState(this, GameplayState);
-			LogoState = new LogoState(this, CreditsState);
 
-#if DEBUG
-			SetState(GameplayState);
-#else
+			CreditsState = new CreditsState(this, TitleState);
+			LogoState = new LogoState(this, CreditsState, TitleState);
+			TitleState = new TitleState(this, LogoState, HowToPlayState);
+			CreditsState.SetTransitionState(TitleState); // i hate this
+
+			GameplayState = new GameplayState(this, TitleState);
+			HowToPlayState = new HowToPlayState(this, GameplayState);
+			TitleState.SetTransitionStateB(HowToPlayState);
+
 			SetState(LogoState);
-#endif
+
 		}
 
 		protected override void Update(System.TimeSpan dt)

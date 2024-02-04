@@ -353,7 +353,7 @@ public class Orders : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
-        if (!Some<IsTitleScreen>() && Some<Price>())
+        if (Some<Price>())
         {
             foreach (var order in OrderFilter.Entities)
             {
