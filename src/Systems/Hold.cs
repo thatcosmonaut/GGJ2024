@@ -112,7 +112,7 @@ public class Hold : MoonTools.ECS.System
 			Set(txt, new Text(
 				Fonts.KosugiID,
 				FontSizes.HOLDING,
-				$"${ProductSpawner.GetPrice(holding)}",
+				$"${ProductSpawner.GetPrice(holding).ToString("F2")}",
 				MoonWorks.Graphics.Font.HorizontalAlignment.Center,
 				MoonWorks.Graphics.Font.VerticalAlignment.Middle
 			));
