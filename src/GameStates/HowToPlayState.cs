@@ -25,7 +25,7 @@ public class HowToPlayState : GameState
     AudioDevice AudioDevice;
 
     float ForceTimer = 0;
-    float MinTime = 3f;
+    float MinTime = 2f;
 
     public HowToPlayState(RollAndCashGame game, GameState transitionState)
     {
