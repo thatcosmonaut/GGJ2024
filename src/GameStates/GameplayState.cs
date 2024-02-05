@@ -107,19 +107,27 @@ public class GameplayState : GameState
 
         Orders.InitializeOrders();
 
-        var cashRegisterLeft = World.CreateEntity();
-        World.Set(cashRegisterLeft, new Position(8, 77));
-        World.Set(cashRegisterLeft, new Rectangle(0, 0, 80, 90));
-        World.Set(cashRegisterLeft, new CanInteract());
-        World.Set(cashRegisterLeft, new CanFillOrders());
-        World.Set(cashRegisterLeft, Color.ForestGreen);
+        var cashRegisterLeftCollision = World.CreateEntity();
+        World.Set(cashRegisterLeftCollision, new Position(15, 70));
+        World.Set(cashRegisterLeftCollision, new Rectangle(0, 0, 60, 50));
+        World.Set(cashRegisterLeftCollision, new Solid());
+
+        var cashRegisterLeftInteraction = World.CreateEntity();
+        World.Set(cashRegisterLeftInteraction, new Position(8, 70));
+        World.Set(cashRegisterLeftInteraction, new Rectangle(0, 0, 80, 90));
+        World.Set(cashRegisterLeftInteraction, new CanInteract());
+        World.Set(cashRegisterLeftInteraction, new CanFillOrders());
+
+        var cashRegisterRightCollision = World.CreateEntity();
+        World.Set(cashRegisterRightCollision, new Position(Dimensions.GAME_W, 70));
+        World.Set(cashRegisterRightCollision, new Rectangle(-80, 0, 80, 50));
+        World.Set(cashRegisterRightCollision, new Solid());
 
         var cashRegisterRight = World.CreateEntity();
-        World.Set(cashRegisterRight, new Position(Dimensions.GAME_W - 88, 77));
-        World.Set(cashRegisterRight, new Rectangle(0, 0, 80, 90));
+        World.Set(cashRegisterRight, new Position(Dimensions.GAME_W, 70));
+        World.Set(cashRegisterRight, new Rectangle(-80, 0, 80, 90));
         World.Set(cashRegisterRight, new CanInteract());
         World.Set(cashRegisterRight, new CanFillOrders());
-        World.Set(cashRegisterRight, Color.ForestGreen);
 
         var exit = World.CreateEntity();
         World.Set(exit, new Position(Dimensions.GAME_W * 0.5f - 44, 0));
