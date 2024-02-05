@@ -99,7 +99,8 @@ public class DroneSpawner : Manipulator
         Relate(drone, emptyProductSpawner, new Targeting());
         Relate(product, emptyProductSpawner, new BelongsToProductSpawner());
 
-        Send(new PlayStaticSoundMessage(Rando.GetRandomItem(DroneSounds), RollAndCash.Data.SoundCategory.Drone));
+        if (Rando.Value < 0.5f)
+            Send(new PlayStaticSoundMessage(Rando.GetRandomItem(DroneSounds), RollAndCash.Data.SoundCategory.Drone));
     }
 
     public void SpawnEvilDrone(Entity productToSteal)

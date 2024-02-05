@@ -181,6 +181,7 @@ public class GameplayState : GameState
         if (World.SomeMessage<EndGame>())
         {
             World.FinishUpdate();
+            Audio.Cleanup();
             World.Dispose();
             Game.SetState(TransitionState);
             return;

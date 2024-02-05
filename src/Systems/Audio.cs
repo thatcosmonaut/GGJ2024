@@ -39,6 +39,7 @@ public class Audio : MoonTools.ECS.System
 		TitleMusicVoice.Loop = true;
 
 		DroneVoice = AudioDevice.Obtain<PersistentVoice>(StaticAudio.Lookup(StaticAudio.Drone1).Format);
+		DroneVoice.SetVolume(0.2f);
 	}
 
 	public override void Update(TimeSpan delta)
@@ -78,6 +79,13 @@ public class Audio : MoonTools.ECS.System
 		{
 			DroneVoice.Stop();
 		}
+	}
+
+	public void Cleanup()
+	{
+		MusicVoice.Unload();
+		MusicVoice.Stop();
+		MusicVoice.Dispose();
 	}
 
 	private void PlayStaticSound(
