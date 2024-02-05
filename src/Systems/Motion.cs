@@ -301,6 +301,10 @@ public class Motion : MoonTools.ECS.System
         foreach (var entity in SolidFilter.Entities)
         {
             UnrelateAll<TouchingSolid>(entity);
+        }
+
+        foreach (var entity in SolidFilter.Entities)
+        {
             var position = Get<Position>(entity);
             var rectangle = Get<Rectangle>(entity);
 
