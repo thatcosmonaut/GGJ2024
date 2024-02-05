@@ -24,8 +24,8 @@ public class HowToPlayState : GameState
     Texture RenderTexture;
     AudioDevice AudioDevice;
 
-	float ForceTimer = 0;
-	float MinTime = 1;
+    float ForceTimer = 0;
+    float MinTime = 3f;
 
     public HowToPlayState(RollAndCashGame game, GameState transitionState)
     {
@@ -81,8 +81,8 @@ public class HowToPlayState : GameState
 
     public override void Start()
     {
-		var sound = StreamingAudio.Lookup(StreamingAudio.tutorial_type_beat);
-		Voice.Load(sound);
+        var sound = StreamingAudio.Lookup(StreamingAudio.tutorial_type_beat);
+        Voice.Load(sound);
         Voice.Play();
     }
 
@@ -93,7 +93,7 @@ public class HowToPlayState : GameState
             Game.SetState(TransitionState);
         }
 
-		ForceTimer += (float) delta.TotalSeconds;
+        ForceTimer += (float)delta.TotalSeconds;
     }
 
     public override void Draw(Window window, double alpha)
