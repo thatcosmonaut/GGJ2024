@@ -54,6 +54,15 @@ namespace RollAndCash
 
 		protected override void Update(System.TimeSpan dt)
 		{
+			if (Inputs.Keyboard.IsPressed(MoonWorks.Input.KeyCode.F11))
+			{
+				if (MainWindow.ScreenMode == ScreenMode.Fullscreen)
+					MainWindow.SetScreenMode(ScreenMode.Windowed);
+				else
+					MainWindow.SetScreenMode(ScreenMode.Fullscreen);
+
+			}
+
 			CurrentState.Update(dt);
 		}
 

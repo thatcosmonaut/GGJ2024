@@ -13,7 +13,7 @@ public readonly record struct ShowingPopup();
 public readonly record struct DisplayingProductPrice();
 public readonly record struct DisplayingIngredientPrice();
 public readonly record struct HasScore();
-public readonly record struct UpdateDisplayScoreOnDestroy();
+public readonly record struct UpdateDisplayScoreOnDestroy(bool Negative);
 public readonly record struct TimingFootstepAudio();
 public readonly record struct BelongsToProductSpawner();
 public readonly record struct ConsideredProduct();

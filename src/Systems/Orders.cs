@@ -267,7 +267,7 @@ public class Orders : MoonTools.ECS.System
 
     public bool TryFillOrder(Entity player)
     {
-		if (!HasOutRelation<Holding>(player)) { return false; }
+        if (!HasOutRelation<Holding>(player)) { return false; }
 
         var product = OutRelationSingleton<Holding>(player);
 
@@ -284,6 +284,14 @@ public class Orders : MoonTools.ECS.System
 
             if (calculate < 0)
             {
+                var x = playerIndex == 1 ? Dimensions.GAME_W - 100 : 100;
+                ProductManipulator.SpawnScoreEffect(
+                    player,
+                    new Position(x, Dimensions.GAME_H),
+                    new SpriteAnimation(Content.SpriteAnimations.Effect_SpinningSkull, Rando.Int(30, 60), true),
+                    calculate
+                );
+
                 Send(new PlayStaticSoundMessage(StaticAudio.CursedCoin));
             }
             else

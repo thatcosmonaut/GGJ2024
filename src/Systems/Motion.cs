@@ -267,7 +267,8 @@ public class Motion : MoonTools.ECS.System
                 {
                     var outEntity = OutRelationSingleton<UpdateDisplayScoreOnDestroy>(entity);
                     var scoreEntity = OutRelationSingleton<HasScore>(outEntity);
-                    var score = Get<DisplayScore>(scoreEntity).Value + 1;
+                    var data = GetRelationData<UpdateDisplayScoreOnDestroy>(entity, outEntity);
+                    var score = Get<DisplayScore>(scoreEntity).Value + (data.Negative ? -1 : 1);
                     Set(scoreEntity, new Text(Content.Fonts.KosugiID, FontSizes.SCORE, score.ToString()));
                     Set(scoreEntity, new DisplayScore(score));
 

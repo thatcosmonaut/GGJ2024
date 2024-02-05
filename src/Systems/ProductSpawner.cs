@@ -14,17 +14,17 @@ public readonly record struct ProductData(string Name, Category Category, Ingred
 public class ProductSpawner : MoonTools.ECS.Manipulator
 {
     Filter ProductFilter;
-	Filter ProductSpawnerFilter;
+    Filter ProductSpawnerFilter;
 
     Filter CategoryFilter;
     Filter IngredientFilter;
 
-	Category[] Categories;
+    Category[] Categories;
 
     public ProductSpawner(World world) : base(world)
     {
         ProductFilter = FilterBuilder.Include<CanBeHeld>().Build();
-		ProductSpawnerFilter = FilterBuilder.Include<Position>().Include<CanSpawn>().Build();
+        ProductSpawnerFilter = FilterBuilder.Include<Position>().Include<CanSpawn>().Build();
 
         CategoryFilter = FilterBuilder.Include<Category>().Build();
         IngredientFilter = FilterBuilder.Include<Ingredient>().Build();
@@ -107,7 +107,7 @@ public class ProductSpawner : MoonTools.ECS.Manipulator
     public void SpawnScoreEffect(Entity owner, Position target, SpriteAnimation spriteAnimation, int amount)
     {
         var maxTime = ((amount / 60f / 2f) + .1f) / 2f;
-        for (var i = 0; i < amount; i++)
+        for (var i = 0; i < MathF.Abs(amount); i++)
         {
             var e = CreateEntity();
             Set(e, new Depth(1));
@@ -117,7 +117,7 @@ public class ProductSpawner : MoonTools.ECS.Manipulator
             Set(e, new DestroyAtScreenBottom());
             Set(e, new AccelerateToPosition(target, 1300f, 1.01f));
             Set(e, new DestroyAtGameEnd());
-            Relate(e, owner, new UpdateDisplayScoreOnDestroy());
+            Relate(e, owner, new UpdateDisplayScoreOnDestroy(amount < 0));
 
             var timer = CreateEntity();
             float factor = (float)i / ((float)amount / 2);
@@ -128,36 +128,36 @@ public class ProductSpawner : MoonTools.ECS.Manipulator
     }
 
     public void ClearProducts()
-	{
-		foreach (var entity in ProductFilter.Entities)
-		{
-			Destroy(entity);
-		}
-	}
+    {
+        foreach (var entity in ProductFilter.Entities)
+        {
+            Destroy(entity);
+        }
+    }
 
-	// completely restock store
-	// TODO: also reshuffle spawner categories
-	public void SpawnAllProducts()
-	{
-		foreach (var spawner in ProductSpawnerFilter.Entities)
-		{
-			if (!HasInRelation<BelongsToProductSpawner>(spawner))
-			{
-				var position = Get<Position>(spawner);
+    // completely restock store
+    // TODO: also reshuffle spawner categories
+    public void SpawnAllProducts()
+    {
+        foreach (var spawner in ProductSpawnerFilter.Entities)
+        {
+            if (!HasInRelation<BelongsToProductSpawner>(spawner))
+            {
+                var position = Get<Position>(spawner);
 
-				Category category;
-				if (Has<SpawnCategory>(spawner))
-				{
-					category = Get<SpawnCategory>(spawner).Category;
-				}
-				else
-				{
-					category = Rando.GetRandomItem(Categories);
-				}
+                Category category;
+                if (Has<SpawnCategory>(spawner))
+                {
+                    category = Get<SpawnCategory>(spawner).Category;
+                }
+                else
+                {
+                    category = Rando.GetRandomItem(Categories);
+                }
 
-				var product = SpawnProduct(position, category);
-				Relate(product, spawner, new BelongsToProductSpawner());
-			}
-		}
-	}
+                var product = SpawnProduct(position, category);
+                Relate(product, spawner, new BelongsToProductSpawner());
+            }
+        }
+    }
 }
