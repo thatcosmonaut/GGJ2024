@@ -86,6 +86,12 @@ public class TitleState : GameState
 		var sound = StreamingAudio.Lookup(StreamingAudio.roll_n_cash_grocery_lords);
         Voice.Load(sound);
         Voice.Play();
+
+        var announcerSound = StaticAudio.Lookup(StaticAudio.RollAndCash);
+        var announcerVoice = AudioDevice.Obtain<TransientVoice>(announcerSound.Format);
+        announcerVoice.Submit(announcerSound);
+        announcerVoice.SetVolume(1.8f);
+        announcerVoice.Play();
     }
 
     public override void Update(TimeSpan delta)
