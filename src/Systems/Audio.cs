@@ -13,7 +13,6 @@ public class Audio : MoonTools.ECS.System
 	AudioDevice AudioDevice;
 
 	StreamingVoice MusicVoice;
-	StreamingVoice TitleMusicVoice;
 
 	StreamingSoundID[] GameplaySongs;
 
@@ -23,20 +22,16 @@ public class Audio : MoonTools.ECS.System
 	{
 		AudioDevice = audioDevice;
 
-		GameplaySongs = new StreamingSoundID[]
-		{
+		GameplaySongs =
+		[
 			StreamingAudio.attentiontwerkers,
 			StreamingAudio.attention_shoppers_v1,
 			StreamingAudio.attention_shoppers_v2,
-		};
+		];
 
 		var streamingAudioData = StreamingAudio.Lookup(StreamingAudio.attention_shoppers_v1);
 		MusicVoice = AudioDevice.Obtain<StreamingVoice>(streamingAudioData.Format);
 		MusicVoice.SetVolume(0.5f);
-
-		TitleMusicVoice = AudioDevice.Obtain<StreamingVoice>(streamingAudioData.Format);
-		TitleMusicVoice.SetVolume(0.5f);
-		TitleMusicVoice.Loop = true;
 
 		DroneVoice = AudioDevice.Obtain<PersistentVoice>(StaticAudio.Lookup(StaticAudio.Drone1).Format);
 		DroneVoice.SetVolume(0.5f);
@@ -59,20 +54,9 @@ public class Audio : MoonTools.ECS.System
 		{
 			var streamingAudioData = StreamingAudio.Lookup(Rando.GetRandomItem(GameplaySongs));
 
-			TitleMusicVoice.Stop();
 			MusicVoice.Stop();
 			MusicVoice.Load(streamingAudioData);
 			MusicVoice.Play();
-		}
-
-		if (SomeMessage<PlayTitleMusic>())
-		{
-			var streamingAudioData = StreamingAudio.Lookup(StreamingAudio.roll_n_cash_grocery_lords);
-
-			MusicVoice.Stop();
-			TitleMusicVoice.Stop();
-			TitleMusicVoice.Load(streamingAudioData);
-			TitleMusicVoice.Play();
 		}
 
 		if (SomeMessage<StopDroneSounds>())
@@ -86,6 +70,9 @@ public class Audio : MoonTools.ECS.System
 		MusicVoice.Unload();
 		MusicVoice.Stop();
 		MusicVoice.Dispose();
+
+		DroneVoice.Stop();
+		DroneVoice.Dispose();
 	}
 
 	private void PlayStaticSound(
