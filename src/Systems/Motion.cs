@@ -17,11 +17,10 @@ public class Motion : MoonTools.ECS.System
     MoonTools.ECS.Filter SolidFilter;
     MoonTools.ECS.Filter AccelerateToPositionFilter;
 
-    Dictionary<(int, int), HashSet<Entity>> InteractSpatialHash = new();
-    HashSet<Entity> InteractResults = new();
+    SpatialHash<Entity> InteractSpatialHash = new SpatialHash<Entity>(0, 0, Dimensions.GAME_W, Dimensions.GAME_H, 32);
 
-    Dictionary<(int, int), HashSet<Entity>> SolidSpatialHash = new();
-    HashSet<Entity> SolidResults = new HashSet<Entity>();
+    SpatialHash<Entity> SolidSpatialHash = new SpatialHash<Entity>(0, 0, Dimensions.GAME_W, Dimensions.GAME_H, 32);
+
 
     const int CellSize = 32;
 
@@ -35,19 +34,12 @@ public class Motion : MoonTools.ECS.System
 
     void ClearCanBeHeldSpatialHash()
     {
-        //don't remove the hashsets/clear the dict, we'll reuse them so we don't have to pressure the GC
-        foreach (var (k, v) in InteractSpatialHash)
-        {
-            v.Clear();
-        }
+        InteractSpatialHash.Clear();
     }
 
     void ClearSolidSpatialHash()
     {
-        foreach (var (k, v) in SolidSpatialHash)
-        {
-            v.Clear();
-        }
+        SolidSpatialHash.Clear();
     }
 
     (int, int) GetHashKey(int x, int y)
@@ -99,21 +91,11 @@ public class Motion : MoonTools.ECS.System
 
     (Entity other, bool hit) CheckSolidCollision(Entity e, Rectangle rect)
     {
-        RetrieveFromHash(SolidSpatialHash, SolidResults, rect);
-
-        foreach (var other in SolidResults)
+        foreach (var (other, otherRect) in SolidSpatialHash.Retrieve(e, rect))
         {
-            if (other != e)
+            if (rect.Intersects(otherRect))
             {
-                var otherR = Get<Rectangle>(other);
-                var otherP = Get<Position>(other);
-                var otherRect = GetWorldRect(otherP, otherR);
-
-                if (rect.Intersects(otherRect))
-                {
-                    return (other, true);
-                }
-
+                return (other, true);
             }
         }
 
@@ -185,7 +167,10 @@ public class Motion : MoonTools.ECS.System
 
         foreach (var entity in InteractFilter.Entities)
         {
-            AddToHash(InteractSpatialHash, entity);
+            var position = Get<Position>(entity);
+            var rect = Get<Rectangle>(entity);
+
+            InteractSpatialHash.Insert(entity, GetWorldRect(position, rect));
         }
 
         foreach (var entity in InteractFilter.Entities)
@@ -201,27 +186,21 @@ public class Motion : MoonTools.ECS.System
             var position = Get<Position>(entity);
             var rect = GetWorldRect(position, Get<Rectangle>(entity));
 
-            RetrieveFromHash(InteractSpatialHash, InteractResults, rect);
-
-            foreach (var other in InteractResults)
+            foreach (var (other, otherRect) in InteractSpatialHash.Retrieve(rect))
             {
-                if (other != entity)
+                if (rect.Intersects(otherRect))
                 {
-                    var otherR = Get<Rectangle>(other);
-                    var otherP = Get<Position>(other);
-                    var otherRect = GetWorldRect(otherP, otherR);
-
-                    if (rect.Intersects(otherRect))
-                    {
-                        Relate(entity, other, new Colliding());
-                    }
+                    Relate(entity, other, new Colliding());
                 }
+
             }
         }
 
         foreach (var entity in SolidFilter.Entities)
         {
-            AddToHash(SolidSpatialHash, entity);
+            var position = Get<Position>(entity);
+            var rect = Get<Rectangle>(entity);
+            SolidSpatialHash.Insert(entity, GetWorldRect(position, rect));
         }
 
         foreach (var entity in VelocityFilter.Entities)
@@ -299,6 +278,23 @@ public class Motion : MoonTools.ECS.System
 
                     Destroy(entity);
                 }
+            }
+
+            // update spatial hashes
+
+            if (Has<CanInteract>(entity))
+            {
+                var position = Get<Position>(entity);
+                var rect = Get<Rectangle>(entity);
+
+                InteractSpatialHash.Insert(entity, GetWorldRect(position, rect));
+            }
+
+            if (Has<Solid>(entity))
+            {
+                var position = Get<Position>(entity);
+                var rect = Get<Rectangle>(entity);
+                SolidSpatialHash.Insert(entity, GetWorldRect(position, rect));
             }
         }
 
