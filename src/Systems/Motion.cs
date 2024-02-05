@@ -2,7 +2,6 @@ using System;
 using MoonWorks.Math.Float;
 using MoonTools.ECS;
 using RollAndCash.Utility;
-using System.Collections.Generic;
 using RollAndCash.Components;
 using RollAndCash.Relations;
 using RollAndCash.Messages;
@@ -12,17 +11,13 @@ namespace RollAndCash.Systems;
 
 public class Motion : MoonTools.ECS.System
 {
-    MoonTools.ECS.Filter VelocityFilter;
-    MoonTools.ECS.Filter InteractFilter;
-    MoonTools.ECS.Filter SolidFilter;
-    MoonTools.ECS.Filter AccelerateToPositionFilter;
+    Filter VelocityFilter;
+    Filter InteractFilter;
+    Filter SolidFilter;
+    Filter AccelerateToPositionFilter;
 
     SpatialHash<Entity> InteractSpatialHash = new SpatialHash<Entity>(0, 0, Dimensions.GAME_W, Dimensions.GAME_H, 32);
-
     SpatialHash<Entity> SolidSpatialHash = new SpatialHash<Entity>(0, 0, Dimensions.GAME_W, Dimensions.GAME_H, 32);
-
-
-    const int CellSize = 32;
 
     public Motion(World world) : base(world)
     {
@@ -40,48 +35,6 @@ public class Motion : MoonTools.ECS.System
     void ClearSolidSpatialHash()
     {
         SolidSpatialHash.Clear();
-    }
-
-    (int, int) GetHashKey(int x, int y)
-    {
-        return (x / CellSize, y / CellSize);
-    }
-
-    void AddToHash(Dictionary<(int, int), HashSet<Entity>> hash, Entity e)
-    {
-        var pos = Get<Position>(e);
-        var rect = Get<Rectangle>(e);
-        var worldRect = GetWorldRect(pos, rect);
-
-        for (var x = worldRect.X; x < worldRect.X + worldRect.Width; x++)
-        {
-            for (var y = worldRect.Y; y < worldRect.Y + worldRect.Height; y++)
-            {
-                var key = GetHashKey(x, y);
-                if (!hash.ContainsKey(key))
-                    hash.Add(key, new HashSet<Entity>());
-
-                hash[key].Add(e);
-            }
-        }
-    }
-
-    void RetrieveFromHash(Dictionary<(int, int), HashSet<Entity>> hash, HashSet<Entity> results, Rectangle rect)
-    {
-        results.Clear();
-
-        for (var x = rect.X; x < rect.X + rect.Width; x++)
-        {
-            for (var y = rect.Y; y < rect.Y + rect.Height; y++)
-            {
-                var key = GetHashKey(x, y);
-                if (hash.ContainsKey(key))
-                {
-                    foreach (var e in hash[key])
-                        results.Add(e);
-                }
-            }
-        }
     }
 
     Rectangle GetWorldRect(Position p, Rectangle r)
