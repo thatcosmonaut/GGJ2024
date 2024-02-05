@@ -304,7 +304,8 @@ public class Motion : MoonTools.ECS.System
 
         foreach (var entity in SolidFilter.Entities)
         {
-            UnrelateAll<TouchingSolid>(entity);
+            Remove<TouchingSolid>(entity);
+
             var position = Get<Position>(entity);
             var rectangle = Get<Rectangle>(entity);
 
@@ -325,21 +326,22 @@ public class Motion : MoonTools.ECS.System
 
             if (leftCollided)
             {
-                Relate(entity, leftOther, new TouchingSolid());
+                Set(entity, new TouchingSolid());
             }
 
             if (rightCollided)
             {
-                Relate(entity, rightOther, new TouchingSolid());
+                Set(entity, new TouchingSolid());
             }
 
             if (upCollided)
             {
-                Relate(entity, upOther, new TouchingSolid());
+                Set(entity, new TouchingSolid());
             }
+
             if (downCollided)
             {
-                Relate(entity, downOther, new TouchingSolid());
+                Set(entity, new TouchingSolid());
             }
         }
 

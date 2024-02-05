@@ -222,9 +222,8 @@ public class NPCController : MoonTools.ECS.System
         foreach (var entity in NPCFilter.Entities)
         {
             var direction = Get<LastDirection>(entity).Direction;
-            var position = Get<Position>(entity);
 
-            if (HasOutRelation<TouchingSolid>(entity) || HasInRelation<TouchingSolid>(entity))
+            if (Has<TouchingSolid>(entity))
             {
                 direction = Vector2.Normalize(Directions.GetRandomItem());
 
