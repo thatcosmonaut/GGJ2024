@@ -174,7 +174,7 @@ public class SpriteBatch
 			);
 			computePass.BindComputePipeline(ComputePipeline);
 			computePass.BindStorageBuffers(InstanceBuffer);
-			computePass.Dispatch((InstanceCount / 64) + 1, 1, 1);
+			computePass.Dispatch((InstanceCount + 63) / 64, 1, 1);
 			commandBuffer.EndComputePass(computePass);
 		}
 	}
