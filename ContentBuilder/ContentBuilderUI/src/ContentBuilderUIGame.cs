@@ -2,13 +2,11 @@ using ImGuiNET;
 using MoonWorks.Graphics;
 using MoonWorks.Input;
 using MoonWorks;
-using MoonWorks.Math.Float;
+using System.Numerics;
 using System.IO;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using MoonWorks.Graphics.Font;
 
 namespace ContentBuilderUI
 {
@@ -25,9 +23,11 @@ namespace ContentBuilderUI
 		private MoonWorks.Graphics.Buffer ImGuiVertexBuffer = null;
 		private MoonWorks.Graphics.Buffer ImGuiIndexBuffer = null;
 		private GraphicsPipeline ImGuiPipeline;
-		private ShaderModule ImGuiVertexShader;
-		private ShaderModule ImGuiFragmentShader;
+		private Shader ImGuiVertexShader;
+		private Shader ImGuiFragmentShader;
 		private Sampler ImGuiSampler;
+
+		private ResourceUploader BufferUploader;
 
 		private string unprocessedContentPath = "";
 		private string projectPath = "";
@@ -39,7 +39,7 @@ namespace ContentBuilderUI
 			WindowCreateInfo windowCreateInfo,
 			FrameLimiterSettings frameLimiterSettings,
 			bool debugMode
-		) : base(windowCreateInfo, frameLimiterSettings, 60, debugMode)
+		) : base(windowCreateInfo, frameLimiterSettings, ShaderFormat.SPIRV, 60, debugMode)
 		{
 			Operations.Initialize();
 
@@ -97,27 +97,49 @@ namespace ContentBuilderUI
 			io.DisplaySize = new System.Numerics.Vector2(MainWindow.Width, MainWindow.Height);
 			io.DisplayFramebufferScale = System.Numerics.Vector2.One;
 
-			ImGuiVertexShader =
-				new ShaderModule(GraphicsDevice, Path.Combine(ShaderContentPath, "ImGui.vert.refresh"));
-			ImGuiFragmentShader =
-				new ShaderModule(GraphicsDevice, Path.Combine(ShaderContentPath, "ImGui.frag.refresh"));
+			ImGuiVertexShader = Shader.Create(
+				GraphicsDevice,
+				Path.Combine(ShaderContentPath, "ImGui.vert.spv"),
+				"main",
+				new ShaderCreateInfo
+				{
+					Format = ShaderFormat.SPIRV,
+					Stage = ShaderStage.Vertex,
+					NumUniformBuffers = 1
+				}
+			);
 
+			ImGuiFragmentShader = Shader.Create(
+				GraphicsDevice,
+				Path.Combine(ShaderContentPath, "ImGui.frag.spv"),
+				"main",
+				new ShaderCreateInfo
+				{
+					Format = ShaderFormat.SPIRV,
+					Stage = ShaderStage.Fragment,
+					NumSamplers = 1
+				}
+			);
 
-			ImGuiSampler = new Sampler(GraphicsDevice, SamplerCreateInfo.LinearClamp);
+			ImGuiSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearClamp);
 
-			ImGuiPipeline = new GraphicsPipeline(
+			ImGuiPipeline = GraphicsPipeline.Create(
 				GraphicsDevice,
 				new GraphicsPipelineCreateInfo
 				{
-					AttachmentInfo = new GraphicsPipelineAttachmentInfo(
-						new ColorAttachmentDescription(
-							MainWindow.SwapchainFormat,
-							ColorAttachmentBlendState.NonPremultiplied
-						)
-					),
+					TargetInfo = new GraphicsPipelineTargetInfo
+					{
+						ColorTargetDescriptions = [
+							new ColorTargetDescription
+							{
+								Format = MainWindow.SwapchainFormat,
+								BlendState = ColorTargetBlendState.NonPremultipliedAlphaBlend
+							}
+						]
+					},
 					DepthStencilState = DepthStencilState.Disable,
-					VertexShaderInfo = GraphicsShaderInfo.Create<Matrix4x4>(ImGuiVertexShader, "main", 0),
-					FragmentShaderInfo = GraphicsShaderInfo.Create(ImGuiFragmentShader, "main", 1),
+					VertexShader = ImGuiVertexShader,
+					FragmentShader = ImGuiFragmentShader,
 					VertexInputState = VertexInputState.CreateSingleBinding<Position2DTextureColorVertex>(),
 					PrimitiveType = PrimitiveType.TriangleList,
 					RasterizerState = RasterizerState.CW_CullNone,
@@ -125,6 +147,7 @@ namespace ContentBuilderUI
 				}
 			);
 
+			BufferUploader = new ResourceUploader(GraphicsDevice);
 			BuildFontAtlas();
 		}
 
@@ -167,7 +190,7 @@ namespace ContentBuilderUI
 
 			if (Inputs.Keyboard.IsDown(KeyCode.LeftControl) && Inputs.Keyboard.IsPressed(KeyCode.V))
 			{
-				var pasteString = SDL2.SDL.SDL_GetClipboardText();
+				var pasteString = SDL3.SDL.SDL_GetClipboardText();
 				io.AddInputCharactersUTF8(pasteString);
 			}
 
@@ -392,9 +415,9 @@ namespace ContentBuilderUI
 
 		}
 
-		private void BuildFontAtlas()
+		private unsafe void BuildFontAtlas()
 		{
-			var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
+			var textureUploader = new ResourceUploader(GraphicsDevice);
 
 			var io = ImGui.GetIO();
 
@@ -405,17 +428,17 @@ namespace ContentBuilderUI
 				out int bytesPerPixel
 			);
 
-			FontTexture = Texture.CreateTexture2D(
-				GraphicsDevice,
-				(uint)width,
-				(uint)height,
-				TextureFormat.R8G8B8A8,
-				TextureUsageFlags.Sampler
-			);
+			var pixelSpan = new Span<Color>((void*)pixelData, width * height);
 
-			commandBuffer.SetTextureData(FontTexture, pixelData, (uint)(width * height * bytesPerPixel));
+			FontTexture = textureUploader.CreateTexture2D(
+				pixelSpan,
+				TextureFormat.R8G8B8A8Unorm,
+				TextureUsageFlags.Sampler,
+                (uint)width,
+                (uint)height);
 
-			GraphicsDevice.Submit(commandBuffer);
+			textureUploader.Upload();
+			textureUploader.Dispose();
 
 			io.Fonts.SetTexID(FontTexture.Handle);
 			io.Fonts.ClearTexData();
@@ -460,24 +483,25 @@ namespace ContentBuilderUI
 			{
 				var cmdList = drawDataPtr.CmdLists[n];
 
-				commandBuffer.SetBufferData<Position2DTextureColorVertex>(
+				BufferUploader.SetBufferData(
 					ImGuiVertexBuffer,
-					cmdList.VtxBuffer.Data,
 					vertexOffset,
-					(uint)cmdList.VtxBuffer.Size
+					new Span<Position2DTextureColorVertex>((void*) cmdList.VtxBuffer.Data, cmdList.VtxBuffer.Size),
+					n == 0
 				);
 
-				commandBuffer.SetBufferData<ushort>(
+				BufferUploader.SetBufferData(
 					ImGuiIndexBuffer,
-					cmdList.IdxBuffer.Data,
 					indexOffset,
-					(uint)cmdList.IdxBuffer.Size
+					new Span<ushort>((void*) cmdList.IdxBuffer.Data, cmdList.IdxBuffer.Size),
+					n == 0
 				);
 
 				vertexOffset += (uint)cmdList.VtxBuffer.Size;
 				indexOffset += (uint)cmdList.IdxBuffer.Size;
 			}
 
+			BufferUploader.Upload();
 			GraphicsDevice.Submit(commandBuffer);
 		}
 
@@ -486,7 +510,7 @@ namespace ContentBuilderUI
 			var view = Matrix4x4.CreateLookAt(
 				new Vector3(0, 0, 1),
 				Vector3.Zero,
-				Vector3.Up
+				Vector3.UnitY
 			);
 
 			var projection = Matrix4x4.CreateOrthographicOffCenter(
@@ -500,18 +524,18 @@ namespace ContentBuilderUI
 
 			var viewProjectionMatrix = view * projection;
 
-			commandBuffer.BeginRenderPass(
-				new ColorAttachmentInfo(renderTexture, MoonWorks.Graphics.Color.White)
+			var renderPass = commandBuffer.BeginRenderPass(
+				new ColorTargetInfo(renderTexture, Color.White)
 			);
 
-			commandBuffer.BindGraphicsPipeline(ImGuiPipeline);
+			renderPass.BindGraphicsPipeline(ImGuiPipeline);
 
-			var vertexUniformOffset = commandBuffer.PushVertexShaderUniforms(
+			commandBuffer.PushVertexUniformData(
 				Matrix4x4.CreateOrthographicOffCenter(0, ioPtr.DisplaySize.X, ioPtr.DisplaySize.Y, 0, -1, 1)
 			);
 
-			commandBuffer.BindVertexBuffers(ImGuiVertexBuffer);
-			commandBuffer.BindIndexBuffer(ImGuiIndexBuffer, IndexElementSize.Sixteen);
+			renderPass.BindVertexBuffers(ImGuiVertexBuffer);
+			renderPass.BindIndexBuffer(ImGuiIndexBuffer, IndexElementSize.Sixteen);
 
 			uint vertexOffset = 0;
 			uint indexOffset = 0;
@@ -524,7 +548,7 @@ namespace ContentBuilderUI
 				{
 					var drawCmd = cmdList.CmdBuffer[cmdIndex];
 
-					commandBuffer.BindFragmentSamplers(
+					renderPass.BindFragmentSamplers(
 						new TextureSamplerBinding(TextureStorage.GetTexture(drawCmd.TextureId), ImGuiSampler)
 					);
 
@@ -539,7 +563,7 @@ namespace ContentBuilderUI
 						continue;
 					}
 
-					commandBuffer.SetScissor(
+					renderPass.SetScissor(
 						new Rect(
 							(int)drawCmd.ClipRect.X,
 							(int)drawCmd.ClipRect.Y,
@@ -548,11 +572,11 @@ namespace ContentBuilderUI
 						)
 					);
 
-					commandBuffer.DrawIndexedPrimitives(
-						vertexOffset,
+					renderPass.DrawIndexedPrimitives(
+						drawCmd.ElemCount,
+						1,
 						indexOffset,
-						drawCmd.ElemCount / 3,
-						vertexUniformOffset,
+                        (int)vertexOffset,
 						0
 					);
 
@@ -562,7 +586,7 @@ namespace ContentBuilderUI
 				vertexOffset += (uint)cmdList.VtxBuffer.Size;
 			}
 
-			commandBuffer.EndRenderPass();
+			commandBuffer.EndRenderPass(renderPass);
 		}
 
 		public struct Position2DTextureColorVertex : IVertexType
@@ -582,12 +606,19 @@ namespace ContentBuilderUI
 				Color = color;
 			}
 
-			public static VertexElementFormat[] Formats { get; } = new VertexElementFormat[3]
-			{
-				VertexElementFormat.Vector2,
-				VertexElementFormat.Vector2,
-				VertexElementFormat.Color
-			};
+			public static VertexElementFormat[] Formats =>
+            [
+                VertexElementFormat.Float2,
+				VertexElementFormat.Float2,
+				VertexElementFormat.Ubyte4Norm
+			];
+
+			public static uint[] Offsets =>
+			[
+				0,
+				8,
+				16
+			];
 		}
 
 		public class DebugTextureStorage

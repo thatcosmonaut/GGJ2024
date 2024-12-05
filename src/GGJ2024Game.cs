@@ -19,18 +19,19 @@ namespace RollAndCash
 		public RollAndCashGame(
 			WindowCreateInfo windowCreateInfo,
 			FrameLimiterSettings frameLimiterSettings,
+			ShaderFormat shaderFormats,
 			bool debugMode
-		) : base(windowCreateInfo, frameLimiterSettings, 60, debugMode)
+		) : base(windowCreateInfo, frameLimiterSettings, shaderFormats, 60, debugMode)
 		{
-			Inputs.Mouse.Hidden = true;
+			Inputs.Mouse.Hide();
 
 			TextureAtlases.LoadAll();
 			SpriteAnimations.LoadAll();
 			ProductLoader.Load();
 
 			var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
-			TextureAtlases.TP_Sprites.Load(GraphicsDevice, commandBuffer);
-			TextureAtlases.TP_HiRes.Load(GraphicsDevice, commandBuffer);
+			TextureAtlases.TP_Sprites.Load(GraphicsDevice);
+			TextureAtlases.TP_HiRes.Load(GraphicsDevice);
 			GraphicsDevice.Submit(commandBuffer);
 
 			StaticAudioPacks.LoadAll(AudioDevice);

@@ -1,5 +1,5 @@
 using System;
-using MoonWorks.Math.Float;
+using System.Numerics;
 
 public readonly record struct Position
 {

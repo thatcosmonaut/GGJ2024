@@ -1,10 +1,10 @@
 using System;
 using System.IO;
+using System.Numerics;
 using System.Text;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
 using MoonWorks.Math;
-using MoonWorks.Math.Float;
 using RollAndCash.Components;
 using RollAndCash.Content;
 using RollAndCash.Data;
@@ -226,7 +226,7 @@ public class NPCController : MoonTools.ECS.System
 
             if (HasOutRelation<TouchingSolid>(entity) || HasInRelation<TouchingSolid>(entity))
             {
-                direction = Vector2.Normalize(Directions.GetRandomItem());
+                direction = MathUtilities.SafeNormalize(Directions.GetRandomItem());
 
                 foreach (var other in OutRelations<TouchingSolid>(entity))
                 {
@@ -291,7 +291,7 @@ public class NPCController : MoonTools.ECS.System
                 Set(entity, new Velocity(direction * NPCSpeed));
                 Set(entity, new LastDirection(direction));
 
-                var depth = MathHelper.Lerp(100, 10, Get<Position>(entity).Y / (float)Dimensions.GAME_H);
+                var depth = float.Lerp(100, 10, Get<Position>(entity).Y / (float)Dimensions.GAME_H);
                 Set(entity, new Depth(depth));
             }
         }

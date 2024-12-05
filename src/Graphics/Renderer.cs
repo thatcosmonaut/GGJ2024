@@ -1,12 +1,11 @@
 using System.Collections.Generic;
-using System.IO;
 using RollAndCash.Components;
 using RollAndCash.Content;
 using MoonTools.ECS;
 using MoonWorks;
 using MoonWorks.Graphics;
 using MoonWorks.Graphics.Font;
-using MoonWorks.Math.Float;
+using System.Numerics;
 using RollAndCash.Relations;
 
 namespace RollAndCash;
@@ -14,7 +13,6 @@ namespace RollAndCash;
 public class Renderer : MoonTools.ECS.Renderer
 {
 	GraphicsDevice GraphicsDevice;
-	GraphicsPipeline SpriteBatchPipeline;
 	GraphicsPipeline TextPipeline;
 
 	SpriteBatch ArtSpriteBatch;
@@ -41,62 +39,36 @@ public class Renderer : MoonTools.ECS.Renderer
 		TextFilter = FilterBuilder.Include<Text>().Include<Position>().Build();
 		SpriteAnimationFilter = FilterBuilder.Include<SpriteAnimation>().Include<Position>().Build();
 
-		var baseContentPath = Path.Combine(
-			System.AppContext.BaseDirectory,
-			"Content"
-		);
-
-		var shaderContentPath = Path.Combine(
-			baseContentPath,
-			"Shaders"
-		);
-
-		RenderTexture = Texture.CreateTexture2D(GraphicsDevice, Dimensions.GAME_W, Dimensions.GAME_H, swapchainFormat, TextureUsageFlags.ColorTarget);
-		DepthTexture = Texture.CreateTexture2D(GraphicsDevice, Dimensions.GAME_W, Dimensions.GAME_H, TextureFormat.D16, TextureUsageFlags.DepthStencilTarget);
+		RenderTexture = Texture.Create2D(GraphicsDevice, Dimensions.GAME_W, Dimensions.GAME_H, swapchainFormat, TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler);
+		DepthTexture = Texture.Create2D(GraphicsDevice, Dimensions.GAME_W, Dimensions.GAME_H, TextureFormat.D16Unorm, TextureUsageFlags.DepthStencilTarget);
 
 		SpriteAtlasTexture = TextureAtlases.TP_Sprites.Texture;
 
-		var vertShaderModule = new ShaderModule(GraphicsDevice, Path.Combine(shaderContentPath, "InstancedSpriteBatch.vert.refresh"));
-		var fragShaderModule = new ShaderModule(GraphicsDevice, Path.Combine(shaderContentPath, "InstancedSpriteBatch.frag.refresh"));
-
-		SpriteBatchPipeline = new GraphicsPipeline(
-			GraphicsDevice,
-				new GraphicsPipelineCreateInfo
-				{
-					AttachmentInfo = new GraphicsPipelineAttachmentInfo(
-						TextureFormat.D16,
-						new ColorAttachmentDescription(
-							swapchainFormat,
-							ColorAttachmentBlendState.NonPremultiplied
-						)
-					),
-					DepthStencilState = DepthStencilState.DepthReadWrite,
-					MultisampleState = MultisampleState.None,
-					PrimitiveType = PrimitiveType.TriangleList,
-					RasterizerState = RasterizerState.CCW_CullNone,
-					VertexInputState = new VertexInputState([
-						VertexBindingAndAttributes.Create<PositionVertex>(0),
-						VertexBindingAndAttributes.Create<SpriteInstanceData>(1, 1, VertexInputRate.Instance)
-					]),
-					VertexShaderInfo = GraphicsShaderInfo.Create<ViewProjectionMatrices>(vertShaderModule, "main", 0),
-					FragmentShaderInfo = GraphicsShaderInfo.Create(fragShaderModule, "main", 1)
-				}
-			);
-
-		TextPipeline = new GraphicsPipeline(
+		TextPipeline = GraphicsPipeline.Create(
 			GraphicsDevice,
 			new GraphicsPipelineCreateInfo
 			{
-				AttachmentInfo = new GraphicsPipelineAttachmentInfo(
-					TextureFormat.D16,
-					new ColorAttachmentDescription(
-						swapchainFormat,
-						ColorAttachmentBlendState.AlphaBlend
-					)
-				),
-				DepthStencilState = DepthStencilState.DepthReadWrite,
-				VertexShaderInfo = GraphicsDevice.TextVertexShaderInfo,
-				FragmentShaderInfo = GraphicsDevice.TextFragmentShaderInfo,
+				TargetInfo = new GraphicsPipelineTargetInfo
+				{
+					DepthStencilFormat = TextureFormat.D16Unorm,
+					HasDepthStencilTarget = true,
+					ColorTargetDescriptions =
+					[
+						new ColorTargetDescription
+						{
+							Format = swapchainFormat,
+							BlendState = ColorTargetBlendState.PremultipliedAlphaBlend
+						}
+					]
+				},
+				DepthStencilState = new DepthStencilState
+				{
+					EnableDepthTest = true,
+					EnableDepthWrite = true,
+					CompareOp = CompareOp.LessOrEqual
+				},
+				VertexShader = GraphicsDevice.TextVertexShader,
+				FragmentShader = GraphicsDevice.TextFragmentShader,
 				VertexInputState = GraphicsDevice.TextVertexInputState,
 				RasterizerState = RasterizerState.CCW_CullNone,
 				PrimitiveType = PrimitiveType.TriangleList,
@@ -104,9 +76,9 @@ public class Renderer : MoonTools.ECS.Renderer
 			}
 		);
 
-		PointSampler = new Sampler(GraphicsDevice, SamplerCreateInfo.PointClamp);
+		PointSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.PointClamp);
 
-		ArtSpriteBatch = new SpriteBatch(GraphicsDevice);
+		ArtSpriteBatch = new SpriteBatch(GraphicsDevice, swapchainFormat, TextureFormat.D16Unorm);
 	}
 
 	public void Render(Window window)
@@ -117,13 +89,13 @@ public class Renderer : MoonTools.ECS.Renderer
 
 		if (swapchainTexture != null)
 		{
-			ArtSpriteBatch.Reset();
-
 			foreach (var (batch, _) in ActiveBatchTransforms)
 			{
 				FreeTextBatch(batch);
 			}
 			ActiveBatchTransforms.Clear();
+
+			ArtSpriteBatch.Start();
 
 			foreach (var entity in RectangleFilter.Entities)
 			{
@@ -240,40 +212,37 @@ public class Renderer : MoonTools.ECS.Renderer
 
 			}
 
-			if (ArtSpriteBatch.InstanceCount > 0)
-			{
-				ArtSpriteBatch.Upload(commandBuffer);
-			}
+			ArtSpriteBatch.Upload(commandBuffer);
 
 			foreach (var (batch, _) in ActiveBatchTransforms)
 			{
 				batch.UploadBufferData(commandBuffer);
 			}
 
-			commandBuffer.BeginRenderPass(
-				new DepthStencilAttachmentInfo(DepthTexture, new DepthStencilValue(1, 0)),
-				new ColorAttachmentInfo(RenderTexture, Color.Black)
+			var renderPass = commandBuffer.BeginRenderPass(
+				new DepthStencilTargetInfo(DepthTexture, 1, 0),
+				new ColorTargetInfo(RenderTexture, Color.Black)
 			);
 
 			var viewProjectionMatrices = new ViewProjectionMatrices(GetCameraMatrix(), GetProjectionMatrix());
 
 			if (ArtSpriteBatch.InstanceCount > 0)
 			{
-				ArtSpriteBatch.Render(commandBuffer, SpriteBatchPipeline, SpriteAtlasTexture, PointSampler, viewProjectionMatrices);
+				ArtSpriteBatch.Render(renderPass, SpriteAtlasTexture, PointSampler, viewProjectionMatrices);
 			}
 
 			if (ActiveBatchTransforms.Count > 0)
 			{
-				commandBuffer.BindGraphicsPipeline(TextPipeline);
+				renderPass.BindGraphicsPipeline(TextPipeline);
 				foreach (var (batch, transform) in ActiveBatchTransforms)
 				{
-					batch.Render(commandBuffer, transform * viewProjectionMatrices.View * viewProjectionMatrices.Projection);
+					batch.Render(renderPass, transform * viewProjectionMatrices.View * viewProjectionMatrices.Projection);
 				}
 			}
 
-			commandBuffer.EndRenderPass();
+			commandBuffer.EndRenderPass(renderPass);
 
-			commandBuffer.CopyTextureToTexture(RenderTexture, swapchainTexture, MoonWorks.Graphics.Filter.Nearest);
+			commandBuffer.Blit(RenderTexture, swapchainTexture, MoonWorks.Graphics.Filter.Nearest);
 		}
 
 		GraphicsDevice.Submit(commandBuffer);

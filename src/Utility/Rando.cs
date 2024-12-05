@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using MoonWorks.Math.Float;
+using System.Numerics;
 
 namespace RollAndCash.Utility;
 public static class Rando

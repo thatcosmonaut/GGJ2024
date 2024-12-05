@@ -63,7 +63,7 @@ public class TexturePage
 		}
 	}
 
-	public void Load(GraphicsDevice graphicsDevice, CommandBuffer commandBuffer)
+	public void Load(GraphicsDevice graphicsDevice)
 	{
 		if (Loaded)
 		{
@@ -72,28 +72,16 @@ public class TexturePage
 
 		var atlasData = AtlasFile.Data;
 
-		var compressedLocation = Path.Combine(AtlasFile.File.DirectoryName, atlasData.Name + ".ctex");
-		if (File.Exists(compressedLocation))
-		{
-			// this is a compressed DDS file, unpack and load
-			using (var compressedFileStream = File.Open(compressedLocation, FileMode.Open, FileAccess.Read))
-			using (var decompressor = new DeflateStream(compressedFileStream, CompressionMode.Decompress))
-			{
-				Texture = Texture.LoadDDS(
-					graphicsDevice,
-					commandBuffer,
-					decompressor
-				);
-			}
-		}
-		else
-		{
-			Texture = Texture.FromImageFile(
-				graphicsDevice,
-				commandBuffer,
-				Path.Combine(AtlasFile.File.DirectoryName, atlasData.Name + ".png")
-			);
-		}
+		var resourceUploader = new ResourceUploader(graphicsDevice);
+
+		Texture = resourceUploader.CreateTexture2DFromCompressed(
+			Path.Combine(AtlasFile.File.DirectoryName, atlasData.Name + ".png"),
+			TextureFormat.R8G8B8A8Unorm,
+			TextureUsageFlags.Sampler
+		);
+
+		resourceUploader.Upload();
+		resourceUploader.Dispose();
 	}
 
 	private void Unload()

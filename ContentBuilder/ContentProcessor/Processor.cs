@@ -28,26 +28,31 @@ namespace ContentProcessor
 			CreateOrClearDirectory(shaderOutputDir);
 
 #if WINDOWS
-			var refreshCompilerExecutable = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "refreshc.exe"));
+			var compilerExectuable = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "shadercross.exe"));
 #elif LINUX || OSX // linux
-			var refreshCompilerExecutable = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "refreshc"));
+			var compilerExectuable = new FileInfo(Path.Combine(System.AppContext.BaseDirectory, "shadercross"));
 #endif
 
-			var arguments = $"{shaderDir.FullName} --vulkan --out {shaderOutputDir.FullName}";
-
-			var process = new Process();
-			process.StartInfo.FileName = refreshCompilerExecutable.FullName;
-			process.StartInfo.Arguments = arguments;
-			process.StartInfo.CreateNoWindow = true;
-			process.StartInfo.UseShellExecute = false;
-			process.StartInfo.RedirectStandardOutput = false;
-			process.StartInfo.RedirectStandardError = false;
-			process.Start();
-			process.WaitForExit();
-
-			if (process.ExitCode != 0)
+			foreach (var file in shaderDir.EnumerateFiles())
 			{
-				throw new System.SystemException("Shader compilation failed!");
+				var arguments = $"{file.FullName} -o {Path.Combine(shaderOutputDir.FullName, file.Name)}.spv";
+
+				var process = new Process();
+				process.StartInfo.FileName = compilerExectuable.FullName;
+				process.StartInfo.Arguments = arguments;
+				process.StartInfo.CreateNoWindow = true;
+				process.StartInfo.UseShellExecute = false;
+				process.StartInfo.RedirectStandardOutput = false;
+				process.StartInfo.RedirectStandardError = true;
+				process.ErrorDataReceived += (sendingProcess, outLine) => Console.WriteLine(outLine.Data);
+				process.Start();
+				process.BeginErrorReadLine();
+				process.WaitForExit();
+
+				if (process.ExitCode != 0)
+				{
+					throw new System.SystemException("Shader compilation failed!");
+				}
 			}
 		}
 

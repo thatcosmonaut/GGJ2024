@@ -1,6 +1,6 @@
-using MoonWorks.Math.Float;
-using RollAndCash.Data;
 using System;
+using System.Numerics;
+using RollAndCash.Data;
 using MoonWorks.Math;
 
 namespace RollAndCash.Components;
@@ -26,7 +26,7 @@ public struct SpriteAnimation
 			}
 			else
 			{
-				return MathHelper.Clamp(integerIndex, 0, SpriteAnimationInfo.Frames.Length - 1);
+				return int.Clamp(integerIndex, 0, SpriteAnimationInfo.Frames.Length - 1);
 			}
 		}
 	}

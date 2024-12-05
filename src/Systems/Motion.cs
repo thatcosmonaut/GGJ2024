@@ -1,5 +1,5 @@
 using System;
-using MoonWorks.Math.Float;
+using System.Numerics;
 using MoonTools.ECS;
 using RollAndCash.Utility;
 using RollAndCash.Components;
@@ -189,7 +189,7 @@ public class Motion : MoonTools.ECS.System
             {
                 var speed = Vector2.Distance(Vector2.Zero, vel) - Get<MotionDamp>(entity).Damping;
                 speed = MathF.Max(speed, 0);
-                vel = speed * Vector2.Normalize(vel);
+                vel = speed * MathUtilities.SafeNormalize(vel);
                 Set(entity, new Velocity(vel));
             }
 
@@ -303,7 +303,7 @@ public class Motion : MoonTools.ECS.System
             var accelTo = Get<AccelerateToPosition>(entity);
             var difference = accelTo.Target - position;
             velocity /= accelTo.MotionDampFactor * (1 + (float)delta.TotalSeconds); // TODO: IDK if this is deltatime friction but game is fixed fps rn anyway
-            velocity += Vector2.Normalize(difference) * accelTo.Acceleration * (float)delta.TotalSeconds;
+            velocity += MathUtilities.SafeNormalize(difference) * accelTo.Acceleration * (float)delta.TotalSeconds;
             Set(entity, new Velocity(velocity));
         }
     }

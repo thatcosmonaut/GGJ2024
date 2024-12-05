@@ -27,8 +27,7 @@ namespace RollAndCash
 				WindowWidth = 1280,
 				WindowHeight = 720,
 				WindowTitle = "ROLL AND CASH: GROCERY LORDS: A LONDON JERRY STORY",
-				ScreenMode = ScreenMode.Windowed,
-				PresentMode = PresentMode.Immediate
+				ScreenMode = ScreenMode.Windowed
 			};
 #else
 			WindowCreateInfo windowCreateInfo = new WindowCreateInfo
@@ -36,8 +35,7 @@ namespace RollAndCash
 				WindowWidth = 1280,
 				WindowHeight = 720,
 				WindowTitle = "ROLL AND CASH: GROCERY LORDS: A LONDON JERRY STORY",
-				ScreenMode = ScreenMode.Fullscreen,
-				PresentMode = PresentMode.Immediate
+				ScreenMode = ScreenMode.Fullscreen
 			};
 #endif
 
@@ -56,6 +54,7 @@ namespace RollAndCash
 			RollAndCashGame game = new RollAndCashGame(
 				windowCreateInfo,
 				frameLimiterSettings,
+				MoonWorks.Graphics.ShaderFormat.SPIRV,
 				debugMode
 			);
 

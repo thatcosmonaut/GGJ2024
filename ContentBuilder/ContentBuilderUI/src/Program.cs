@@ -14,8 +14,7 @@ namespace ContentBuilderUI
 				WindowWidth = 800,
 				WindowHeight = 800,
 				WindowTitle = "ContentBuilderUI",
-				ScreenMode = ScreenMode.Windowed,
-				PresentMode = PresentMode.FIFORelaxed
+				ScreenMode = ScreenMode.Windowed
 			};
 
 			FrameLimiterSettings frameLimiterSettings = new FrameLimiterSettings

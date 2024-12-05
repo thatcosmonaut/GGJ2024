@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using MoonWorks;
 using MoonWorks.Audio;
 using MoonWorks.Graphics;
 using MoonWorks.Graphics.Font;
-using MoonWorks.Math.Float;
 using RollAndCash.Content;
 using RollAndCash.Utility;
 
@@ -17,12 +17,9 @@ public class CreditsState : GameState
     GameState TransitionState;
 
     GraphicsDevice GraphicsDevice;
-    AudioDevice AudioDevice;
 
     GraphicsPipeline TextPipeline;
     PersistentVoice Voice;
-
-    GraphicsPipeline HiResPipeline;
 
     SpriteBatch HiResSpriteBatch;
     Sampler LinearSampler;
@@ -50,67 +47,41 @@ public class CreditsState : GameState
         Voice = game.AudioDevice.Obtain<PersistentVoice>(sound.Format);
 
         GraphicsDevice = Game.GraphicsDevice;
-        AudioDevice = Game.AudioDevice;
 
-        TextPipeline = new GraphicsPipeline(
-            Game.GraphicsDevice,
-            new GraphicsPipelineCreateInfo
-            {
-                AttachmentInfo = new GraphicsPipelineAttachmentInfo(
-                    new ColorAttachmentDescription(
-                        Game.MainWindow.SwapchainFormat,
-                        ColorAttachmentBlendState.AlphaBlend
-                    )
-                ),
-                DepthStencilState = DepthStencilState.DepthReadWrite,
-                VertexShaderInfo = GraphicsDevice.TextVertexShaderInfo,
-                FragmentShaderInfo = GraphicsDevice.TextFragmentShaderInfo,
-                VertexInputState = GraphicsDevice.TextVertexInputState,
-                RasterizerState = RasterizerState.CCW_CullNone,
-                PrimitiveType = PrimitiveType.TriangleList,
-                MultisampleState = MultisampleState.None
-            }
-        );
+		TextPipeline = GraphicsPipeline.Create(
+			GraphicsDevice,
+			new GraphicsPipelineCreateInfo
+			{
+				TargetInfo = new GraphicsPipelineTargetInfo
+				{
+					DepthStencilFormat = TextureFormat.D16Unorm,
+					HasDepthStencilTarget = true,
+					ColorTargetDescriptions =
+					[
+						new ColorTargetDescription
+						{
+							Format = game.MainWindow.SwapchainFormat,
+							BlendState = ColorTargetBlendState.PremultipliedAlphaBlend
+						}
+					]
+				},
+				DepthStencilState = new DepthStencilState
+				{
+					EnableDepthTest = true,
+					EnableDepthWrite = true,
+					CompareOp = CompareOp.LessOrEqual
+				},
+				VertexShader = GraphicsDevice.TextVertexShader,
+				FragmentShader = GraphicsDevice.TextFragmentShader,
+				VertexInputState = GraphicsDevice.TextVertexInputState,
+				RasterizerState = RasterizerState.CCW_CullNone,
+				PrimitiveType = PrimitiveType.TriangleList,
+				MultisampleState = MultisampleState.None
+			}
+		);
 
-        var baseContentPath = Path.Combine(
-            System.AppContext.BaseDirectory,
-            "Content"
-        );
-
-        var shaderContentPath = Path.Combine(
-            baseContentPath,
-            "Shaders"
-        );
-
-        var vertShaderModule = new ShaderModule(GraphicsDevice, Path.Combine(shaderContentPath, "InstancedSpriteBatch.vert.refresh"));
-        var fragShaderModule = new ShaderModule(GraphicsDevice, Path.Combine(shaderContentPath, "InstancedSpriteBatch.frag.refresh"));
-
-
-        HiResPipeline = new GraphicsPipeline(
-            GraphicsDevice,
-            new GraphicsPipelineCreateInfo
-            {
-                AttachmentInfo = new GraphicsPipelineAttachmentInfo(
-                    new ColorAttachmentDescription(
-                        game.MainWindow.SwapchainFormat,
-                        ColorAttachmentBlendState.NonPremultiplied
-                    )
-                ),
-                DepthStencilState = DepthStencilState.Disable,
-                MultisampleState = MultisampleState.None,
-                PrimitiveType = PrimitiveType.TriangleList,
-                RasterizerState = RasterizerState.CCW_CullNone,
-                VertexInputState = new VertexInputState([
-                    VertexBindingAndAttributes.Create<PositionVertex>(0),
-                            VertexBindingAndAttributes.Create<SpriteInstanceData>(1, 1, VertexInputRate.Instance)
-                ]),
-                VertexShaderInfo = GraphicsShaderInfo.Create<ViewProjectionMatrices>(vertShaderModule, "main", 0),
-                FragmentShaderInfo = GraphicsShaderInfo.Create(fragShaderModule, "main", 1)
-            }
-        );
-
-        LinearSampler = new Sampler(GraphicsDevice, SamplerCreateInfo.LinearClamp);
-        HiResSpriteBatch = new SpriteBatch(GraphicsDevice);
+        LinearSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearClamp);
+        HiResSpriteBatch = new SpriteBatch(GraphicsDevice, game.MainWindow.SwapchainFormat);
 
         Rando.Shuffle(Names);
     }
@@ -155,7 +126,7 @@ public class CreditsState : GameState
             ActiveBatchTransforms.Clear();
 
 
-            HiResSpriteBatch.Reset();
+            HiResSpriteBatch.Start();
 
             var logoAnimation = SpriteAnimations.Logo_JerryCrew;
             var sprite = logoAnimation.Frames[0];
@@ -185,15 +156,14 @@ public class CreditsState : GameState
                 batch.UploadBufferData(commandBuffer);
             }
 
-            commandBuffer.BeginRenderPass(
-                new ColorAttachmentInfo(swapchainTexture, Color.Black)
+            var renderPass = commandBuffer.BeginRenderPass(
+                new ColorTargetInfo(swapchainTexture, Color.Black)
             );
 
             var hiResViewProjectionMatrices = new ViewProjectionMatrices(Matrix4x4.Identity, GetHiResProjectionMatrix());
 
             HiResSpriteBatch.Render(
-                commandBuffer,
-                HiResPipeline,
+                renderPass,
                 TextureAtlases.TP_HiRes.Texture,
                 LinearSampler,
                 hiResViewProjectionMatrices
@@ -203,14 +173,14 @@ public class CreditsState : GameState
             {
                 var hiResProjectionMatrix = GetHiResProjectionMatrix();
 
-                commandBuffer.BindGraphicsPipeline(TextPipeline);
+                renderPass.BindGraphicsPipeline(TextPipeline);
                 foreach (var (batch, transform) in ActiveBatchTransforms)
                 {
-                    batch.Render(commandBuffer, transform * hiResProjectionMatrix);
+                    batch.Render(renderPass, transform * hiResProjectionMatrix);
                 }
             }
 
-            commandBuffer.EndRenderPass();
+            commandBuffer.EndRenderPass(renderPass);
         }
 
         GraphicsDevice.Submit(commandBuffer);

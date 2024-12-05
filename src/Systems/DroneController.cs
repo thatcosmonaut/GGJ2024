@@ -1,6 +1,7 @@
 using System;
+using System.Numerics;
 using MoonTools.ECS;
-using MoonWorks.Math.Float;
+using MoonWorks.Math;
 using RollAndCash.Components;
 using RollAndCash.Content;
 using RollAndCash.Messages;
@@ -69,7 +70,7 @@ public class DroneController : MoonTools.ECS.System
                 var targetedPosition = Get<Position>(targetedSpawner);
 
                 var vectorToTarget = targetedPosition + new Vector2(0, -15) - targeterPosition;
-                var direction = Vector2.Normalize(vectorToTarget);
+                var direction = MathUtilities.SafeNormalize(vectorToTarget);
                 var distance = MathF.Min(vectorToTarget.Length(), RestockDroneSpeed);
 
                 Set(targeter, new Velocity(direction * distance));
@@ -84,7 +85,7 @@ public class DroneController : MoonTools.ECS.System
                     Set(product, targetedPosition);
 
                     // fly off in a random direction
-                    var randomDirection = Vector2.Rotate(Vector2.UnitX, Rando.Range(0, 2 * MathF.PI));
+                    var randomDirection = MathUtilities.Rotate(Vector2.UnitX, Rando.Range(0, 2 * MathF.PI));
                     Set(targeter, new Velocity(randomDirection * RestockDroneSpeed));
                 }
             }
@@ -105,7 +106,7 @@ public class DroneController : MoonTools.ECS.System
                     var vectorToTarget = targetPosition + new Vector2(0, -15) - stealerPosition;
                     var distanceSquared = vectorToTarget.LengthSquared();
 
-                    var direction = Vector2.Normalize(vectorToTarget);
+                    var direction = MathUtilities.SafeNormalize(vectorToTarget);
                     Set(stealer, new Velocity(direction * EvilDroneSpeed));
                     Set(stealer, new LastDirection(direction));
 

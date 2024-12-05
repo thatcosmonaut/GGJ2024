@@ -1,8 +1,6 @@
 using System;
 using MoonTools.ECS;
 using MoonWorks;
-using MoonWorks.Graphics;
-using MoonWorks.Math.Float;
 using RollAndCash.Components;
 using RollAndCash.Content;
 using RollAndCash.Messages;

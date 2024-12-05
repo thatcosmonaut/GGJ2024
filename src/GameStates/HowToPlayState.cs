@@ -1,10 +1,8 @@
 using System;
-using System.IO;
 using MoonWorks;
 using MoonWorks.Audio;
 using MoonWorks.Graphics;
-using MoonWorks.Math;
-using MoonWorks.Math.Float;
+using System.Numerics;
 using RollAndCash.Content;
 
 namespace RollAndCash.GameStates;
@@ -14,8 +12,6 @@ public class HowToPlayState : GameState
     RollAndCashGame Game;
     GraphicsDevice GraphicsDevice;
     GameState TransitionState;
-
-    GraphicsPipeline HiResPipeline;
 
     SpriteBatch HiResSpriteBatch;
     Sampler LinearSampler;
@@ -38,46 +34,10 @@ public class HowToPlayState : GameState
         Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
         Voice.Loop = true;
 
-        var baseContentPath = Path.Combine(
-            System.AppContext.BaseDirectory,
-            "Content"
-        );
+        LinearSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearClamp);
+        HiResSpriteBatch = new SpriteBatch(GraphicsDevice, game.MainWindow.SwapchainFormat);
 
-        var shaderContentPath = Path.Combine(
-            baseContentPath,
-            "Shaders"
-        );
-
-        var vertShaderModule = new ShaderModule(GraphicsDevice, Path.Combine(shaderContentPath, "InstancedSpriteBatch.vert.refresh"));
-        var fragShaderModule = new ShaderModule(GraphicsDevice, Path.Combine(shaderContentPath, "InstancedSpriteBatch.frag.refresh"));
-
-        HiResPipeline = new GraphicsPipeline(
-            GraphicsDevice,
-            new GraphicsPipelineCreateInfo
-            {
-                AttachmentInfo = new GraphicsPipelineAttachmentInfo(
-                    new ColorAttachmentDescription(
-                        game.MainWindow.SwapchainFormat,
-                        ColorAttachmentBlendState.NonPremultiplied
-                    )
-                ),
-                DepthStencilState = DepthStencilState.Disable,
-                MultisampleState = MultisampleState.None,
-                PrimitiveType = PrimitiveType.TriangleList,
-                RasterizerState = RasterizerState.CCW_CullNone,
-                VertexInputState = new VertexInputState([
-                    VertexBindingAndAttributes.Create<PositionVertex>(0),
-                    VertexBindingAndAttributes.Create<SpriteInstanceData>(1, 1, VertexInputRate.Instance)
-                ]),
-                VertexShaderInfo = GraphicsShaderInfo.Create<ViewProjectionMatrices>(vertShaderModule, "main", 0),
-                FragmentShaderInfo = GraphicsShaderInfo.Create(fragShaderModule, "main", 1)
-            }
-        );
-
-        LinearSampler = new Sampler(GraphicsDevice, SamplerCreateInfo.LinearClamp);
-        HiResSpriteBatch = new SpriteBatch(GraphicsDevice);
-
-        RenderTexture = Texture.CreateTexture2D(GraphicsDevice, Dimensions.GAME_W, Dimensions.GAME_H, game.MainWindow.SwapchainFormat, TextureUsageFlags.ColorTarget);
+        RenderTexture = Texture.Create2D(GraphicsDevice, Dimensions.GAME_W, Dimensions.GAME_H, game.MainWindow.SwapchainFormat, TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler);
     }
 
     public override void Start()
@@ -105,7 +65,7 @@ public class HowToPlayState : GameState
 
         if (swapchainTexture != null)
         {
-            HiResSpriteBatch.Reset();
+            HiResSpriteBatch.Start();
 
             var logoAnimation = SpriteAnimations.Screen_HowToPlay;
             var sprite = logoAnimation.Frames[0];
@@ -119,21 +79,20 @@ public class HowToPlayState : GameState
 
             HiResSpriteBatch.Upload(commandBuffer);
 
-            commandBuffer.BeginRenderPass(new ColorAttachmentInfo(RenderTexture, Color.Black));
+            var renderPass = commandBuffer.BeginRenderPass(new ColorTargetInfo(RenderTexture, Color.Black));
 
             var hiResViewProjectionMatrices = new ViewProjectionMatrices(Matrix4x4.Identity, GetHiResProjectionMatrix());
 
             HiResSpriteBatch.Render(
-                commandBuffer,
-                HiResPipeline,
+                renderPass,
                 TextureAtlases.TP_HiRes.Texture,
                 LinearSampler,
                 hiResViewProjectionMatrices
             );
 
-            commandBuffer.EndRenderPass();
+            commandBuffer.EndRenderPass(renderPass);
 
-            commandBuffer.CopyTextureToTexture(RenderTexture, swapchainTexture, MoonWorks.Graphics.Filter.Nearest);
+            commandBuffer.Blit(RenderTexture, swapchainTexture, Filter.Nearest);
 
         }
 

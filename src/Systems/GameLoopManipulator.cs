@@ -7,8 +7,8 @@ using MoonTools.ECS;
 using MoonWorks.Graphics.Font;
 using RollAndCash.Relations;
 using System.IO;
+using System.Numerics;
 using RollAndCash.Utility;
-using MoonWorks;
 
 public class GameLoopManipulator : MoonTools.ECS.Manipulator
 {
@@ -87,7 +87,7 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 			Set(playerEntity, new SpriteAnimation(sprite, 0));
 			Set(playerEntity, new Depth(0.1f));
 			Set(playerEntity, new IsScoreScreen());
-			Set(playerEntity, new SpriteScale(new MoonWorks.Math.Float.Vector2(2, 2)));
+			Set(playerEntity, new SpriteScale(new Vector2(2, 2)));
 
 			// Spawn trophy for winning player
 			var countUpTime = 1.4f;
@@ -100,11 +100,11 @@ public class GameLoopManipulator : MoonTools.ECS.Manipulator
 				Set(trophy, new SpriteAnimation(trophySprite, 140, true));
 				Set(trophy, new SlowDownAnimation(15, 1));
 				Set(trophy, new Position(x, y - 32));
-				Set(trophy, new Velocity(new MoonWorks.Math.Float.Vector2(0, -330)));
+				Set(trophy, new Velocity(new Vector2(0, -330)));
 				Set(trophy, new MotionDamp(10));
 				Set(trophy, new Depth(0.1f));
 				Set(trophy, new IsScoreScreen());
-				Set(trophy, new SpriteScale(new MoonWorks.Math.Float.Vector2(2, 2)));
+				Set(trophy, new SpriteScale(new Vector2(2, 2)));
 
 				var timer = CreateEntity();
 				Set(timer, new Timer(countUpTime + 1f));

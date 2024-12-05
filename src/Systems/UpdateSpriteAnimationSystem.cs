@@ -64,7 +64,7 @@ public class UpdateSpriteAnimationSystem : MoonTools.ECS.System
 				var timerEntity = OutRelationSingleton<CountUpScore>(entity);
 				var timeFactor = 1 - Get<Timer>(timerEntity).Remaining;
 				var data = GetRelationData<CountUpScore>(entity, timerEntity);
-				var value = (int)Math.Floor(MathHelper.Lerp(data.Start, data.End, Easing.InOutExpo(timeFactor)));
+				var value = (int)Math.Floor(float.Lerp(data.Start, data.End, Easing.InOutExpo(timeFactor)));
 				Set(entity, new Text(
 					Fonts.KosugiID,
 					FontSizes.SCORE,

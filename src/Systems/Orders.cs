@@ -1,13 +1,10 @@
 using System;
-using System.IO.IsolatedStorage;
 using RollAndCash.Components;
 using RollAndCash.Content;
 using RollAndCash.Messages;
 using RollAndCash.Relations;
 using RollAndCash.Utility;
 using MoonTools.ECS;
-using MoonWorks.Math.Float;
-using System.Text;
 using MoonWorks.Graphics.Font;
 using RollAndCash.Data;
 

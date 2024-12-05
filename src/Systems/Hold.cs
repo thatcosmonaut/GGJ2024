@@ -1,6 +1,5 @@
 
 using System;
-using MoonWorks.Math.Float;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
 using RollAndCash.Components;
@@ -88,7 +87,7 @@ public class Hold : MoonTools.ECS.System
 		var holderDirection = Get<LastDirection>(e).Direction;
 
 		Set(holding, holderPos + holderDirection * 16 + new Position(0, -10));
-		var depth = MathHelper.Lerp(100, 10, Get<Position>(holding).Y / (float)Dimensions.GAME_H);
+		var depth = float.Lerp(100, 10, Get<Position>(holding).Y / (float)Dimensions.GAME_H);
 		Set(holding, new Depth(depth));
 
 		// this is drone jank -evan
@@ -254,7 +253,7 @@ public class Hold : MoonTools.ECS.System
 			yOffset += 15;
 		}
 
-		textBoundsRectangle.Inflate(5, 5);
+		textBoundsRectangle = textBoundsRectangle.Inflate(5, 5);
 
 		Set(backgroundRect, new Rectangle(0, 0, textBoundsRectangle.Width, textBoundsRectangle.Height));
 	}

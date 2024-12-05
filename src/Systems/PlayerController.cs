@@ -8,7 +8,7 @@ using RollAndCash.Utility;
 using MoonTools.ECS;
 using MoonWorks.Graphics;
 using MoonWorks.Math;
-using MoonWorks.Math.Float;
+using System.Numerics;
 
 namespace RollAndCash.Systems;
 
@@ -122,12 +122,12 @@ public class PlayerController : MoonTools.ECS.System
 			// limit max speed
 			if (velocity.Length() > maxSpeed)
 			{
-				velocity = Vector2.Normalize(velocity) * maxSpeed;
+				velocity = MathUtilities.SafeNormalize(velocity) * maxSpeed;
 			}
 
 			if (direction.LengthSquared() > 0)
 			{
-				var dot = Vector2.Dot(Vector2.Normalize(direction), Vector2.Normalize(Get<LastDirection>(entity).Direction));
+				var dot = Vector2.Dot(MathUtilities.SafeNormalize(direction), MathUtilities.SafeNormalize(Get<LastDirection>(entity).Direction));
 				if (dot < 0)
 				{
 					Set(entity, new CanFunnyRun());
@@ -140,7 +140,7 @@ public class PlayerController : MoonTools.ECS.System
 					Set(entity, new FunnyRunTimer(.25f));
 				}
 
-				direction = Vector2.Normalize(direction);
+				direction = MathUtilities.SafeNormalize(direction);
 
 				var maxAdd = deltaTime * 30;
 				if (HasOutRelation<Holding>(entity))
@@ -157,7 +157,7 @@ public class PlayerController : MoonTools.ECS.System
 				Set(entity, new CanFunnyRun());
 				var speed = Get<Velocity>(entity).Value.Length();
 				speed = Math.Max(speed - (accelSpeed * deltaTime * 60), 0);
-				velocity = Vector2.Normalize(velocity) * speed;
+				velocity = MathUtilities.SafeNormalize(velocity) * speed;
 				Set(entity, new MaxSpeed(MaxSpeedBase));
 			}
 
@@ -174,7 +174,7 @@ public class PlayerController : MoonTools.ECS.System
 			// #endregion
 
 			Set(entity, new Velocity(velocity));
-			var depth = MathHelper.Lerp(100, 10, Get<Position>(entity).Y / (float)Dimensions.GAME_H);
+			var depth = float.Lerp(100, 10, Get<Position>(entity).Y / (float)Dimensions.GAME_H);
 			Set(entity, new Depth(depth));
 		}
 	}

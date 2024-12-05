@@ -2,7 +2,7 @@ using System;
 using MoonTools.ECS;
 using RollAndCash.Utility;
 using RollAndCash.Components;
-using MoonWorks.Math.Float;
+using System.Numerics;
 using RollAndCash.Data;
 using RollAndCash.Relations;
 using MoonWorks.Math;
@@ -50,7 +50,7 @@ public class ProductSpawner : MoonTools.ECS.Manipulator
         Set(entity, new CanBeHeld());
         Set(entity, new CanInteract());
         Set(entity, new SlowDownAnimation(15, 1));
-        var depth = MathHelper.Lerp(100, 10, position.Y / (float)Dimensions.GAME_H);
+        var depth = float.Lerp(100, 10, position.Y / (float)Dimensions.GAME_H);
         Set(entity, new Depth(depth));
         Set(entity, new DestroyWhenOutOfBounds());
 
@@ -99,7 +99,7 @@ public class ProductSpawner : MoonTools.ECS.Manipulator
         Set(e, new Depth(1));
         Set(e, spriteAnimation);
         Set(e, new SlowDownAnimation(5, 1));
-        Set(e, new Velocity(Vector2.Rotate(Vector2.UnitX * speed, float.DegreesToRadians(Rando.Int(0, 360)))));
+        Set(e, new Velocity(MathUtilities.Rotate(Vector2.UnitX * speed, float.DegreesToRadians(Rando.Int(0, 360)))));
         Set(e, new FallSpeed(10));
         Set(e, new DestroyAtScreenBottom());
     }
