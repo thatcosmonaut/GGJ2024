@@ -63,18 +63,19 @@ public class LoadState : GameState
         LoadTimer.Start();
         TextureAtlases.EnqueueLoadAllImages(AsyncIOLoader);
         StaticAudioPacks.pack_0.LoadAsync(AsyncIOLoader);
+        AsyncIOLoader.Submit();
         Timer.Start();
     }
 
     public override void Update(TimeSpan delta)
     {
-        if (LoadTimer.IsRunning && AsyncIOLoader.Idle)
+        if (LoadTimer.IsRunning && AsyncIOLoader.Complete)
         {
             LoadTimer.Stop();
             Logger.LogInfo($"Load finished in {LoadTimer.Elapsed.TotalMilliseconds}ms");
         }
 
-        if (Timer.Elapsed.TotalSeconds > 3 && AsyncIOLoader.Idle)
+        if (Timer.Elapsed.TotalSeconds > 3 && AsyncIOLoader.Complete)
         {
             Timer.Stop();
             Game.SetState(TransitionState);
@@ -136,13 +137,6 @@ public class LoadState : GameState
         StaticAudio.LoadAll();
         SpriteAnimations.LoadAll();
         ProductLoader.Load();
-    }
-
-    // In case we quit during load
-    public void Destroy()
-    {
-        AsyncIOLoader?.Dispose();
-        AsyncIOLoader = null;
     }
 
     private Matrix4x4 GetHiResProjectionMatrix()
