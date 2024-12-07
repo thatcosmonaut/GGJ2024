@@ -40,7 +40,7 @@ namespace RollAndCash.Data
 			MainBuffer = AudioBuffer.Create(audioDevice);
 		}
 
-		public void LoadAsync(AsyncIOLoader loader)
+		public void LoadAsync(AsyncFileLoader loader)
 		{
 			loader.EnqueueWavLoad(AudioFile.FullName, MainBuffer);
 		}

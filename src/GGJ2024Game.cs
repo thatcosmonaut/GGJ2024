@@ -64,7 +64,7 @@ namespace RollAndCash
 
 		protected override void Destroy()
 		{
-
+			LoadState.Destroy();
 		}
 
 		public void SetState(GameState gameState)
