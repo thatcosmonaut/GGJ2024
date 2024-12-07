@@ -1,19 +1,6 @@
 using System.Collections.Generic;
-using System.IO;
 
 namespace RollAndCash.Data;
-
-public struct CramTextureAtlasFile
-{
-	public FileInfo File { get; }
-	public CramTextureAtlasData Data { get; }
-
-	public CramTextureAtlasFile(FileInfo file, CramTextureAtlasData data)
-	{
-		File = file;
-		Data = data;
-	}
-}
 
 public struct CramTextureAtlasData
 {

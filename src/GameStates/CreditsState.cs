@@ -17,6 +17,7 @@ public class CreditsState : GameState
     GameState TransitionState;
 
     GraphicsDevice GraphicsDevice;
+    AudioDevice AudioDevice;
 
     GraphicsPipeline TextPipeline;
     PersistentVoice Voice;
@@ -43,10 +44,8 @@ public class CreditsState : GameState
         Game = game;
         TransitionState = transitionStateA;
 
-        var sound = StaticAudio.Lookup(StaticAudio.CreditsLaugh);
-        Voice = game.AudioDevice.Obtain<PersistentVoice>(sound.Format);
-
         GraphicsDevice = Game.GraphicsDevice;
+        AudioDevice = Game.AudioDevice;
 
 		TextPipeline = GraphicsPipeline.Create(
 			GraphicsDevice,
@@ -92,6 +91,11 @@ public class CreditsState : GameState
         CreditsTime = 0;
 
         var sound = StaticAudio.Lookup(StaticAudio.CreditsLaugh);
+        if (Voice == null)
+        {
+            Voice = AudioDevice.Obtain<PersistentVoice>(sound.Format);
+        }
+
         Voice.Submit(sound);
         Voice.Play();
     }
@@ -110,7 +114,6 @@ public class CreditsState : GameState
     {
         TransitionState = state;
     }
-
 
     public override void Draw(Window window, double alpha)
     {

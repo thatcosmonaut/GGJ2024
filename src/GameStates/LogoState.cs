@@ -37,10 +37,6 @@ public class LogoState : GameState
         TransitionStateA = transitionStateA;
         TransitionStateB = transitionStateA;
 
-        var sound = StaticAudio.Lookup(StaticAudio.MoonWorksChime);
-        Voice = AudioDevice.Obtain<PersistentVoice>(sound.Format);
-        Voice.Submit(sound);
-
         LinearSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearClamp);
         HiResSpriteBatch = new SpriteBatch(GraphicsDevice, game.MainWindow.SwapchainFormat);
     }
@@ -50,6 +46,12 @@ public class LogoState : GameState
 		Fade = 0;
     	FadeTimer = 0;
         SoundPlayed = false;
+
+        if (Voice == null)
+        {
+            var sound = StaticAudio.Lookup(StaticAudio.MoonWorksChime);
+            Voice = AudioDevice.Obtain<PersistentVoice>(sound.Format);
+        }
     }
 
     public override void Update(TimeSpan delta)

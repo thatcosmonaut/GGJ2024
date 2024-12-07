@@ -1,6 +1,5 @@
 using MoonWorks.Graphics;
 using MoonWorks;
-using RollAndCash.Systems;
 using RollAndCash.Content;
 using RollAndCash.GameStates;
 
@@ -8,6 +7,7 @@ namespace RollAndCash
 {
 	public class RollAndCashGame : Game
 	{
+		LoadState LoadState;
 		LogoState LogoState;
 		CreditsState CreditsState;
 		GameplayState GameplayState;
@@ -25,32 +25,22 @@ namespace RollAndCash
 		{
 			Inputs.Mouse.Hide();
 
-			TextureAtlases.LoadAll();
-			SpriteAnimations.LoadAll();
-			ProductLoader.Load();
-
-			var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
-			TextureAtlases.TP_Sprites.Load(GraphicsDevice);
-			TextureAtlases.TP_HiRes.Load(GraphicsDevice);
-			GraphicsDevice.Submit(commandBuffer);
-
-			StaticAudioPacks.LoadAll(AudioDevice);
-			StaticAudio.LoadAll();
+			TextureAtlases.Init(GraphicsDevice);
+			StaticAudioPacks.Init(AudioDevice);
 			StreamingAudio.InitAll(AudioDevice);
 			Fonts.LoadAll(GraphicsDevice);
-
 
 			CreditsState = new CreditsState(this, TitleState);
 			LogoState = new LogoState(this, CreditsState, TitleState);
 			TitleState = new TitleState(this, LogoState, HowToPlayState);
+			LoadState = new LoadState(this, LogoState);
 			CreditsState.SetTransitionState(TitleState); // i hate this
 
 			GameplayState = new GameplayState(this, TitleState);
 			HowToPlayState = new HowToPlayState(this, GameplayState);
 			TitleState.SetTransitionStateB(HowToPlayState);
 
-			SetState(LogoState);
-
+			SetState(LoadState);
 		}
 
 		protected override void Update(System.TimeSpan dt)
