@@ -54,7 +54,7 @@ namespace RollAndCash
 			RollAndCashGame game = new RollAndCashGame(
 				windowCreateInfo,
 				frameLimiterSettings,
-				MoonWorks.Graphics.ShaderFormat.SPIRV,
+				MoonWorks.Graphics.ShaderFormat.SPIRV | MoonWorks.Graphics.ShaderFormat.DXBC,
 				debugMode
 			);
 
