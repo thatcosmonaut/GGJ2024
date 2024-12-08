@@ -14,7 +14,7 @@ public class LoadState : GameState
 {
     RollAndCashGame Game;
     GraphicsDevice GraphicsDevice;
-    AsyncFileLoader AsyncIOLoader;
+    AsyncFileLoader AsyncFileLoader;
     GameState TransitionState;
 
     GraphicsPipeline TextPipeline;
@@ -29,7 +29,7 @@ public class LoadState : GameState
     {
         Game = game;
         GraphicsDevice = Game.GraphicsDevice;
-        AsyncIOLoader = new AsyncFileLoader(GraphicsDevice);
+        AsyncFileLoader = new AsyncFileLoader(GraphicsDevice);
         TransitionState = transitionState;
 
         TextPipeline = GraphicsPipeline.Create(
@@ -61,21 +61,27 @@ public class LoadState : GameState
     public override void Start()
     {
         LoadTimer.Start();
-        TextureAtlases.EnqueueLoadAllImages(AsyncIOLoader);
-        StaticAudioPacks.pack_0.LoadAsync(AsyncIOLoader);
-        AsyncIOLoader.Submit();
+        TextureAtlases.EnqueueLoadAllImages(AsyncFileLoader);
+        StaticAudioPacks.pack_0.LoadAsync(AsyncFileLoader);
+        AsyncFileLoader.Submit();
         Timer.Start();
     }
 
     public override void Update(TimeSpan delta)
     {
-        if (LoadTimer.IsRunning && AsyncIOLoader.Complete)
+        if (AsyncFileLoader.Status == AsyncFileLoaderStatus.Failed)
+        {
+            // Uh oh, time to bail!
+            throw new ApplicationException("Game assets could not be loaded!");
+        }
+
+        if (LoadTimer.IsRunning && AsyncFileLoader.Status == AsyncFileLoaderStatus.Complete)
         {
             LoadTimer.Stop();
             Logger.LogInfo($"Load finished in {LoadTimer.Elapsed.TotalMilliseconds}ms");
         }
 
-        if (Timer.Elapsed.TotalSeconds > 3 && AsyncIOLoader.Complete)
+        if (Timer.Elapsed.TotalSeconds > 3 && AsyncFileLoader.Status == AsyncFileLoaderStatus.Complete)
         {
             Timer.Stop();
             Game.SetState(TransitionState);
@@ -131,8 +137,8 @@ public class LoadState : GameState
 
     public override void End()
     {
-        AsyncIOLoader.Dispose();
-        AsyncIOLoader = null;
+        AsyncFileLoader.Dispose();
+        AsyncFileLoader = null;
         StaticAudioPacks.pack_0.SliceBuffers();
         StaticAudio.LoadAll();
         SpriteAnimations.LoadAll();
