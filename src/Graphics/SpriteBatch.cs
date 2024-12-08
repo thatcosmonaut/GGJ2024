@@ -83,7 +83,7 @@ public class SpriteBatch
         vertShader.Dispose();
 
 		InstanceTransferBuffer = TransferBuffer.Create<SpriteInstanceData>(GraphicsDevice, TransferBufferUsage.Upload, MAX_SPRITE_COUNT);
-		InstanceBuffer = Buffer.Create<SpriteInstanceData>(GraphicsDevice, BufferUsageFlags.Vertex, MAX_SPRITE_COUNT);
+		InstanceBuffer = Buffer.Create<SpriteInstanceData>(GraphicsDevice, BufferUsageFlags.Vertex | BufferUsageFlags.ComputeStorageRead, MAX_SPRITE_COUNT);
 		InstanceIndex = 0;
 
 		TransferBuffer spriteIndexTransferBuffer = TransferBuffer.Create<uint>(
