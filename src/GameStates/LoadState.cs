@@ -63,6 +63,7 @@ public class LoadState : GameState
         LoadTimer.Start();
         TextureAtlases.EnqueueLoadAllImages(AsyncFileLoader);
         StaticAudioPacks.pack_0.LoadAsync(AsyncFileLoader);
+        StreamingAudio.LoadAsync(AsyncFileLoader);
         AsyncFileLoader.Submit();
         Timer.Start();
     }
@@ -81,6 +82,7 @@ public class LoadState : GameState
             Logger.LogInfo($"Load finished in {LoadTimer.Elapsed.TotalMilliseconds}ms");
         }
 
+        // "loading screens are why you have loading times" -Ethan Lee
         if (Timer.Elapsed.TotalSeconds > 3 && AsyncFileLoader.Status == AsyncFileLoaderStatus.Complete)
         {
             Timer.Stop();
