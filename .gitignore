@@ -10,6 +10,7 @@ Content
 src/Generated
 
 imgui.ini
+.idea
 
 # User-specific files
 *.rsuser

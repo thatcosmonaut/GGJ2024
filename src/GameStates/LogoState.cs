@@ -23,8 +23,8 @@ public class LogoState : GameState
     float Fade = 0;
     float FadeTimer = 0;
 
-    float FadeInDuration = 2f;
-    float FadeHoldDuration = 1f;
+    float FadeInDuration = 0.2f;
+    float FadeHoldDuration = 2f;
     float FadeOutDuration = 2f;
 
     bool SoundPlayed = false;
@@ -62,10 +62,10 @@ public class LogoState : GameState
             0,
             FadeTimer,
             FadeInDuration,
-            Easing.Function.Float.InQuart,
+            Easing.Function.Float.InQuad,
             FadeHoldDuration,
             FadeOutDuration,
-            Easing.Function.Float.OutQuart
+            Easing.Function.Float.InQuad
         );
 
         if (!SoundPlayed && Fade == 1)
@@ -82,11 +82,10 @@ public class LogoState : GameState
         {
             Game.SetState(TransitionStateB);
         }
-        else if (FadeTimer > FadeInDuration + FadeHoldDuration + FadeOutDuration)
+        else if (FadeTimer > FadeInDuration + FadeHoldDuration + FadeOutDuration + 0.5f)
         {
             Game.SetState(TransitionStateA);
         }
-
     }
 
     public override void Draw(Window window, double alpha)
