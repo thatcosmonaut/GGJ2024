@@ -154,6 +154,16 @@ namespace ContentBuilderUI
 		protected override void Update(System.TimeSpan dt)
 		{
 			var io = ImGui.GetIO();
+
+			if (io.WantCaptureKeyboard) 
+			{
+				MainWindow.StartTextInput();
+			}
+			else if (!io.WantCaptureKeyboard)
+			{
+				MainWindow.StopTextInput();
+			}
+
 			io.AddMousePosEvent(Inputs.Mouse.X, Inputs.Mouse.Y);
 			io.AddMouseButtonEvent(0, Inputs.Mouse.LeftButton.IsDown);
 			io.AddMouseButtonEvent(1, Inputs.Mouse.RightButton.IsDown);
