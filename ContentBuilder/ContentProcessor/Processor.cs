@@ -700,32 +700,40 @@ namespace RollAndCash.Content
 		{
 			var textureDir = new DirectoryInfo(Path.Combine(outputDir.FullName, "Textures"));
 
+			var readStrings = new List<string>();
 			var definitionStrings = new List<string>();
 			var assignmentStrings = new List<string>();
 
 			foreach (var file in textureDir.GetFiles("*.json"))
 			{
 				var name = Path.GetFileNameWithoutExtension(file.Name);
-				definitionStrings.Add($"public static TexturePage {name};");
-				assignmentStrings.Add($"{name} = CramAtlasReader.ReadTextureAtlas(Path.Combine(TextureContentPath, \"{file.Name}\"));");
+				readStrings.Add($"CramAtlasReader.ReadTextureAtlas(GraphicsDevice, {name});");
+				assignmentStrings.Add($"asyncFileLoader.EnqueueCompressedImageLoad(Path.ChangeExtension({name}.JsonFilename, \".png\"), {name}.Texture);");
+				definitionStrings.Add($"public static TexturePage {name} = new TexturePage(Path.Combine(TextureContentPath, \"{file.Name}\"));");
 			}
 
 			var textureAtlasesClassCode = $@"
 using System.IO;
 using RollAndCash.Data;
+using MoonWorks.AsyncIO;
+using MoonWorks.Graphics;
 
 namespace RollAndCash.Content
 {{
 	public static class TextureAtlases
 	{{
-		public static bool Loaded = false;
-
+		public static GraphicsDevice GraphicsDevice {{ get; private set; }}
 		public static string TextureContentPath = Path.Combine(System.AppContext.BaseDirectory, ""Content"", ""Textures"");
 
-		public static void LoadAll()
+		public static void Init(GraphicsDevice graphicsDevice)
+		{{
+			GraphicsDevice = graphicsDevice;
+			{string.Join("\n\t\t\t", readStrings)}
+		}}
+
+		public static void EnqueueLoadAllImages(AsyncFileLoader asyncFileLoader)
 		{{
 			{string.Join("\n\t\t\t", assignmentStrings)}
-			Loaded = true;
 		}}
 
 		{string.Join("\n\t\t", definitionStrings)}
@@ -1016,20 +1024,21 @@ namespace RollAndCash.Content
 		{
 			var staticAudioOutputDir = new DirectoryInfo(Path.Combine(outputDir.FullName, "Audio", "Static"));
 
-			var definitionStrings = new List<string>();
+			var initStrings = new List<string>();
 			var loadStrings = new List<string>();
-			var unloadStrings = new List<string>();
+			var definitionStrings = new List<string>();
 
 			foreach (var jsonFile in staticAudioOutputDir.EnumerateFiles("*.json"))
 			{
-				var wavFile = new FileInfo(Path.ChangeExtension(jsonFile.FullName, ".wav"));
-				definitionStrings.Add($"public static StaticAudioPack {Path.GetFileNameWithoutExtension(jsonFile.Name)} = new StaticAudioPack(Path.Combine(StaticAudioContentPath, \"{wavFile.Name}\"), Path.Combine(StaticAudioContentPath, \"{jsonFile.Name}\"));");
-				loadStrings.Add($"{Path.GetFileNameWithoutExtension(jsonFile.Name)}.Load(audioDevice);");
-				unloadStrings.Add($"{Path.GetFileNameWithoutExtension(jsonFile.Name)}.Dispose();");
+				var name = Path.GetFileNameWithoutExtension(jsonFile.FullName);
+				initStrings.Add($"{name}.Init(audioDevice, Path.Combine(StaticAudioContentPath, \"{name}.wav\"), Path.Combine(StaticAudioContentPath, \"{name}.json\"));");
+				loadStrings.Add($"{name}.LoadAsync(asyncFileLoader);");
+				definitionStrings.Add($"public static StaticAudioPack {name} = new StaticAudioPack();");
 			}
 
 			var staticAudioClassCode = $@"
 using System.IO;
+using MoonWorks.AsyncIO;
 using MoonWorks.Audio;
 using RollAndCash.Data;
 
@@ -1039,18 +1048,14 @@ namespace RollAndCash.Content
 	{{
 		public static string StaticAudioContentPath = Path.Combine(System.AppContext.BaseDirectory, ""Content"", ""Audio"", ""Static"");
 
-		public static bool Loaded = false;
-
-		public static void LoadAll(AudioDevice audioDevice)
+		public static void Init(AudioDevice audioDevice)
 		{{
-			{string.Join("\n\t\t\t", loadStrings)}
-			Loaded = true;
+			{string.Join("\n\t\t\t", initStrings)}
 		}}
 
-		public static void UnloadAll()
+		public static void LoadAsync(AsyncFileLoader asyncFileLoader)
 		{{
-			{string.Join("\n\t\t\t", unloadStrings)}
-			Loaded = false;
+			{string.Join("\n\t\t\t", loadStrings)}
 		}}
 
 		{string.Join("\n\t\t", definitionStrings)}
@@ -1139,7 +1144,6 @@ namespace RollAndCash.Content
 
 			var definitionStrings = new List<string>();
 			var lookupStrings = new List<string>();
-			var nameLookupStrings = new List<string>();
 
 			var id = 0;
 			foreach (var file in streamingAudioOutputDir.EnumerateFiles())
@@ -1147,51 +1151,46 @@ namespace RollAndCash.Content
 				var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(file.Name);
 
 				definitionStrings.Add($"public static StreamingSoundID {fileNameWithoutExtension} = new StreamingSoundID({id});");
-				lookupStrings.Add($"{{{id}, new AudioDataQoa(audioDevice, Path.Combine(StreamingAudioContentPath, \"{file.Name}\")) }}");
-				nameLookupStrings.Add($"{{\"{fileNameWithoutExtension}\", {id} }}");
+				lookupStrings.Add($"{{{id}, new QoaFile(Path.Combine(StreamingAudioContentPath, \"{file.Name}\"), AudioDataQoa.Create(audioDevice)) }}");
 
 				id += 1;
 			}
 
 			var streamingAudioClassCode = $@"
 using System.IO;
+using MoonWorks.AsyncIO;
 using MoonWorks.Audio;
 using System.Collections.Generic;
 
 namespace RollAndCash.Content
 {{
 	public record struct StreamingSoundID(int ID);
+	public record class QoaFile(string FilePath, AudioDataQoa AudioData);
 
 	public static class StreamingAudio
 	{{
 		private static string StreamingAudioContentPath = Path.Combine(System.AppContext.BaseDirectory, ""Content"", ""Audio"", ""Streaming"");
-
-		public static bool Loaded = false;
-
-		private static Dictionary<string, int> nameLookup;
-		private static Dictionary<int, AudioDataQoa> IDToSound;
-
-		public static StreamingSoundID IDFromName(string name)
-		{{
-			return new StreamingSoundID(nameLookup[name]);
-		}}
+		private static Dictionary<int, QoaFile> IDToQoaFile;
 
 		public static AudioDataQoa Lookup(StreamingSoundID id)
 		{{
-			return IDToSound[id.ID];
+			return IDToQoaFile[id.ID].AudioData;
 		}}
 
-		public static void InitAll(AudioDevice audioDevice)
+		public static void Init(AudioDevice audioDevice)
 		{{
-			IDToSound = new Dictionary<int, AudioDataQoa>
+			IDToQoaFile = new Dictionary<int, QoaFile>
 			{{
 				{string.Join(",\n\t\t\t\t", lookupStrings)}
 			}};
-			nameLookup = new Dictionary<string, int>
+		}}
+
+		public static void LoadAsync(AsyncFileLoader loader)
+		{{
+			foreach (var (id, qoaFile) in IDToQoaFile)
 			{{
-				{string.Join(",\n\t\t\t\t", nameLookupStrings)}
-			}};
-			Loaded = true;
+				loader.EnqueueQoaStreamingLoad(qoaFile.FilePath, qoaFile.AudioData);
+			}}
 		}}
 
 		{string.Join("\n\t\t", definitionStrings)}

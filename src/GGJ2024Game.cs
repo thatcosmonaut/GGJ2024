@@ -27,7 +27,7 @@ namespace RollAndCash
 
 			TextureAtlases.Init(GraphicsDevice);
 			StaticAudioPacks.Init(AudioDevice);
-			StreamingAudio.InitAll(AudioDevice);
+			StreamingAudio.Init(AudioDevice);
 			Fonts.LoadAll(GraphicsDevice);
 
 			CreditsState = new CreditsState(this, TitleState);
