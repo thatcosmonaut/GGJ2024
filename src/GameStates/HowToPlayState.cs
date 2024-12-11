@@ -44,6 +44,7 @@ public class HowToPlayState : GameState
             Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
             Voice.Loop = true;
         }
+        sound.Seek(0);
         Voice.Load(sound);
         Voice.Play();
     }

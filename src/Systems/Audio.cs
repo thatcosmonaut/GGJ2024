@@ -53,8 +53,7 @@ public class Audio : MoonTools.ECS.System
 		if (SomeMessage<PlaySongMessage>())
 		{
 			var streamingAudioData = StreamingAudio.Lookup(Rando.GetRandomItem(GameplaySongs));
-
-			MusicVoice.Stop();
+			streamingAudioData.Seek(0);
 			MusicVoice.Load(streamingAudioData);
 			MusicVoice.Play();
 		}

@@ -45,6 +45,7 @@ public class TitleState : GameState
         if (Voice == null)
         {
             Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
+            Voice.Loop = true;
         }
         Voice.Load(sound);
         Voice.Play();
