@@ -1,60 +1,43 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
 using MoonWorks;
-using MoonWorks.Audio;
+using MoonWorks.AsyncIO;
 using MoonWorks.Graphics;
 using MoonWorks.Graphics.Font;
 using RollAndCash.Content;
-using RollAndCash.Utility;
+using RollAndCash.Systems;
 
 namespace RollAndCash.GameStates;
 
-public class CreditsState : GameState
+public class LoadState : GameState
 {
     RollAndCashGame Game;
+    GraphicsDevice GraphicsDevice;
+    AsyncFileLoader AsyncFileLoader;
     GameState TransitionState;
 
-    GraphicsDevice GraphicsDevice;
-    AudioDevice AudioDevice;
-
     GraphicsPipeline TextPipeline;
-    PersistentVoice Voice;
-
-    SpriteBatch HiResSpriteBatch;
-    Sampler LinearSampler;
 
     Queue<TextBatch> BatchPool = new Queue<TextBatch>();
     List<(TextBatch, Matrix4x4)> ActiveBatchTransforms = new List<(TextBatch, Matrix4x4)>();
 
-    private string[] Names = [
-        "BEAU BLYTH",
-        "COLIN JACKSON",
-        "CASSANDRA LUGO",
-        "EVAN HEMSLEY",
-        "LAURA MICHET"
-    ];
+    System.Diagnostics.Stopwatch Timer = new System.Diagnostics.Stopwatch();
+    System.Diagnostics.Stopwatch LoadTimer = new System.Diagnostics.Stopwatch();
 
-    float CreditsTime = 0;
-    float CreditsDuration = 4;
-
-    public CreditsState(RollAndCashGame game, GameState transitionStateA)
+    public LoadState(RollAndCashGame game, GameState transitionState)
     {
         Game = game;
-        TransitionState = transitionStateA;
-
         GraphicsDevice = Game.GraphicsDevice;
-        AudioDevice = Game.AudioDevice;
+        AsyncFileLoader = new AsyncFileLoader(GraphicsDevice);
+        TransitionState = transitionState;
 
-		TextPipeline = GraphicsPipeline.Create(
+        TextPipeline = GraphicsPipeline.Create(
 			GraphicsDevice,
 			new GraphicsPipelineCreateInfo
 			{
 				TargetInfo = new GraphicsPipelineTargetInfo
 				{
-					DepthStencilFormat = TextureFormat.D16Unorm,
-					HasDepthStencilTarget = true,
 					ColorTargetDescriptions =
 					[
 						new ColorTargetDescription
@@ -64,12 +47,7 @@ public class CreditsState : GameState
 						}
 					]
 				},
-				DepthStencilState = new DepthStencilState
-				{
-					EnableDepthTest = true,
-					EnableDepthWrite = true,
-					CompareOp = CompareOp.LessOrEqual
-				},
+				DepthStencilState = DepthStencilState.Disable,
 				VertexShader = GraphicsDevice.TextVertexShader,
 				FragmentShader = GraphicsDevice.TextFragmentShader,
 				VertexInputState = GraphicsDevice.TextVertexInputState,
@@ -78,48 +56,45 @@ public class CreditsState : GameState
 				MultisampleState = MultisampleState.None
 			}
 		);
-
-        LinearSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearClamp);
-        HiResSpriteBatch = new SpriteBatch(GraphicsDevice, game.MainWindow.SwapchainFormat);
-
-        Rando.Shuffle(Names);
     }
 
     public override void Start()
     {
-        Rando.Shuffle(Names);
-        CreditsTime = 0;
-
-        var sound = StaticAudio.Lookup(StaticAudio.CreditsLaugh);
-        if (Voice == null)
-        {
-            Voice = AudioDevice.Obtain<PersistentVoice>(sound.Format);
-        }
-
-        Voice.Submit(sound);
-        Voice.Play();
+        LoadTimer.Start();
+        TextureAtlases.EnqueueLoadAllImages(AsyncFileLoader);
+        StaticAudioPacks.LoadAsync(AsyncFileLoader);
+        StreamingAudio.LoadAsync(AsyncFileLoader);
+        AsyncFileLoader.Submit();
+        Timer.Start();
     }
 
     public override void Update(TimeSpan delta)
     {
-        CreditsTime += (float)delta.TotalSeconds;
-
-        if (Game.Inputs.AnyPressed || CreditsTime >= CreditsDuration)
+        if (AsyncFileLoader.Status == AsyncFileLoaderStatus.Failed)
         {
+            // Uh oh, time to bail!
+            throw new ApplicationException("Game assets could not be loaded!");
+        }
+
+        if (LoadTimer.IsRunning && AsyncFileLoader.Status == AsyncFileLoaderStatus.Complete)
+        {
+            LoadTimer.Stop();
+            Logger.LogInfo($"Load finished in {LoadTimer.Elapsed.TotalMilliseconds}ms");
+        }
+
+        // "loading screens are why you have loading times" -Ethan Lee
+        if (Timer.Elapsed.TotalSeconds > 3 && AsyncFileLoader.Status == AsyncFileLoaderStatus.Complete)
+        {
+            Timer.Stop();
             Game.SetState(TransitionState);
         }
-    }
-
-    public void SetTransitionState(GameState state)
-    {
-        TransitionState = state;
     }
 
     public override void Draw(Window window, double alpha)
     {
         var commandBuffer = GraphicsDevice.AcquireCommandBuffer();
 
-        var swapchainTexture = commandBuffer.AcquireSwapchainTexture(window);
+        var swapchainTexture = commandBuffer.AcquireSwapchainTexture(Game.MainWindow);
         if (swapchainTexture != null)
         {
             foreach (var (batch, _) in ActiveBatchTransforms)
@@ -128,30 +103,13 @@ public class CreditsState : GameState
             }
             ActiveBatchTransforms.Clear();
 
-            HiResSpriteBatch.Start();
-
-            var logoAnimation = SpriteAnimations.Logo_JerryCrew;
-            var sprite = logoAnimation.Frames[0];
-            var logoPosition = new Position(665, 80);
-
-            HiResSpriteBatch.Add(
-                new Vector3(logoPosition.X, logoPosition.Y, -1f),
-                0,
-                new Vector2(sprite.SliceRect.W, sprite.SliceRect.H),
-                Color.White,
-                sprite.UV.LeftTop, sprite.UV.Dimensions
-            );
-
-            HiResSpriteBatch.Upload(commandBuffer);
-
-            AddString("is", 50, Color.White, new Position(960, 350));
-
-            var y = 470;
-            foreach (var name in Names)
-            {
-                AddString(name, 70, Color.White, new Position(960, y));
-                y += 100;
-            }
+            AddString("L", 60, new Position(1640, 1020), 1.2f + 4 * (float)Timer.Elapsed.TotalSeconds);
+            AddString("O", 60, new Position(1680, 1020), 1.0f + 4 * (float)Timer.Elapsed.TotalSeconds);
+            AddString("A", 60, new Position(1720, 1020), 0.8f + 4 * (float)Timer.Elapsed.TotalSeconds);
+            AddString("D", 60, new Position(1760, 1020), 0.6f + 4 * (float)Timer.Elapsed.TotalSeconds);
+            AddString("I", 60, new Position(1782, 1020), 0.4f + 4 * (float)Timer.Elapsed.TotalSeconds);
+            AddString("N", 60, new Position(1820, 1020), 0.2f + 4 * (float)Timer.Elapsed.TotalSeconds);
+            AddString("G", 60, new Position(1860, 1020), 0.0f + 4 * (float)Timer.Elapsed.TotalSeconds);
 
             foreach (var (batch, _) in ActiveBatchTransforms)
             {
@@ -160,15 +118,6 @@ public class CreditsState : GameState
 
             var renderPass = commandBuffer.BeginRenderPass(
                 new ColorTargetInfo(swapchainTexture, Color.Black)
-            );
-
-            var hiResViewProjectionMatrices = new ViewProjectionMatrices(Matrix4x4.Identity, GetHiResProjectionMatrix());
-
-            HiResSpriteBatch.Render(
-                renderPass,
-                TextureAtlases.TP_HiRes.Texture,
-                LinearSampler,
-                hiResViewProjectionMatrices
             );
 
             if (ActiveBatchTransforms.Count > 0)
@@ -190,7 +139,12 @@ public class CreditsState : GameState
 
     public override void End()
     {
-        Voice.Stop();
+        AsyncFileLoader.Dispose();
+        AsyncFileLoader = null;
+        StaticAudioPacks.pack_0.SliceBuffers();
+        StaticAudio.LoadAll();
+        SpriteAnimations.LoadAll();
+        ProductLoader.Load();
     }
 
     private Matrix4x4 GetHiResProjectionMatrix()
@@ -205,7 +159,7 @@ public class CreditsState : GameState
         );
     }
 
-    private void AddString(string text, int pixelSize, Color color, Position position)
+    private void AddString(string text, int pixelSize, Position position, float rotation)
     {
         var batch = AcquireTextBatch();
 
@@ -213,12 +167,12 @@ public class CreditsState : GameState
         batch.Add(
             text,
             pixelSize,
-            color,
+            Color.White,
             HorizontalAlignment.Center,
             VerticalAlignment.Middle
         );
 
-        ActiveBatchTransforms.Add((batch, Matrix4x4.CreateTranslation(position.X, position.Y, -1)));
+        ActiveBatchTransforms.Add((batch, Matrix4x4.CreateRotationX(-rotation) * Matrix4x4.CreateTranslation(position.X, position.Y, -1)));
     }
 
     private TextBatch AcquireTextBatch()

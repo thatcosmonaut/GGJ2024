@@ -1,10 +1,6 @@
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using MoonWorks;
-using MoonTools.ECS;
-using RollAndCash.Systems;
-using RollAndCash.Components;
 
 namespace RollAndCash
 {
@@ -54,7 +50,7 @@ namespace RollAndCash
 			RollAndCashGame game = new RollAndCashGame(
 				windowCreateInfo,
 				frameLimiterSettings,
-				MoonWorks.Graphics.ShaderFormat.SPIRV,
+				MoonWorks.Graphics.ShaderFormat.SPIRV | MoonWorks.Graphics.ShaderFormat.DXBC,
 				debugMode
 			);
 

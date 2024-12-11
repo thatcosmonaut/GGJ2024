@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using MoonWorks.AsyncIO;
 using MoonWorks.Audio;
 
 namespace RollAndCash.Data
@@ -15,13 +15,12 @@ namespace RollAndCash.Data
 
 	public class StaticAudioPack : IDisposable
 	{
-		public FileInfo AudioFile { get; }
-		public FileInfo JsonFile { get; }
+		public FileInfo AudioFile { get; private set; }
 
 		public AudioBuffer MainBuffer { get; private set; }
-		public bool Loaded => MainBuffer != null;
 		private bool IsDisposed;
 
+		private Dictionary<string, StaticAudioPackDataEntry> Entries;
 		private Dictionary<string, AudioBuffer> AudioBuffers = new Dictionary<string, AudioBuffer>();
 
 		private static JsonSerializerOptions serializerOptions = new JsonSerializerOptions
@@ -31,27 +30,27 @@ namespace RollAndCash.Data
 
 		private static StaticAudioPackDictionaryContext serializerContext = new StaticAudioPackDictionaryContext(serializerOptions);
 
-		public StaticAudioPack(string audioFilePath, string jsonFilePath)
+		public void Init(AudioDevice audioDevice, string audioFilePath, string jsonFilePath)
 		{
 			AudioFile = new FileInfo(audioFilePath);
-			JsonFile = new FileInfo(jsonFilePath);
-		}
-
-		public unsafe void Load(AudioDevice audioDevice)
-		{
-			if (Loaded)
-			{
-				return;
-			}
-
-			MainBuffer = AudioDataWav.CreateBuffer(audioDevice, AudioFile.FullName);
-
-			var entries = JsonSerializer.Deserialize(
-				File.ReadAllText(JsonFile.FullName),
+			Entries = JsonSerializer.Deserialize(
+				File.ReadAllText(jsonFilePath),
 				typeof(Dictionary<string, StaticAudioPackDataEntry>),
 				serializerContext) as Dictionary<string, StaticAudioPackDataEntry>;
+			MainBuffer = AudioBuffer.Create(audioDevice);
+		}
 
-			foreach (var (name, dataEntry) in entries)
+		public void LoadAsync(AsyncFileLoader loader)
+		{
+			loader.EnqueueWavLoad(AudioFile.FullName, MainBuffer);
+		}
+
+		/// <summary>
+		/// Call this after the audio buffer data is loaded.
+		/// </summary>
+		public void SliceBuffers()
+		{
+			foreach (var (name, dataEntry) in Entries)
 			{
 				AudioBuffers[name] = MainBuffer.Slice(dataEntry.Start, (uint)dataEntry.Length);
 			}

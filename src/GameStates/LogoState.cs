@@ -23,8 +23,8 @@ public class LogoState : GameState
     float Fade = 0;
     float FadeTimer = 0;
 
-    float FadeInDuration = 2f;
-    float FadeHoldDuration = 1f;
+    float FadeInDuration = 0.2f;
+    float FadeHoldDuration = 2f;
     float FadeOutDuration = 2f;
 
     bool SoundPlayed = false;
@@ -37,10 +37,6 @@ public class LogoState : GameState
         TransitionStateA = transitionStateA;
         TransitionStateB = transitionStateA;
 
-        var sound = StaticAudio.Lookup(StaticAudio.MoonWorksChime);
-        Voice = AudioDevice.Obtain<PersistentVoice>(sound.Format);
-        Voice.Submit(sound);
-
         LinearSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearClamp);
         HiResSpriteBatch = new SpriteBatch(GraphicsDevice, game.MainWindow.SwapchainFormat);
     }
@@ -50,6 +46,12 @@ public class LogoState : GameState
 		Fade = 0;
     	FadeTimer = 0;
         SoundPlayed = false;
+
+        if (Voice == null)
+        {
+            var sound = StaticAudio.Lookup(StaticAudio.MoonWorksChime);
+            Voice = AudioDevice.Obtain<PersistentVoice>(sound.Format);
+        }
     }
 
     public override void Update(TimeSpan delta)
@@ -60,10 +62,10 @@ public class LogoState : GameState
             0,
             FadeTimer,
             FadeInDuration,
-            Easing.Function.Float.InQuart,
+            Easing.Function.Float.InQuad,
             FadeHoldDuration,
             FadeOutDuration,
-            Easing.Function.Float.OutQuart
+            Easing.Function.Float.InQuad
         );
 
         if (!SoundPlayed && Fade == 1)
@@ -80,11 +82,10 @@ public class LogoState : GameState
         {
             Game.SetState(TransitionStateB);
         }
-        else if (FadeTimer > FadeInDuration + FadeHoldDuration + FadeOutDuration)
+        else if (FadeTimer > FadeInDuration + FadeHoldDuration + FadeOutDuration + 0.5f)
         {
             Game.SetState(TransitionStateA);
         }
-
     }
 
     public override void Draw(Window window, double alpha)

@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using MoonWorks;
 using MoonWorks.Graphics;
 using RollAndCash.Components;
+using RollAndCash.Content;
 
 namespace RollAndCash.Data;
 
@@ -13,12 +14,12 @@ public class TexturePage
 {
 	static List<TexturePage> IDLookup = new List<TexturePage>();
 
+	public string JsonFilename { get; private set; }
 	public readonly TexturePageID ID;
-	CramTextureAtlasFile AtlasFile { get; }
+	public CramTextureAtlasData AtlasData { get; private set;}
 	public Texture Texture { get; private set; } = null;
-	public bool Loaded => Texture != null;
-	public uint Width => (uint)AtlasFile.Data.Width;
-	public uint Height => (uint)AtlasFile.Data.Height;
+	public uint Width => (uint)AtlasData.Width;
+	public uint Height => (uint)AtlasData.Height;
 
 	private Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
 	private Dictionary<string, SpriteAnimationInfo> animationInfos = new Dictionary<string, SpriteAnimationInfo>();
@@ -28,21 +29,25 @@ public class TexturePage
 		return IDLookup[id.ID];
 	}
 
-	public TexturePage(CramTextureAtlasFile file)
+	public TexturePage(string jsonFilename)
 	{
 		lock (IDLookup)
 		{
 			ID = new TexturePageID(IDLookup.Count);
 			IDLookup.Add(this);
 		}
+		JsonFilename = jsonFilename;
+	}
 
-		AtlasFile = file;
-		foreach (var image in AtlasFile.Data.Images)
+	public void Load(GraphicsDevice graphicsDevice, CramTextureAtlasData data)
+	{
+		AtlasData = data;
+		foreach (var image in AtlasData.Images)
 		{
 			AddSprite(image);
 		}
 
-		foreach (var (name, spriteAnimation) in AtlasFile.Data.Animations)
+		foreach (var (name, spriteAnimation) in AtlasData.Animations)
 		{
 			var frames = new List<Sprite>();
 
@@ -61,25 +66,20 @@ public class TexturePage
 
 			animationInfos.Add(name, spriteAnimationInfo);
 		}
-	}
 
-	public void Load(GraphicsDevice graphicsDevice)
-	{
-		if (Loaded)
-		{
-			Logger.LogWarn("Texture already loaded!");
-		}
-
-		var atlasData = AtlasFile.Data;
-
-		var resourceUploader = new ResourceUploader(graphicsDevice);
-
-		Texture = resourceUploader.CreateTexture2DFromCompressed(
-			Path.Combine(AtlasFile.File.DirectoryName, atlasData.Name + ".png"),
+		Texture = Texture.Create2D(
+			graphicsDevice,
+            (uint)AtlasData.Width,
+            (uint)AtlasData.Height,
 			TextureFormat.R8G8B8A8Unorm,
 			TextureUsageFlags.Sampler
 		);
+	}
 
+	public void LoadImage(GraphicsDevice graphicsDevice, ReadOnlySpan<byte> data)
+	{
+		var resourceUploader = new ResourceUploader(graphicsDevice);
+		resourceUploader.SetTextureDataFromCompressed(new TextureRegion(Texture), data);
 		resourceUploader.Upload();
 		resourceUploader.Dispose();
 	}

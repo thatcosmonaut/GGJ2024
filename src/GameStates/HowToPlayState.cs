@@ -30,10 +30,6 @@ public class HowToPlayState : GameState
         GraphicsDevice = game.GraphicsDevice;
         TransitionState = transitionState;
 
-        var sound = StreamingAudio.Lookup(StreamingAudio.tutorial_type_beat);
-        Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
-        Voice.Loop = true;
-
         LinearSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearClamp);
         HiResSpriteBatch = new SpriteBatch(GraphicsDevice, game.MainWindow.SwapchainFormat);
 
@@ -43,6 +39,12 @@ public class HowToPlayState : GameState
     public override void Start()
     {
         var sound = StreamingAudio.Lookup(StreamingAudio.tutorial_type_beat);
+        if (Voice == null)
+        {
+            Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
+            Voice.Loop = true;
+        }
+        sound.Seek(0);
         Voice.Load(sound);
         Voice.Play();
     }

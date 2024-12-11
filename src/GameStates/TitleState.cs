@@ -33,9 +33,6 @@ public class TitleState : GameState
         TransitionStateA = transitionStateA;
         TransitionStateB = transitionStateB;
 
-        var sound = StreamingAudio.Lookup(StreamingAudio.roll_n_cash_grocery_lords);
-        Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
-
         LinearSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearClamp);
         HiResSpriteBatch = new SpriteBatch(GraphicsDevice, game.MainWindow.SwapchainFormat);
 
@@ -44,7 +41,12 @@ public class TitleState : GameState
 
     public override void Start()
     {
-		var sound = StreamingAudio.Lookup(StreamingAudio.roll_n_cash_grocery_lords);
+        var sound = StreamingAudio.Lookup(StreamingAudio.roll_n_cash_grocery_lords);
+        if (Voice == null)
+        {
+            Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
+            Voice.Loop = true;
+        }
         Voice.Load(sound);
         Voice.Play();
 

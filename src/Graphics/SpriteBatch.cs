@@ -83,7 +83,9 @@ public class SpriteBatch
         vertShader.Dispose();
 
 		InstanceTransferBuffer = TransferBuffer.Create<SpriteInstanceData>(GraphicsDevice, TransferBufferUsage.Upload, MAX_SPRITE_COUNT);
-		InstanceBuffer = Buffer.Create<SpriteInstanceData>(GraphicsDevice, BufferUsageFlags.Vertex, MAX_SPRITE_COUNT);
+		InstanceTransferBuffer.Name = "SpriteBatch InstanceTransferBuffer";
+
+		InstanceBuffer = Buffer.Create<SpriteInstanceData>(GraphicsDevice, BufferUsageFlags.Vertex | BufferUsageFlags.ComputeStorageRead, MAX_SPRITE_COUNT);
 		InstanceIndex = 0;
 
 		TransferBuffer spriteIndexTransferBuffer = TransferBuffer.Create<uint>(
@@ -91,6 +93,7 @@ public class SpriteBatch
 			TransferBufferUsage.Upload,
 			MAX_SPRITE_COUNT * 6
 		);
+		spriteIndexTransferBuffer.Name = "SpriteIndex TransferBuffer";
 
 		QuadVertexBuffer = Buffer.Create<PositionTextureColorVertex>(
 			GraphicsDevice,
@@ -122,6 +125,8 @@ public class SpriteBatch
 		copyPass.UploadToBuffer(spriteIndexTransferBuffer, QuadIndexBuffer, false);
 		cmdbuf.EndCopyPass(copyPass);
 		GraphicsDevice.Submit(cmdbuf);
+
+		spriteIndexTransferBuffer.Dispose();
 	}
 
 	// Call this before adding sprites
