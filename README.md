@@ -6,6 +6,8 @@ Available [on itch.io](https://prophetgoddess.itch.io/roll-and-cash-grocery-lord
 
 In December 2024, Evan upgraded the code to use the latest version of MoonWorks. This now serves as a decent example of a small but complete game that uses the MoonWorks framework.
 
+You will need to run the ContentBuilderUI project first. This will generate the content files necessary to build and run the game.
+
 ## Licenses
 
 ROLL AND CASH: GROCERY LORDS is released under multiple licenses, contained in the licenses folder.
