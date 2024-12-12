@@ -35,11 +35,7 @@ namespace RollAndCash
 			};
 #endif
 
-			FrameLimiterSettings frameLimiterSettings = new FrameLimiterSettings
-			{
-				Mode = FrameLimiterMode.Capped,
-				Cap = 60
-			};
+			FramePacingSettings framePacingSettings = FramePacingSettings.CreateLatencyOptimized(60);
 
 			var debugMode = false;
 
@@ -49,7 +45,7 @@ namespace RollAndCash
 
 			RollAndCashGame game = new RollAndCashGame(
 				windowCreateInfo,
-				frameLimiterSettings,
+				framePacingSettings,
 				MoonWorks.Graphics.ShaderFormat.SPIRV | MoonWorks.Graphics.ShaderFormat.DXBC,
 				debugMode
 			);

@@ -37,9 +37,9 @@ namespace ContentBuilderUI
 
 		public unsafe ContentBuilderUIGame(
 			WindowCreateInfo windowCreateInfo,
-			FrameLimiterSettings frameLimiterSettings,
+			FramePacingSettings frameLimiterSettings,
 			bool debugMode
-		) : base(windowCreateInfo, frameLimiterSettings, ShaderFormat.SPIRV, 60, debugMode)
+		) : base(windowCreateInfo, frameLimiterSettings, ShaderFormat.SPIRV, debugMode)
 		{
 			Operations.Initialize();
 
@@ -155,7 +155,7 @@ namespace ContentBuilderUI
 		{
 			var io = ImGui.GetIO();
 
-			if (io.WantCaptureKeyboard) 
+			if (io.WantCaptureKeyboard)
 			{
 				MainWindow.StartTextInput();
 			}

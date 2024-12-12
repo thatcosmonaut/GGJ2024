@@ -18,10 +18,10 @@ namespace RollAndCash
 
 		public RollAndCashGame(
 			WindowCreateInfo windowCreateInfo,
-			FrameLimiterSettings frameLimiterSettings,
+			FramePacingSettings framePacingSettings,
 			ShaderFormat shaderFormats,
 			bool debugMode
-		) : base(windowCreateInfo, frameLimiterSettings, shaderFormats, 60, debugMode)
+		) : base(windowCreateInfo, framePacingSettings, shaderFormats, debugMode)
 		{
 			Inputs.Mouse.Hide();
 

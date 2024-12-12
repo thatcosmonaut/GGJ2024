@@ -17,15 +17,11 @@ namespace ContentBuilderUI
 				ScreenMode = ScreenMode.Windowed
 			};
 
-			FrameLimiterSettings frameLimiterSettings = new FrameLimiterSettings
-			{
-				Mode = FrameLimiterMode.Capped,
-				Cap = 60
-			};
+			FramePacingSettings framePacingSettings = FramePacingSettings.CreateLatencyOptimized(60);
 
 			ContentBuilderUIGame game = new ContentBuilderUIGame(
 				windowCreateInfo,
-				frameLimiterSettings,
+				framePacingSettings,
 				true
 			);
 
