@@ -69,6 +69,7 @@ public class TexturePage
 
 		Texture = Texture.Create2D(
 			graphicsDevice,
+			data.Name,
             (uint)AtlasData.Width,
             (uint)AtlasData.Height,
 			TextureFormat.R8G8B8A8Unorm,
