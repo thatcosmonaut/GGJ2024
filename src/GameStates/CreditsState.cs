@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
 using MoonWorks;
 using MoonWorks.Audio;
@@ -19,14 +17,12 @@ public class CreditsState : GameState
     GraphicsDevice GraphicsDevice;
     AudioDevice AudioDevice;
 
+    TextBatch TextBatch;
     GraphicsPipeline TextPipeline;
     PersistentVoice Voice;
 
     SpriteBatch HiResSpriteBatch;
     Sampler LinearSampler;
-
-    Queue<TextBatch> BatchPool = new Queue<TextBatch>();
-    List<(TextBatch, Matrix4x4)> ActiveBatchTransforms = new List<(TextBatch, Matrix4x4)>();
 
     private string[] Names = [
         "BEAU BLYTH",
@@ -53,8 +49,6 @@ public class CreditsState : GameState
 			{
 				TargetInfo = new GraphicsPipelineTargetInfo
 				{
-					DepthStencilFormat = TextureFormat.D16Unorm,
-					HasDepthStencilTarget = true,
 					ColorTargetDescriptions =
 					[
 						new ColorTargetDescription
@@ -64,12 +58,7 @@ public class CreditsState : GameState
 						}
 					]
 				},
-				DepthStencilState = new DepthStencilState
-				{
-					EnableDepthTest = true,
-					EnableDepthWrite = true,
-					CompareOp = CompareOp.LessOrEqual
-				},
+				DepthStencilState = DepthStencilState.Disable,
 				VertexShader = GraphicsDevice.TextVertexShader,
 				FragmentShader = GraphicsDevice.TextFragmentShader,
 				VertexInputState = GraphicsDevice.TextVertexInputState,
@@ -78,6 +67,7 @@ public class CreditsState : GameState
 				MultisampleState = MultisampleState.None
 			}
 		);
+        TextBatch = new TextBatch(GraphicsDevice);
 
         LinearSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearClamp);
         HiResSpriteBatch = new SpriteBatch(GraphicsDevice, game.MainWindow.SwapchainFormat);
@@ -122,12 +112,6 @@ public class CreditsState : GameState
         var swapchainTexture = commandBuffer.AcquireSwapchainTexture(window);
         if (swapchainTexture != null)
         {
-            foreach (var (batch, _) in ActiveBatchTransforms)
-            {
-                FreeTextBatch(batch);
-            }
-            ActiveBatchTransforms.Clear();
-
             HiResSpriteBatch.Start();
 
             var logoAnimation = SpriteAnimations.Logo_JerryCrew;
@@ -144,6 +128,7 @@ public class CreditsState : GameState
 
             HiResSpriteBatch.Upload(commandBuffer);
 
+            TextBatch.Start();
             AddString("is", 50, Color.White, new Position(960, 350));
 
             var y = 470;
@@ -153,10 +138,7 @@ public class CreditsState : GameState
                 y += 100;
             }
 
-            foreach (var (batch, _) in ActiveBatchTransforms)
-            {
-                batch.UploadBufferData(commandBuffer);
-            }
+            TextBatch.UploadBufferData(commandBuffer);
 
             var renderPass = commandBuffer.BeginRenderPass(
                 new ColorTargetInfo(swapchainTexture, Color.Black)
@@ -171,16 +153,8 @@ public class CreditsState : GameState
                 hiResViewProjectionMatrices
             );
 
-            if (ActiveBatchTransforms.Count > 0)
-            {
-                var hiResProjectionMatrix = GetHiResProjectionMatrix();
-
-                renderPass.BindGraphicsPipeline(TextPipeline);
-                foreach (var (batch, transform) in ActiveBatchTransforms)
-                {
-                    batch.Render(renderPass, transform * hiResProjectionMatrix);
-                }
-            }
+            renderPass.BindGraphicsPipeline(TextPipeline);
+            TextBatch.Render(renderPass, GetHiResProjectionMatrix());
 
             commandBuffer.EndRenderPass(renderPass);
         }
@@ -207,34 +181,14 @@ public class CreditsState : GameState
 
     private void AddString(string text, int pixelSize, Color color, Position position)
     {
-        var batch = AcquireTextBatch();
-
-        batch.Start(Fonts.FromID(Fonts.KosugiID));
-        batch.Add(
+        TextBatch.Add(
+            Fonts.FromID(Fonts.KosugiID),
             text,
             pixelSize,
+            Matrix4x4.CreateTranslation(position.X, position.Y, -1),
             color,
             HorizontalAlignment.Center,
             VerticalAlignment.Middle
         );
-
-        ActiveBatchTransforms.Add((batch, Matrix4x4.CreateTranslation(position.X, position.Y, -1)));
-    }
-
-    private TextBatch AcquireTextBatch()
-    {
-        if (BatchPool.Count > 0)
-        {
-            return BatchPool.Dequeue();
-        }
-        else
-        {
-            return new TextBatch(GraphicsDevice);
-        }
-    }
-
-    private void FreeTextBatch(TextBatch batch)
-    {
-        BatchPool.Enqueue(batch);
     }
 }

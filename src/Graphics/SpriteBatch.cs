@@ -58,7 +58,8 @@ public class SpriteBatch
 			RasterizerState = RasterizerState.CCW_CullNone,
 			VertexInputState = VertexInputState.CreateSingleBinding<PositionTextureColorVertex>(),
 			VertexShader = vertShader,
-			FragmentShader = fragShader
+			FragmentShader = fragShader,
+			Name = "SpriteBatch Pipeline"
 		};
 
 		if (depthTextureFormat.HasValue)
@@ -82,27 +83,28 @@ public class SpriteBatch
         fragShader.Dispose();
         vertShader.Dispose();
 
-		InstanceTransferBuffer = TransferBuffer.Create<SpriteInstanceData>(GraphicsDevice, TransferBufferUsage.Upload, MAX_SPRITE_COUNT);
-		InstanceTransferBuffer.Name = "SpriteBatch InstanceTransferBuffer";
+		InstanceTransferBuffer = TransferBuffer.Create<SpriteInstanceData>(GraphicsDevice, "SpriteBatch InstanceTransferBuffer", TransferBufferUsage.Upload, MAX_SPRITE_COUNT);
 
 		InstanceBuffer = Buffer.Create<SpriteInstanceData>(GraphicsDevice, BufferUsageFlags.Vertex | BufferUsageFlags.ComputeStorageRead, MAX_SPRITE_COUNT);
 		InstanceIndex = 0;
 
 		TransferBuffer spriteIndexTransferBuffer = TransferBuffer.Create<uint>(
 			GraphicsDevice,
+			"SpriteIndex TransferBuffer",
 			TransferBufferUsage.Upload,
 			MAX_SPRITE_COUNT * 6
 		);
-		spriteIndexTransferBuffer.Name = "SpriteIndex TransferBuffer";
 
 		QuadVertexBuffer = Buffer.Create<PositionTextureColorVertex>(
 			GraphicsDevice,
+			"Quad Vertex",
 			BufferUsageFlags.ComputeStorageWrite | BufferUsageFlags.Vertex,
 			MAX_SPRITE_COUNT * 4
 		);
 
 		QuadIndexBuffer = Buffer.Create<uint>(
 			GraphicsDevice,
+			"Quad Index",
 			BufferUsageFlags.Index,
 			MAX_SPRITE_COUNT * 6
 		);
@@ -184,7 +186,6 @@ public class SpriteBatch
 		}
 	}
 
-	// Call this inside of render pass
 	public void Render(RenderPass renderPass, Texture texture, Sampler sampler, ViewProjectionMatrices viewProjectionMatrices)
 	{
 		renderPass.BindGraphicsPipeline(GraphicsPipeline);
