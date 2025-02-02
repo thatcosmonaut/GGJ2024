@@ -19,7 +19,10 @@ namespace ContentBuilderUI
 
 			FramePacingSettings framePacingSettings = FramePacingSettings.CreateLatencyOptimized(60);
 
+			var appInfo = new AppInfo("JerryCrew", "RollAndCashContentBuilder");
+
 			ContentBuilderUIGame game = new ContentBuilderUIGame(
+				appInfo,
 				windowCreateInfo,
 				framePacingSettings,
 				true

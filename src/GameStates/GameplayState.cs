@@ -66,7 +66,7 @@ public class GameplayState : GameState
 
         Ticker = new Ticker(World, cats);
 
-        Renderer = new Renderer(World, Game.GraphicsDevice, Game.MainWindow.SwapchainFormat);
+        Renderer = new Renderer(World, Game.GraphicsDevice, Game.RootTitleStorage, Game.MainWindow.SwapchainFormat);
 
         var topBorder = World.CreateEntity();
         World.Set(topBorder, new Position(0, 65));

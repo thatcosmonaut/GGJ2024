@@ -21,24 +21,19 @@ public class SpriteBatch
 	Buffer QuadVertexBuffer;
 	Buffer QuadIndexBuffer;
 
-	public SpriteBatch(GraphicsDevice graphicsDevice, TextureFormat renderTextureFormat, TextureFormat? depthTextureFormat = null)
+	public SpriteBatch(GraphicsDevice graphicsDevice, MoonWorks.Storage.TitleStorage titleStorage, TextureFormat renderTextureFormat, TextureFormat? depthTextureFormat = null)
 	{
 		GraphicsDevice = graphicsDevice;
 
-        var baseContentPath = System.IO.Path.Combine(
-            System.AppContext.BaseDirectory,
-            "Content"
-        );
-
         var shaderContentPath = System.IO.Path.Combine(
-            baseContentPath,
-            "Shaders"
+            "Content",
+			"Shaders"
         );
 
-        ComputePipeline = ShaderCross.Create(GraphicsDevice, System.IO.Path.Combine(shaderContentPath, "SpriteBatch.comp.hlsl.spv"), "main", ShaderCross.ShaderFormat.SPIRV);
+        ComputePipeline = ShaderCross.Create(GraphicsDevice, titleStorage, System.IO.Path.Combine(shaderContentPath, "SpriteBatch.comp.hlsl.spv"), "main", ShaderCross.ShaderFormat.SPIRV);
 
-		var vertShader = ShaderCross.Create(GraphicsDevice, System.IO.Path.Combine(shaderContentPath, "SpriteBatch.vert.hlsl.spv"), "main", ShaderCross.ShaderFormat.SPIRV, ShaderStage.Vertex);
-		var fragShader = ShaderCross.Create(GraphicsDevice, System.IO.Path.Combine(shaderContentPath, "SpriteBatch.frag.hlsl.spv"), "main", ShaderCross.ShaderFormat.SPIRV, ShaderStage.Fragment);
+		var vertShader = ShaderCross.Create(GraphicsDevice, titleStorage, System.IO.Path.Combine(shaderContentPath, "SpriteBatch.vert.hlsl.spv"), "main", ShaderCross.ShaderFormat.SPIRV, ShaderStage.Vertex);
+		var fragShader = ShaderCross.Create(GraphicsDevice, titleStorage, System.IO.Path.Combine(shaderContentPath, "SpriteBatch.frag.hlsl.spv"), "main", ShaderCross.ShaderFormat.SPIRV, ShaderStage.Fragment);
 
 		var createInfo = new GraphicsPipelineCreateInfo
 		{

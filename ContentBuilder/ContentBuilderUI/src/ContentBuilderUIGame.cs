@@ -12,8 +12,8 @@ namespace ContentBuilderUI
 {
 	class ContentBuilderUIGame : Game
 	{
-		private string ShaderContentPath = Path.Combine(System.AppContext.BaseDirectory, "Content", "Shaders");
-		private string FontContentPath = Path.Combine(AppContext.BaseDirectory, "Content", "Fonts");
+		private string ShaderContentPath = Path.Combine("Content", "Shaders");
+		private string FontContentPath = Path.Combine("Content", "Fonts");
 
 		private DebugTextureStorage TextureStorage;
 		private Texture FontTexture;
@@ -36,10 +36,11 @@ namespace ContentBuilderUI
 		private bool ProjectPathValid = false;
 
 		public unsafe ContentBuilderUIGame(
+			AppInfo appInfo,
 			WindowCreateInfo windowCreateInfo,
 			FramePacingSettings frameLimiterSettings,
 			bool debugMode
-		) : base(windowCreateInfo, frameLimiterSettings, ShaderFormat.SPIRV, debugMode)
+		) : base(appInfo, windowCreateInfo, frameLimiterSettings, ShaderFormat.SPIRV, debugMode)
 		{
 			Operations.Initialize();
 
@@ -99,6 +100,7 @@ namespace ContentBuilderUI
 
 			ImGuiVertexShader = Shader.Create(
 				GraphicsDevice,
+				RootTitleStorage,
 				Path.Combine(ShaderContentPath, "ImGui.vert.spv"),
 				"main",
 				new ShaderCreateInfo
@@ -111,6 +113,7 @@ namespace ContentBuilderUI
 
 			ImGuiFragmentShader = Shader.Create(
 				GraphicsDevice,
+				RootTitleStorage,
 				Path.Combine(ShaderContentPath, "ImGui.frag.spv"),
 				"main",
 				new ShaderCreateInfo
@@ -438,7 +441,7 @@ namespace ContentBuilderUI
 				out int bytesPerPixel
 			);
 
-			var pixelSpan = new Span<Color>((void*)pixelData, width * height);
+			var pixelSpan = new ReadOnlySpan<Color>((void*)pixelData, width * height);
 
 			FontTexture = textureUploader.CreateTexture2D(
 				pixelSpan,
@@ -496,14 +499,14 @@ namespace ContentBuilderUI
 				BufferUploader.SetBufferData(
 					ImGuiVertexBuffer,
 					vertexOffset,
-					new Span<Position2DTextureColorVertex>((void*) cmdList.VtxBuffer.Data, cmdList.VtxBuffer.Size),
+					new ReadOnlySpan<Position2DTextureColorVertex>((void*) cmdList.VtxBuffer.Data, cmdList.VtxBuffer.Size),
 					n == 0
 				);
 
 				BufferUploader.SetBufferData(
 					ImGuiIndexBuffer,
 					indexOffset,
-					new Span<ushort>((void*) cmdList.IdxBuffer.Data, cmdList.IdxBuffer.Size),
+					new ReadOnlySpan<ushort>((void*) cmdList.IdxBuffer.Data, cmdList.IdxBuffer.Size),
 					n == 0
 				);
 

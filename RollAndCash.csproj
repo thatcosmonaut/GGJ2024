@@ -29,5 +29,16 @@
 		<ProjectReference Include="lib\MoonTools.ECS\MoonTools.ECS.csproj" />
 	</ItemGroup>
 
+	<!-- The MacOS dynamic loader really sucks! -->
+	<!-- https://github.com/dotnet/runtime/issues/96337 -->
+	<Target Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))" Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="install_name_tool -add_rpath @executable_path/. $(TargetPath)" />
+	</Target>
+
+	<!-- It really really sucks! -->
+	<Target Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))" Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="codesign -s - -f --deep $(TargetPath)" />
+	</Target>
+
 	<Import Project=".\CopyMoonlibs.targets" />
 </Project>

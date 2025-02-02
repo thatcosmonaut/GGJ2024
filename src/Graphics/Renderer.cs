@@ -7,6 +7,7 @@ using MoonWorks.Graphics;
 using MoonWorks.Graphics.Font;
 using System.Numerics;
 using RollAndCash.Relations;
+using MoonWorks.Storage;
 
 namespace RollAndCash;
 
@@ -29,7 +30,7 @@ public class Renderer : MoonTools.ECS.Renderer
 	MoonTools.ECS.Filter TextFilter;
 	MoonTools.ECS.Filter SpriteAnimationFilter;
 
-	public Renderer(World world, GraphicsDevice graphicsDevice, TextureFormat swapchainFormat) : base(world)
+	public Renderer(World world, GraphicsDevice graphicsDevice, TitleStorage titleStorage, TextureFormat swapchainFormat) : base(world)
 	{
 		GraphicsDevice = graphicsDevice;
 
@@ -78,7 +79,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
 		PointSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.PointClamp);
 
-		ArtSpriteBatch = new SpriteBatch(GraphicsDevice, swapchainFormat, TextureFormat.D16Unorm);
+		ArtSpriteBatch = new SpriteBatch(GraphicsDevice, titleStorage, swapchainFormat, TextureFormat.D16Unorm);
 	}
 
 	public void Render(Window window)

@@ -38,7 +38,7 @@ public class LogoState : GameState
         TransitionStateB = transitionStateA;
 
         LinearSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearClamp);
-        HiResSpriteBatch = new SpriteBatch(GraphicsDevice, game.MainWindow.SwapchainFormat);
+        HiResSpriteBatch = new SpriteBatch(GraphicsDevice, Game.RootTitleStorage, game.MainWindow.SwapchainFormat);
     }
 
     public override void Start()

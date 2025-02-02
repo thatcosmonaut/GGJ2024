@@ -70,7 +70,7 @@ public class CreditsState : GameState
         TextBatch = new TextBatch(GraphicsDevice);
 
         LinearSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearClamp);
-        HiResSpriteBatch = new SpriteBatch(GraphicsDevice, game.MainWindow.SwapchainFormat);
+        HiResSpriteBatch = new SpriteBatch(GraphicsDevice, Game.RootTitleStorage, game.MainWindow.SwapchainFormat);
 
         Rando.Shuffle(Names);
     }

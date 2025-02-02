@@ -17,18 +17,19 @@ namespace RollAndCash
 		GameState CurrentState;
 
 		public RollAndCashGame(
+			AppInfo appInfo,
 			WindowCreateInfo windowCreateInfo,
 			FramePacingSettings framePacingSettings,
 			ShaderFormat shaderFormats,
 			bool debugMode
-		) : base(windowCreateInfo, framePacingSettings, shaderFormats, debugMode)
+		) : base(appInfo, windowCreateInfo, framePacingSettings, shaderFormats, debugMode)
 		{
 			Inputs.Mouse.Hide();
 
 			TextureAtlases.Init(GraphicsDevice);
 			StaticAudioPacks.Init(AudioDevice);
 			StreamingAudio.Init(AudioDevice);
-			Fonts.LoadAll(GraphicsDevice);
+			Fonts.LoadAll(GraphicsDevice, RootTitleStorage);
 
 			CreditsState = new CreditsState(this, TitleState);
 			LogoState = new LogoState(this, CreditsState, TitleState);

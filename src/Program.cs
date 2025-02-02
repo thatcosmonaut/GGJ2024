@@ -43,7 +43,9 @@ namespace RollAndCash
 			debugMode = true;
 #endif
 
+			var appInfo = new AppInfo("JerryCrew", "RollAndCash");
 			RollAndCashGame game = new RollAndCashGame(
+				appInfo,
 				windowCreateInfo,
 				framePacingSettings,
 				MoonWorks.Graphics.ShaderFormat.SPIRV | MoonWorks.Graphics.ShaderFormat.DXBC,
