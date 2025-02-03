@@ -12,11 +12,11 @@ public class Audio : MoonTools.ECS.System
 {
 	AudioDevice AudioDevice;
 
-	StreamingVoice MusicVoice;
-
 	StreamingSoundID[] GameplaySongs;
 
+	PersistentVoice MusicVoice;
 	PersistentVoice DroneVoice;
+	AudioDataQoa Music;
 
 	public Audio(World world, AudioDevice audioDevice) : base(world)
 	{
@@ -30,7 +30,7 @@ public class Audio : MoonTools.ECS.System
 		];
 
 		var streamingAudioData = StreamingAudio.Lookup(StreamingAudio.attention_shoppers_v1);
-		MusicVoice = AudioDevice.Obtain<StreamingVoice>(streamingAudioData.Format);
+		MusicVoice = AudioDevice.Obtain<PersistentVoice>(streamingAudioData.Format);
 		MusicVoice.SetVolume(0.5f);
 
 		DroneVoice = AudioDevice.Obtain<PersistentVoice>(StaticAudio.Lookup(StaticAudio.Drone1).Format);
@@ -52,9 +52,9 @@ public class Audio : MoonTools.ECS.System
 
 		if (SomeMessage<PlaySongMessage>())
 		{
-			var streamingAudioData = StreamingAudio.Lookup(Rando.GetRandomItem(GameplaySongs));
-			streamingAudioData.Seek(0);
-			MusicVoice.Load(streamingAudioData);
+			Music = StreamingAudio.Lookup(Rando.GetRandomItem(GameplaySongs));
+			Music.Seek(0);
+			Music.SendTo(MusicVoice);
 			MusicVoice.Play();
 		}
 
@@ -66,8 +66,7 @@ public class Audio : MoonTools.ECS.System
 
 	public void Cleanup()
 	{
-		MusicVoice.Unload();
-		MusicVoice.Stop();
+		Music.Disconnect();
 		MusicVoice.Dispose();
 
 		DroneVoice.Stop();

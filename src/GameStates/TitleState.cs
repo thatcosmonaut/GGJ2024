@@ -19,9 +19,11 @@ public class TitleState : GameState
 
     SpriteBatch HiResSpriteBatch;
     Texture RenderTexture;
-
     Sampler LinearSampler;
-    StreamingVoice Voice;
+
+    PersistentVoice MusicVoice;
+    AudioDataQoa Music;
+
     float Time = 30.0f;
     private float Timer = 0.0f;
 
@@ -41,14 +43,16 @@ public class TitleState : GameState
 
     public override void Start()
     {
-        var sound = StreamingAudio.Lookup(StreamingAudio.roll_n_cash_grocery_lords);
-        if (Voice == null)
+        if (MusicVoice == null)
         {
-            Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
-            Voice.Loop = true;
+            Music = StreamingAudio.Lookup(StreamingAudio.roll_n_cash_grocery_lords);
+            Music.Loop = true;
+            MusicVoice = AudioDevice.Obtain<PersistentVoice>(Music.Format);
         }
-        Voice.Load(sound);
-        Voice.Play();
+
+        Music.Seek(0);
+        Music.SendTo(MusicVoice);
+        MusicVoice.Play();
 
         var announcerSound = StaticAudio.Lookup(StaticAudio.RollAndCash);
         var announcerVoice = AudioDevice.Obtain<TransientVoice>(announcerSound.Format);
@@ -60,8 +64,6 @@ public class TitleState : GameState
     public override void Update(TimeSpan delta)
     {
         Timer += (float)delta.TotalSeconds;
-
-        Voice.Update();
 
         if (Game.Inputs.AnyPressed)
         {
@@ -123,7 +125,7 @@ public class TitleState : GameState
 
     public override void End()
     {
-        Voice.Stop();
+        Music.Disconnect();
     }
 
     private Matrix4x4 GetHiResProjectionMatrix()

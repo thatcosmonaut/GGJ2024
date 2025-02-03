@@ -16,9 +16,10 @@ public class HowToPlayState : GameState
     SpriteBatch HiResSpriteBatch;
     Sampler LinearSampler;
 
-    StreamingVoice Voice;
     Texture RenderTexture;
     AudioDevice AudioDevice;
+    PersistentVoice MusicVoice;
+    AudioDataQoa Music;
 
     float ForceTimer = 0;
     float MinTime = 2f;
@@ -38,15 +39,16 @@ public class HowToPlayState : GameState
 
     public override void Start()
     {
-        var sound = StreamingAudio.Lookup(StreamingAudio.tutorial_type_beat);
-        if (Voice == null)
+        if (MusicVoice == null)
         {
-            Voice = AudioDevice.Obtain<StreamingVoice>(sound.Format);
-            Voice.Loop = true;
+            Music = StreamingAudio.Lookup(StreamingAudio.tutorial_type_beat);
+            Music.Loop = true;
+            MusicVoice = AudioDevice.Obtain<PersistentVoice>(Music.Format);
         }
-        sound.Seek(0);
-        Voice.Load(sound);
-        Voice.Play();
+
+        Music.Seek(0);
+        Music.SendTo(MusicVoice);
+        MusicVoice.Play();
     }
 
     public override void Update(TimeSpan delta)
@@ -103,7 +105,7 @@ public class HowToPlayState : GameState
 
     public override void End()
     {
-        Voice.Stop();
+        Music.Disconnect();
     }
 
     private Matrix4x4 GetHiResProjectionMatrix()
