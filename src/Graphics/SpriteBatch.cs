@@ -25,10 +25,7 @@ public class SpriteBatch
 	{
 		GraphicsDevice = graphicsDevice;
 
-        var shaderContentPath = System.IO.Path.Combine(
-            "Content",
-			"Shaders"
-        );
+        var shaderContentPath = "Content/Shaders";
 
         ComputePipeline = ShaderCross.Create(GraphicsDevice, titleStorage, $"{shaderContentPath}/SpriteBatch.comp.hlsl.spv", "main", ShaderCross.ShaderFormat.SPIRV);
 
