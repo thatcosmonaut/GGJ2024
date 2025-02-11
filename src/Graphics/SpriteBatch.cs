@@ -30,10 +30,10 @@ public class SpriteBatch
 			"Shaders"
         );
 
-        ComputePipeline = ShaderCross.Create(GraphicsDevice, titleStorage, System.IO.Path.Combine(shaderContentPath, "SpriteBatch.comp.hlsl.spv"), "main", ShaderCross.ShaderFormat.SPIRV);
+        ComputePipeline = ShaderCross.Create(GraphicsDevice, titleStorage, $"{shaderContentPath}/SpriteBatch.comp.hlsl.spv", "main", ShaderCross.ShaderFormat.SPIRV);
 
-		var vertShader = ShaderCross.Create(GraphicsDevice, titleStorage, System.IO.Path.Combine(shaderContentPath, "SpriteBatch.vert.hlsl.spv"), "main", ShaderCross.ShaderFormat.SPIRV, ShaderStage.Vertex);
-		var fragShader = ShaderCross.Create(GraphicsDevice, titleStorage, System.IO.Path.Combine(shaderContentPath, "SpriteBatch.frag.hlsl.spv"), "main", ShaderCross.ShaderFormat.SPIRV, ShaderStage.Fragment);
+		var vertShader = ShaderCross.Create(GraphicsDevice, titleStorage, $"{shaderContentPath}/SpriteBatch.vert.hlsl.spv", "main", ShaderCross.ShaderFormat.SPIRV, ShaderStage.Vertex);
+		var fragShader = ShaderCross.Create(GraphicsDevice, titleStorage, $"{shaderContentPath}/SpriteBatch.frag.hlsl.spv", "main", ShaderCross.ShaderFormat.SPIRV, ShaderStage.Fragment);
 
 		var createInfo = new GraphicsPipelineCreateInfo
 		{
