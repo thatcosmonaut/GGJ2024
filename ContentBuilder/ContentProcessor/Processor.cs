@@ -645,7 +645,7 @@ namespace ContentProcessor
 				var name = Path.GetFileNameWithoutExtension(file.Name);
 				var ID = name.Replace("-", "") + "ID";
 				definitionStrings.Add($"public static FontID {ID};");
-				assignmentStrings.Add($"{ID} = LoadFont(graphicsDevice, titleStorage, $\"{{FontContentPath}}/{name}.font\"));");
+				assignmentStrings.Add($"{ID} = LoadFont(graphicsDevice, titleStorage, $\"{{FontContentPath}}/{name}.font\");");
 			}
 
 			var fontsClassCode = $@"
