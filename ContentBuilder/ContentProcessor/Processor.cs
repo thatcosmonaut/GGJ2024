@@ -636,6 +636,7 @@ namespace ContentProcessor
 			UpdateFontClass = false;
 
 			var fontsDir = new DirectoryInfo(Path.Combine(outputDir.FullName, "Fonts"));
+			fontsDir.Create();
 
 			var definitionStrings = new List<string>();
 			var assignmentStrings = new List<string>();
