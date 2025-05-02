@@ -645,7 +645,7 @@ namespace ContentProcessor
 				var name = Path.GetFileNameWithoutExtension(file.Name);
 				var ID = name.Replace("-", "") + "ID";
 				definitionStrings.Add($"public static FontID {ID};");
-				assignmentStrings.Add($"{ID} = LoadFont(graphicsDevice, titleStorage, Path.Combine(FontContentPath, \"{name}.font\"));");
+				assignmentStrings.Add($"{ID} = LoadFont(graphicsDevice, titleStorage, $\"{{FontContentPath}}/{name}.font\");");
 			}
 
 			var fontsClassCode = $@"
@@ -659,7 +659,7 @@ namespace RollAndCash.Content
 {{
     public static class Fonts
     {{
-        public static string FontContentPath = Path.Combine(""Content"", ""Fonts"");
+        public static string FontContentPath = ""Content/Fonts"";
 
 		{string.Join("\n\t\t", definitionStrings)}
 

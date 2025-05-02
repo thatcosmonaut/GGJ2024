@@ -12,7 +12,7 @@ namespace ContentBuilderUI
 {
 	class ContentBuilderUIGame : Game
 	{
-		private string ShaderContentPath = Path.Combine("Content", "Shaders");
+		private string ShaderContentPath = "Content/Shaders";
 		private string FontContentPath = Path.Combine("Content", "Fonts");
 
 		private DebugTextureStorage TextureStorage;
@@ -101,7 +101,7 @@ namespace ContentBuilderUI
 			ImGuiVertexShader = Shader.Create(
 				GraphicsDevice,
 				RootTitleStorage,
-				Path.Combine(ShaderContentPath, "ImGui.vert.spv"),
+				$"{ShaderContentPath}/ImGui.vert.spv",
 				"main",
 				new ShaderCreateInfo
 				{
@@ -114,7 +114,7 @@ namespace ContentBuilderUI
 			ImGuiFragmentShader = Shader.Create(
 				GraphicsDevice,
 				RootTitleStorage,
-				Path.Combine(ShaderContentPath, "ImGui.frag.spv"),
+				$"{ShaderContentPath}/ImGui.frag.spv",
 				"main",
 				new ShaderCreateInfo
 				{
