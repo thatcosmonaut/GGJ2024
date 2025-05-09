@@ -16,12 +16,12 @@ To compile this game, follow the following steps
 
 - In the process, you may encounter the following error message
 
-- "ContentBuilderUI.csproj: Error NU1105 : Unable to find project information for '/Users/dev/Documents/GitHub/Moonworks/Tactician/ContentBuilder/ContentBuilderUI/lib/ImGui.NET/ImGui.NET.csproj'. If you are using Visual Studio, this may be because the project is unloaded or not part of the current solution so run a restore from the command-line. Otherwise, the project file may be invalid or missing targets required for restore."
+- ``"ContentBuilderUI.csproj: Error NU1105 : Unable to find project information for '/Users/dev/Documents/GitHub/Moonworks/Tactician/ContentBuilder/ContentBuilderUI/lib/ImGui.NET/ImGui.NET.csproj'. If you are using Visual Studio, this may be because the project is unloaded or not part of the current solution so run a restore from the command-line. Otherwise, the project file may be invalid or missing targets required for restore."``
 
-- If you do, try using dotnet restore
+- If you do, try using ``dotnet restore``
 
 - Then navigate to the ImGui.NET.csproj file (which is in ./ContentBuilder/ContentBuilderUI/lib/ImGui.NET) in your terminal or powershell and run:
-dotnet build ImGui.NET.csproj
+``dotnet build ImGui.NET.csproj``
 
 - Then try running the ContentBuilderUI project again.
 
