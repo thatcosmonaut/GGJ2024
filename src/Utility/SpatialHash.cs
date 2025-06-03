@@ -62,10 +62,10 @@ public class SpatialHash<T> where T : unmanaged, System.IEquatable<T>
     {
         var relativeX = rectangle.X - X;
         var relativeY = rectangle.Y - Y;
-        var rowRangeStart = Math.Clamp(relativeX / CellSize, 0, ColumnCount - 1);
-        var rowRangeEnd = Math.Clamp((relativeX + rectangle.Width) / CellSize, 0, ColumnCount - 1);
-        var columnRangeStart = Math.Clamp(relativeY / CellSize, 0, RowCount - 1);
-        var columnRangeEnd = Math.Clamp((relativeY + rectangle.Height) / CellSize, 0, RowCount - 1);
+        var rowRangeStart = Math.Clamp(relativeY / CellSize, 0, RowCount - 1);
+        var rowRangeEnd = Math.Clamp((relativeY + rectangle.Width) / CellSize, 0, RowCount - 1);
+        var columnRangeStart = Math.Clamp(relativeX / CellSize, 0, ColumnCount - 1);
+        var columnRangeEnd = Math.Clamp((relativeX + rectangle.Height) / CellSize, 0, ColumnCount - 1);
 
         for (var i = rowRangeStart; i <= rowRangeEnd; i += 1)
         {
@@ -85,10 +85,10 @@ public class SpatialHash<T> where T : unmanaged, System.IEquatable<T>
     {
         var relativeX = rectangle.X - X;
         var relativeY = rectangle.Y - Y;
-        var rowRangeStart = Math.Clamp(relativeX / CellSize, 0, ColumnCount - 1);
-        var rowRangeEnd = Math.Clamp((relativeX + rectangle.Width) / CellSize, 0, ColumnCount - 1);
-        var columnRangeStart = Math.Clamp(relativeY / CellSize, 0, RowCount - 1);
-        var columnRangeEnd = Math.Clamp((relativeY + rectangle.Height) / CellSize, 0, RowCount - 1);
+        var rowRangeStart = Math.Clamp(relativeY / CellSize, 0, RowCount - 1);
+        var rowRangeEnd = Math.Clamp((relativeY + rectangle.Width) / CellSize, 0, RowCount - 1);
+        var columnRangeStart = Math.Clamp(relativeX / CellSize, 0, ColumnCount - 1);
+        var columnRangeEnd = Math.Clamp((relativeX + rectangle.Height) / CellSize, 0, ColumnCount - 1);
 
         return new RetrieveEnumerator(
             this,
@@ -106,10 +106,10 @@ public class SpatialHash<T> where T : unmanaged, System.IEquatable<T>
     {
         var relativeX = rectangle.X - X;
         var relativeY = rectangle.Y - Y;
-        var rowRangeStart = Math.Clamp(relativeX / CellSize, 0, ColumnCount - 1);
-        var rowRangeEnd = Math.Clamp((relativeX + rectangle.Width) / CellSize, 0, ColumnCount - 1);
-        var columnRangeStart = Math.Clamp(relativeY / CellSize, 0, RowCount - 1);
-        var columnRangeEnd = Math.Clamp((relativeY + rectangle.Height) / CellSize, 0, RowCount - 1);
+        var rowRangeStart = Math.Clamp(relativeY / CellSize, 0, RowCount - 1);
+        var rowRangeEnd = Math.Clamp((relativeY + rectangle.Width) / CellSize, 0, RowCount - 1);
+        var columnRangeStart = Math.Clamp(relativeX / CellSize, 0, ColumnCount - 1);
+        var columnRangeEnd = Math.Clamp((relativeX + rectangle.Height) / CellSize, 0, ColumnCount - 1);
 
         return new RetrieveEnumerator(
             this,
