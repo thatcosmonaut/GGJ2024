@@ -57,6 +57,11 @@ namespace RollAndCash
 
 			CurrentState.Update(dt);
 		}
+		
+		protected override void Step()
+        {
+    
+        }
 
 		protected override void Draw(double alpha)
 		{
@@ -78,5 +83,5 @@ namespace RollAndCash
 			gameState.Start();
 			CurrentState = gameState;
 		}
-	}
+    }
 }
